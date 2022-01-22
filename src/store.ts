@@ -20,3 +20,21 @@ export const useStore = create<Store>((set) => ({
 }));
 
 export const getTournament = (store: Store) => store.tournament;
+
+useStore.getState().createTournament({
+  name: "Tournament 1",
+  participants: [
+    {
+      name: "Player 1",
+      score: 0,
+      id: 0,
+    },
+    {
+      name: "Player 2",
+      score: 0,
+      id: 1,
+    },
+  ],
+  setupsCount: 2,
+  startTime: new Date(),
+});

@@ -31,9 +31,9 @@ const card = css`
 
 export function Create() {
   return (
-    <>
+    <IonPage>
       <Header />
-      <IonPage>
+      <IonContent>
         <div className={wrapper}>
           <IonCard className={card}>
             <IonCardContent>
@@ -54,7 +54,7 @@ export function Create() {
             </IonCardContent>
           </IonCard>
         </div>
-      </IonPage>
-    </>
+      </IonContent>
+    </IonPage>
   );
 }
