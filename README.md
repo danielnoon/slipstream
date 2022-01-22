@@ -25,3 +25,8 @@ Developed with love in Typescript for [CornHacks 2022](https://unlcornhacks.com/
 * Ben Lohrman ([@blohrman](https://github.com/blohrman))
 * Liam Seper ([@lseper](https://github.com/lseper))
 * Andrew Herold ([@heroldev](https://github.com/heroldev))
+
+## Disclaimer
+This project is nothing more than a Minimum Viable Product (MVP). While we plan to develop this further, we would not plan a full release until we have ensured full application stability and security and other quality-of-life features.
+
+# Slipstream. Speed past the headaches of planning. 
