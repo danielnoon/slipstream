@@ -25,7 +25,7 @@ function shuffle<T>(arr: T[]): T[] {
   return arr;
 }
 
-function handleLeftovers<T>(partitions: T[][], n: number): T[][] {
+export function handleLeftovers<T>(partitions: T[][], n: number): T[][] {
     const leftovers = partitions[partitions.length - 1].length;
   // deal with dispersing leftovers into more rounds
   // cases:
@@ -53,7 +53,8 @@ export function createSeedingRounds(tournamentDetails: Tournament): Setup[] {
   let rounds: Participant[][] = handleLeftovers([...chunked(participantsShuffled, 4)], 4);
 
   const setups = tournamentDetails.setupsCount;
-  const setupsPartition: Participant[][][] = handleLeftovers([...chunked(rounds, setups)], setups);
+  const roundsPerSetup = Math.floor(rounds.length / setups);
+  const setupsPartition: Participant[][][] = handleLeftovers([...chunked(rounds, roundsPerSetup)], roundsPerSetup);
 
   const returnSetups: Setup[] = [];
 
