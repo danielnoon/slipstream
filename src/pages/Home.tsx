@@ -1,9 +1,9 @@
-import { IonContent } from "@ionic/react";
+import { IonButton, IonContent } from "@ionic/react";
 
 export function Home() {
   return (
     <IonContent>
-      <h1>Home</h1>
+      <IonButton href="/create">Create New Tournament</IonButton>
     </IonContent>
   );
 }

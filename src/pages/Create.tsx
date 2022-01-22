@@ -15,6 +15,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
+import { Header } from "../components/Header";
 
 const wrapper = css`
   display: flex;
@@ -31,6 +32,7 @@ const card = css`
 export function Create() {
   return (
     <>
+      <Header />
       <IonPage>
         <div className={wrapper}>
           <IonCard className={card}>
