@@ -1,0 +1,14 @@
+
+
+Magenta: #fe00a0
+
+Cyan: #13fefe
+
+Yellow: #fef209
+
+Black/off-grey background: #222222
+
+White: #FFFFFF
+
+
+
