@@ -6,6 +6,6 @@ export default interface Round {
   id: number;
   eta?: Date;
   participants: Participant[];
-  courses: Course [];
+  courses?: Course [];
   result?: RoundResult;
 }
