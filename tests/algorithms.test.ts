@@ -2,6 +2,7 @@ import { createSeedingRounds, handleLeftovers } from '../src/algorithms';
 import Participant from '../src/types/Participant';
 import Round from '../src/types/Round';
 import Tournament from '../src/types/Tournament';
+import Setup from '../src/types/Setup';
 
 
 test("Test handleLeftovers (no leftovers)", () => {
@@ -110,5 +111,14 @@ const tournament1: Tournament = {
 }
 
 test("Test createSeedingRounds with no leftovers", () => {
-    
+    const setups: Setup[] = createSeedingRounds(tournament1);
+    // only 2 setups
+    expect(setups).toHaveLength(2);
+    // both setups have 1 round
+    expect(setups[0].rounds).toHaveLength(1);
+    expect(setups[1].rounds).toHaveLength(1);
+    // all rounds in setup 1 have 4 players
+    expect(setups[0].rounds[0].participants).toHaveLength(4);
+    // all rounds in setup 2 have 4 players
+    expect(setups[1].rounds[0].participants).toHaveLength(4);
 })

@@ -54,26 +54,32 @@ export function createSeedingRounds(tournamentDetails: Tournament): Setup[] {
   
   // disperse rounds correctly
   let rounds: Participant[][] = handleLeftovers([...chunked(participantsShuffled, 4)], 4);
+  let globalRoundId = 0;
+  const actualRounds: Round[] = [];
+  for(let round = 0; round < rounds.length; round++){
+      actualRounds.push({id: globalRoundId, participants: rounds[round]});
+  }
 
   const setups = tournamentDetails.setupsCount;
   const roundsPerSetup = Math.floor(rounds.length / setups);
-  const setupsPartition: Participant[][][] = handleLeftovers([...chunked(rounds, roundsPerSetup)], roundsPerSetup);
+
+  let setupsPartition: Round[][];
+  if(roundsPerSetup === 1){
+    setupsPartition = actualRounds.map(entry => [entry]);
+  } else {
+    setupsPartition = [...chunked(actualRounds, roundsPerSetup)];
+  }
 
   const returnSetups: Setup[] = [];
-
   let globalIdCounter = 0;
   for(let setup = 0; setup < setupsPartition.length; setup++) {
         const currSetup: Setup = {
             id: setup,
-            rounds: []
-        }
-        const roundsList = setupsPartition[setup]
-        for(let round = 0; round < roundsList.length; round++) {
-            currSetup.rounds.push({ participants: roundsList[round], id: globalIdCounter});
-            globalIdCounter++;
+            rounds: setupsPartition[setup]
         }
         returnSetups.push(currSetup);
     }
+  console.log(returnSetups);
   return returnSetups;
 }
 
