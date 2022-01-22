@@ -22,7 +22,11 @@ export function Seeding() {
             <h2>Setup {setup.id}</h2>
             <div className={roundsWrapper}>
               {setup.rounds.map((round, i) => (
-                <RoundCard key={round.id} {...round} />
+                <RoundCard
+                  key={round.id}
+                  {...round}
+                  onClick={() => console.log("hai")}
+                />
               ))}
             </div>
           </div>
