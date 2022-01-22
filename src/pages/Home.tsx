@@ -1,7 +1,9 @@
+import { IonContent } from "@ionic/react";
+
 export function Home() {
   return (
-    <div>
-      <h1>Slipstream</h1>
-    </div>
+    <IonContent>
+      <h1>Home</h1>
+    </IonContent>
   );
 }
