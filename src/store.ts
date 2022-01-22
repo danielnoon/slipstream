@@ -8,14 +8,17 @@ import Tournament from "./types/Tournament";
 export interface Store {
   tournament: Tournament | null;
   setups: Setup[];
+  rounds: Map<number, Round>;
 
   createTournament: (tournament: Tournament) => void;
   seed: () => void;
+  updateRound: (round: Round) => void;
 }
 
 export const useStore = create<Store>((set) => ({
   tournament: null,
   setups: [],
+  rounds: new Map(),
 
   createTournament: (tournament: Tournament) => {
     set(
@@ -29,6 +32,20 @@ export const useStore = create<Store>((set) => ({
     set(
       produce<Store>((draft) => {
         draft.setups = createSeedingRounds(draft.tournament!);
+        draft.rounds = new Map();
+        for (const setup of draft.setups) {
+          for (const round of setup.rounds) {
+            draft.rounds.set(round.id, round);
+          }
+        }
+      })
+    );
+  },
+
+  updateRound: (round: Round) => {
+    set(
+      produce<Store>((draft) => {
+        draft.rounds.set(round.id, round);
       })
     );
   },

@@ -7,6 +7,7 @@ import { useStore } from "../store";
 const roundsWrapper = css`
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
 `;
 
 export function Seeding() {
