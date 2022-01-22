@@ -9,6 +9,7 @@ import {
   IonTitle,
 } from "@ionic/react";
 import { Header } from "../components/Header";
+import { RoundCard } from "../components/RoundCard";
 
 const content = css`
   display: grid;
@@ -36,6 +37,7 @@ export function Home() {
           <IonCard className={card}>
             <IonTitle size="large">You don't have any tournaments!</IonTitle>
           </IonCard>
+          <RoundCard roundNum={1} eta={new Date()} participants={[{id: 1, name: "test", score: 0}]} />
         </div>
       </IonContent>
     </IonPage>
