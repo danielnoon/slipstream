@@ -14,6 +14,7 @@
     "@types/react-router-dom": "^5.3.3",
     "immer": "^9.0.12",
     "ionicons": "^6.0.1",
+    "itertools": "^1.7.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^5.3.0",
