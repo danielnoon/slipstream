@@ -27,6 +27,7 @@ import "@ionic/react/css/flex-utils.css";
 import "@ionic/react/css/display.css";
 
 import "./theme.css";
+import { Seeding } from "./pages/Seeding";
 
 setupIonicReact();
 
@@ -39,8 +40,11 @@ function App() {
             <Route path="/" exact={true}>
               <Home />
             </Route>
-            <Route path="/create" exact={true}>
+            <Route path="/create">
               <Create />
+            </Route>
+            <Route path="/seeding">
+              <Seeding />
             </Route>
           </IonRouterOutlet>
         </IonSplitPane>
