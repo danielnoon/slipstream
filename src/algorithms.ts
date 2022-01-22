@@ -41,7 +41,7 @@ function handleLeftovers<T>(partitions: T[][], n: number): T[][] {
       const roundToPickFrom = (partitions.length - (i + 1));
       const filler = partitions[roundToPickFrom >= 0 ? roundToPickFrom : 0].pop();
       // fill the last round with that filler player
-      partitions[partitions.length].push(filler!);
+      partitions[partitions.length - 1].push(filler!);
   }
   return partitions;
 }
