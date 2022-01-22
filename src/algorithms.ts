@@ -2,8 +2,8 @@
 import Participant from "./types/Participant";
 import Round from "./types/Round";
 import Tournament from "./types/Tournament";
-import Setup from './types/Setup';
-import { chunked } from 'itertools';
+import Setup from "./types/Setup";
+import { chunked, range } from "itertools";
 
 function shuffle<T>(arr: T[]): T[] {
   let currentIndex = arr.length;
@@ -26,58 +26,52 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export function handleLeftovers<T>(partitions: T[][], n: number): T[][] {
-    const leftovers = partitions[partitions.length - 1].length;
+  const leftovers = partitions[partitions.length - 1].length;
   // deal with dispersing leftovers into more rounds
   // cases:
   //    3 people round [[1,2,3,4], [5,6,7,8], [9,10,11]] => [[1,2,3,4], [5,6,7,8], [9,10,11]]
   //        have one 3 person round (no change)
-  //    2 people round [[1,2,3,4], [5,6,7,8], [9,10]] => [[1,2,3,4], [5,6,7], [9,10,8]] 
+  //    2 people round [[1,2,3,4], [5,6,7,8], [9,10]] => [[1,2,3,4], [5,6,7], [9,10,8]]
   //        have two 3 person rounds (pick 1 from a 4 person round and add to last round)
   //    1 person round [[1,2,3,4], [5,6,7,8], [9]] => [[1,2,3], [5,6,7], [9,8,4]]
   //        have three 3 person rounds (pick 1 from 2nd to last round, 1 from 3rd to last round)
-  for(let i = 1; i < (4 - leftovers); i++){
-      // pick from one round back
-      // TODO: This will break ONLY on tournaments with 5, 6 players, but this ternary should fix it
-      const roundToPickFrom = (partitions.length - (i + 1));
-      const filler = partitions[roundToPickFrom >= 0 ? roundToPickFrom : 0].pop();
-      // fill the last round with that filler player
-      partitions[partitions.length - 1].push(filler!);
+  for (let i = 1; i < 4 - leftovers; i++) {
+    // pick from one round back
+    // TODO: This will break ONLY on tournaments with 5, 6 players, but this ternary should fix it
+    const roundToPickFrom = partitions.length - (i + 1);
+    const filler = partitions[roundToPickFrom >= 0 ? roundToPickFrom : 0].pop();
+    // fill the last round with that filler player
+    partitions[partitions.length - 1].push(filler!);
   }
   return partitions;
 }
 
 export function createSeedingRounds(tournamentDetails: Tournament): Setup[] {
   const participantsShuffled = shuffle(tournamentDetails.participants);
-  
+
   // disperse rounds correctly
-  let rounds: Participant[][] = handleLeftovers([...chunked(participantsShuffled, 4)], 4);
+  let rounds: Participant[][] = handleLeftovers(
+    [...chunked(participantsShuffled, 4)],
+    4
+  );
   let globalRoundId = 0;
   const actualRounds: Round[] = [];
-  for(let round = 0; round < rounds.length; round++){
-      actualRounds.push({id: globalRoundId, participants: rounds[round]});
+
+  for (let round = 0; round < rounds.length; round++) {
+    actualRounds.push({ id: globalRoundId, participants: rounds[round] });
+    globalRoundId += 1;
   }
 
-  const setups = tournamentDetails.setupsCount;
-  const roundsPerSetup = Math.floor(rounds.length / setups);
+  const setups: Setup[] = [...range(tournamentDetails.setupsCount)].map(
+    (id) => ({ id, rounds: [] })
+  );
 
-  let setupsPartition: Round[][];
-  if(roundsPerSetup === 1){
-    setupsPartition = actualRounds.map(entry => [entry]);
-  } else {
-    setupsPartition = [...chunked(actualRounds, roundsPerSetup)];
+  let currentSetup = 0;
+
+  for (const round of actualRounds) {
+    setups[currentSetup].rounds.push(round);
+    currentSetup = (currentSetup + 1) % tournamentDetails.setupsCount;
   }
 
-  const returnSetups: Setup[] = [];
-  let globalIdCounter = 0;
-  for(let setup = 0; setup < setupsPartition.length; setup++) {
-        const currSetup: Setup = {
-            id: setup,
-            rounds: setupsPartition[setup]
-        }
-        returnSetups.push(currSetup);
-    }
-  console.log(returnSetups);
-  return returnSetups;
+  return setups;
 }
-
-export {};
