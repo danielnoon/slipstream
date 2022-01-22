@@ -1,6 +1,7 @@
 import Participant from "./Participant";
 
 export default interface Round {
-  setup: number;
+  id: number;
+  eta: Date;
   participants: Participant[];
 }
