@@ -2,6 +2,7 @@
 import Participant from "./types/Participant";
 import Round from "./types/Round";
 import Tournament from "./types/Tournament";
+import Setup from './types/Setup';
 import { chunked } from 'itertools';
 
 function shuffle<T>(arr: T[]): T[] {
@@ -45,7 +46,7 @@ function handleLeftovers<T>(partitions: T[][], n: number): T[][] {
   return partitions;
 }
 
-export function createSeedingRounds(tournamentDetails: Tournament): Round[] {
+export function createSeedingRounds(tournamentDetails: Tournament): Setup[] {
   const participantsShuffled = shuffle(tournamentDetails.participants);
   
   // disperse rounds correctly
@@ -54,8 +55,22 @@ export function createSeedingRounds(tournamentDetails: Tournament): Round[] {
   const setups = tournamentDetails.setupsCount;
   const setupsPartition: Participant[][][] = handleLeftovers([...chunked(rounds, setups)], setups);
 
-  for(let setup = 0; setup < setupsPartition.length)
-  return rounds;
+  const returnSetups: Setup[] = [];
+
+  let globalIdCounter = 0;
+  for(let setup = 0; setup < setupsPartition.length; setup++) {
+        const currSetup: Setup = {
+            id: setup,
+            rounds: []
+        }
+        const roundsList = setupsPartition[setup]
+        for(let round = 0; round < roundsList.length; round++) {
+            currSetup.rounds.push({ participants: roundsList[round], id: globalIdCounter});
+            globalIdCounter++;
+        }
+        returnSetups.push(currSetup);
+    }
+  return returnSetups;
 }
 
 export {};
