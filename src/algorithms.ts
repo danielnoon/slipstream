@@ -2,6 +2,7 @@
 import Participant from "./types/Participant";
 import Round from "./types/Round";
 import Tournament from "./types/Tournament";
+import { chunked } from 'itertools';
 
 function shuffle<T>(arr: T[]): T[] {
   let currentIndex = arr.length;
@@ -23,43 +24,37 @@ function shuffle<T>(arr: T[]): T[] {
   return arr;
 }
 
+function handleLeftovers<T>(partitions: T[][], n: number): T[][] {
+    const leftovers = partitions[partitions.length - 1].length;
+  // deal with dispersing leftovers into more rounds
+  // cases:
+  //    3 people round [[1,2,3,4], [5,6,7,8], [9,10,11]] => [[1,2,3,4], [5,6,7,8], [9,10,11]]
+  //        have one 3 person round (no change)
+  //    2 people round [[1,2,3,4], [5,6,7,8], [9,10]] => [[1,2,3,4], [5,6,7], [9,10,8]] 
+  //        have two 3 person rounds (pick 1 from a 4 person round and add to last round)
+  //    1 person round [[1,2,3,4], [5,6,7,8], [9]] => [[1,2,3], [5,6,7], [9,8,4]]
+  //        have three 3 person rounds (pick 1 from 2nd to last round, 1 from 3rd to last round)
+  for(let i = 1; i < (4 - leftovers); i++){
+      // pick from one round back
+      // TODO: This will break ONLY on tournaments with 5, 6 players, but this ternary should fix it
+      const roundToPickFrom = (partitions.length - (i + 1));
+      const filler = partitions[roundToPickFrom >= 0 ? roundToPickFrom : 0].pop();
+      // fill the last round with that filler player
+      partitions[partitions.length].push(filler!);
+  }
+  return partitions;
+}
+
 export function createSeedingRounds(tournamentDetails: Tournament): Round[] {
   const participantsShuffled = shuffle(tournamentDetails.participants);
-  const rounds: Round[] = [];
+  
+  // disperse rounds correctly
+  let rounds: Participant[][] = handleLeftovers([...chunked(participantsShuffled, 4)], 4);
 
-  let ppS = Math.ceil(
-    participantsShuffled.length / tournamentDetails.setupsCount
-  );
+  const setups = tournamentDetails.setupsCount;
+  const setupsPartition: Participant[][][] = handleLeftovers([...chunked(rounds, setups)], setups);
 
-  // find nearest divisible by 4 (people per match) number
-  while (ppS % 4 !== 0) {
-    ppS += 1;
-  }
-
-  for (let i = 0; i < tournamentDetails.setupsCount; i++) {
-    // fencepost problem
-    const setupEndIndex =
-      ppS * (i + 1) > participantsShuffled.length
-        ? participantsShuffled.length
-        : ppS * (i + 1);
-    const participantsForSetup = participantsShuffled.slice(
-      ppS * i,
-      setupEndIndex
-    );
-
-    for (let j = 0; j < participantsForSetup.length; j += 4) {
-      // fencepost problem
-      const endIndex =
-        j + 4 > participantsForSetup.length
-          ? participantsForSetup.length
-          : j + 4;
-      rounds.push({
-        setup: i + 1,
-        participants: participantsForSetup.slice(j, endIndex),
-      });
-    }
-  }
-
+  for(let setup = 0; setup < setupsPartition.length)
   return rounds;
 }
 
