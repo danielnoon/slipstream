@@ -68,6 +68,7 @@ const testParticipants = [
   "Jacob",
   "Kathy",
   "Leo",
+  "Mia",
 ];
 
 useStore.getState().createTournament({
