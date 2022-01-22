@@ -7,5 +7,5 @@ export default interface Round {
   eta?: Date;
   participants: Participant[];
   courses: Course [];
-  result: RoundResult;
+  result?: RoundResult;
 }
