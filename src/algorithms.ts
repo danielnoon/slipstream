@@ -4,6 +4,9 @@ import Round from "./types/Round";
 import Tournament from "./types/Tournament";
 import Setup from './types/Setup';
 import { chunked } from 'itertools';
+import Course from "./types/Course";
+import { Platform } from "./types/Platform";
+import CourseData from "./courseData";
 
 function shuffle<T>(arr: T[]): T[] {
   let currentIndex = arr.length;
@@ -72,6 +75,25 @@ export function createSeedingRounds(tournamentDetails: Tournament): Setup[] {
         returnSetups.push(currSetup);
     }
   return returnSetups;
+}
+
+export const generateCourseSelection = (platform: Platform, threshold: number): Course[] => {
+
+  let courseSelection: Course[] = []
+
+  switch (platform) {
+    case Platform.Wii:
+    let dividedThreshold = threshold / 4.0
+
+    const firstCourse = CourseData.getRandomWiiCourse(Math.round(dividedThreshold))
+    const secondCourse = CourseData.getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty) / 3.0))
+    const thirdCourse = CourseData.getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty - secondCourse.degreeOfDifficulty) / 2.0))
+    const fourthCourse = CourseData.getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty - secondCourse.degreeOfDifficulty - thirdCourse.degreeOfDifficulty)))
+
+    courseSelection = [firstCourse, secondCourse, thirdCourse, fourthCourse]
+  }
+
+  return courseSelection
 }
 
 export {};
