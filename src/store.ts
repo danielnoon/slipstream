@@ -1,4 +1,5 @@
 import produce, { enableAllPlugins } from "immer";
+import { range } from "itertools";
 import create from "zustand";
 import { createSeedingRounds } from "./algorithms";
 import Participant from "./types/Participant";
@@ -18,6 +19,12 @@ export interface Store {
   seed: () => void;
   updateRound: (round: Round) => void;
   setParticipantScore: (id: number, score: number) => void;
+  setRaceResult: (
+    round: number,
+    race: number,
+    player: number,
+    place: number
+  ) => void;
 }
 
 export const useStore = create<Store>((set) => ({
@@ -70,6 +77,30 @@ export const useStore = create<Store>((set) => ({
       })
     );
   },
+
+  setRaceResult(roundId, raceId, playerId, place) {
+    set(
+      produce<Store>((draft) => {
+        const round = draft.rounds.get(roundId)!;
+        console.log("hello");
+        if (!round.result) {
+          round.result = {
+            raceResults: [],
+            roundStandings: [],
+          };
+        }
+        console.log("helloo")
+        if (!round.result.raceResults[raceId]) {
+          round.result.raceResults[raceId] = new Map();
+        }
+        console.log("hellooo")
+        round.result.raceResults[raceId].set(playerId, {
+          participant: playerId,
+          rank: place,
+        });
+      })
+    );
+  },
 }));
 
 (window as any).store = useStore;
@@ -77,6 +108,9 @@ export const useStore = create<Store>((set) => ({
 export const getTournament = (store: Store) => store.tournament;
 export const getParticipantScore = (id: number) => (store: Store) =>
   store.participants.get(id)!.score;
+export const getRank =
+  (roundId: number, raceId: number, playerId: number) => (store: Store) =>
+    store.rounds.get(roundId)?.result?.raceResults[raceId].get(playerId)?.rank!;
 
 const testParticipants = [
   "Ally",

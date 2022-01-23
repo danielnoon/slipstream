@@ -7,6 +7,8 @@ import { chunked, range } from "itertools";
 import Course from "./types/Course";
 import { Platform } from "./types/Platform";
 import CourseData from "./courseData";
+import { useStore } from "./store";
+import RoundResult from "./types/RoundResult";
 
 function shuffle<T>(arr: T[]): T[] {
   let currentIndex = arr.length;
@@ -79,6 +81,15 @@ export function createSeedingRounds(tournamentDetails: Tournament): Setup[] {
   return setups;
 }
 
+// // setting a participant's score
+// useStore.getState().setParticipantScore(participant_id, newScore)
+// // getting a participant from the store
+// useStore.getState().participants.get(participant_id)
+
+export function updatePlayerScores(results: RoundResult[]): void {
+    //
+}
+
 export const generateCourseSelection = (
   platform: Platform,
   threshold: number
@@ -105,7 +116,5 @@ export const generateCourseSelection = (
       courseSelection.push(fourthCourse)
   }
 
-  return courseSelection
-}
-
-export { };
+  return courseSelection;
+};
