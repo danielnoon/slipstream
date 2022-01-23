@@ -17,6 +17,7 @@ export interface Store {
   createTournament: (tournament: Tournament) => void;
   seed: () => void;
   updateRound: (round: Round) => void;
+  setParticipantScore: (id: number, score: number) => void;
 }
 
 export const useStore = create<Store>((set) => ({
@@ -25,7 +26,7 @@ export const useStore = create<Store>((set) => ({
   rounds: new Map(),
   participants: new Map(),
 
-  createTournament: (tournament: Tournament) => {
+  createTournament: (tournament) => {
     set(
       produce<Store>((draft) => {
         draft.tournament = tournament;
@@ -51,7 +52,7 @@ export const useStore = create<Store>((set) => ({
     );
   },
 
-  updateRound: (round: Round) => {
+  updateRound: (round) => {
     set(
       produce<Store>((draft) => {
         draft.rounds.set(round.id, round);
@@ -59,7 +60,7 @@ export const useStore = create<Store>((set) => ({
     );
   },
 
-  setParticipantScore(id: number, score: number) {
+  setParticipantScore(id, score) {
     set(
       produce<Store>((draft) => {
         draft.participants.set(id, {
