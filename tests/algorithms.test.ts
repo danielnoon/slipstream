@@ -288,21 +288,57 @@ const tournament2: Tournament = {
     setupsCount: 4
 }
 
-test("Test createSeedingRounds with no leftovers", () => {
+test("Test createSeedingRounds with 3 leftovers and 4 setups", () => {
     const setups: Setup[] = createSeedingRounds(tournament2);
     // only 2 setups
     expect(setups).toHaveLength(4);
     // both setups have 1 round
-    expect(setups[0].rounds).toHaveLength(1);
-    expect(setups[1].rounds).toHaveLength(1);
-    expect(setups[2].rounds).toHaveLength(1);
-    expect(setups[3].rounds).toHaveLength(1);
+    expect(setups[0].rounds).toHaveLength(2);
+    expect(setups[1].rounds).toHaveLength(2);
+    expect(setups[2].rounds).toHaveLength(2);
+    expect(setups[3].rounds).toHaveLength(2);
     // all rounds in setup 1 have 4 players
     expect(setups[0].rounds[0].participants).toHaveLength(4);
+    expect(setups[0].rounds[1].participants).toHaveLength(4);
     // all rounds in setup 2 have 4 players
     expect(setups[1].rounds[0].participants).toHaveLength(4);
+    expect(setups[1].rounds[1].participants).toHaveLength(4);
     // all rounds in setup 3 have 4 players
     expect(setups[2].rounds[0].participants).toHaveLength(4);
-    // all rounds in setup 4 have 3 players
-    expect(setups[3].rounds[0].participants).toHaveLength(3);
+    expect(setups[2].rounds[1].participants).toHaveLength(4);
+    // first round in setup 4 should have 4 players, second round should have 3 players
+    expect(setups[3].rounds[0].participants).toHaveLength(4);
+    expect(setups[3].rounds[1].participants).toHaveLength(3);
+})
+
+const tournament3: Tournament = {
+    name: "Test Tournament #2",
+    participants: participants2,
+    startTime: new Date("March 11, 2021 12:00:00"),
+    setupsCount: 5
+}
+
+test("Test createSeedingRounds with 3 leftovers and 5 setups", () => {
+    const setups: Setup[] = createSeedingRounds(tournament3);
+    // only 2 setups
+    expect(setups).toHaveLength(5);
+    // both setups have 1 round
+    expect(setups[0].rounds).toHaveLength(2);
+    expect(setups[1].rounds).toHaveLength(2);
+    expect(setups[2].rounds).toHaveLength(2);
+    expect(setups[3].rounds).toHaveLength(1);
+    expect(setups[4].rounds).toHaveLength(1);
+    // all rounds in setup 1 have 4 players
+    expect(setups[0].rounds[0].participants).toHaveLength(4);
+    expect(setups[0].rounds[1].participants).toHaveLength(4);
+    // all rounds in setup 2 have 4 players
+    expect(setups[1].rounds[0].participants).toHaveLength(4);
+    expect(setups[1].rounds[1].participants).toHaveLength(4);
+    // first round in setup 3 have 4 players, second has 3 players
+    expect(setups[2].rounds[0].participants).toHaveLength(4);
+    expect(setups[2].rounds[1].participants).toHaveLength(3);
+    // first round in setup 4 should have 4 players
+    expect(setups[3].rounds[0].participants).toHaveLength(4);
+    // first round in setup 5 should have 4 players
+    expect(setups[4].rounds[0].participants).toHaveLength(4);
 })
