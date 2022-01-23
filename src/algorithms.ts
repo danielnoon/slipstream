@@ -135,7 +135,9 @@ export const generateCourseSelection = (
   let courseSelection: Course[] = [];
 
   switch (platform) {
-    case Platform.Wii:
+    // TODO: the default case is for Mario Kart Wii (RevoKart). Make this work with other platforms
+
+    default:
       let dividedThreshold = threshold / 4.0
 
       const firstCourse = CourseData.getRandomWiiCourse(Math.round(dividedThreshold))
