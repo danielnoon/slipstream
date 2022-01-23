@@ -1,18 +1,22 @@
 import { css } from "@emotion/css";
-import { IonButton, IonContent, IonGrid, IonItem, IonListHeader, IonModal, IonSelect, IonSelectOption } from "@ionic/react";
+import { IonButton, IonButtons, IonContent, IonGrid, IonHeader, IonIcon, IonItem, IonListHeader, IonModal, IonSelect, IonSelectOption, IonTitle, IonToolbar } from "@ionic/react";
 import { range } from "itertools";
 import React, { Fragment } from "react";
 import { useStore } from "../store";
 import { uploadRoundResult } from '../algorithms';
+import { current } from "immer";
+import { save } from "ionicons/icons";
 
 const modal = css`
   --width: 800px;
+  --height: 32em;
 `;
 
 const grid = (players: number) => css`
   display: grid;
   grid-template-columns: 12em repeat(${players}, 1fr);
   grid-template-rows: repeat(5, 4em);
+  width: 100%;
 `;
 
 const flex = css`
@@ -20,7 +24,12 @@ const flex = css`
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  flex-grow: 1;
 `;
+
+const disableButton = css`
+  transition: 200ms linear;
+`
 
 interface Props {
   id: number;
@@ -40,10 +49,11 @@ export function ScoreEntryModal(props: Props) {
     const requiredEntries = participants.length * 4;
     let entriesCount = 0;
     if(results) {
-        entriesCount = results.raceResults.length;;
+      entriesCount = results.raceResults.reduce((prev, curr) => prev + curr.size, 0);
     }
     return entriesCount === requiredEntries;
   }
+  console.log(canSubmit());
 
   const ordinalsMap = ["1st", "2nd", "3rd", "4th"];
   
@@ -68,6 +78,17 @@ export function ScoreEntryModal(props: Props) {
   return (
     <IonModal isOpen={isOpen} className={modal} onDidDismiss={onClose}>
       <IonContent>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', paddingBottom:24}}>
+        <IonHeader>
+          <IonToolbar>
+            <IonTitle>Edit Placements for Round {id + 1}</IonTitle>
+            <IonButtons slot="end">
+              <IonButton fill="clear" onClick={onClose}>
+                <IonIcon slot="icon-only" icon={save} />
+              </IonButton>
+            </IonButtons>
+          </IonToolbar>
+        </IonHeader>
         <IonGrid className={grid(participants.length)}>
           <div></div>
           {participants.map(part => (
@@ -85,11 +106,13 @@ export function ScoreEntryModal(props: Props) {
           ))}
         </IonGrid>
         {
-          canSubmit() && results && 
           <div className={flex}>
-            <IonButton onClick={() => uploadRoundResult(results)}>Submit Round</IonButton>
+            <IonButton color={canSubmit() && results ? "primary" : "dark"} 
+            disabled={!(canSubmit() && results)} 
+            onClick={() => uploadRoundResult(results!)}>Submit Round</IonButton>
           </div>
         }
+        </div>
       </IonContent>
     </IonModal>
   );
