@@ -2,6 +2,7 @@ import { css } from "@emotion/css";
 import { IonPage, IonContent } from "@ionic/react";
 import { Header } from "../components/Header";
 import { RoundCard } from "../components/RoundCard";
+import { SetupLabel } from "../components/SetupLabel";
 import { useStore } from "../store";
 
 const roundsWrapper = css`
@@ -20,7 +21,7 @@ export function Seeding() {
       <IonContent>
         {setups.map((setup, i) => (
           <div key={i}>
-            <h2>Setup {setup.id}</h2>
+            <SetupLabel label={"Setup " + (setup.id + 1)}/>
             <div className={roundsWrapper}>
               {setup.rounds.map((round, i) => (
                 <RoundCard

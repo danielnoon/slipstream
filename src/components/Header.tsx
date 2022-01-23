@@ -15,7 +15,7 @@ export function Header({ title }: Props) {
           src={logo}
           alt="Slipstream Logo"
           height="40"
-          style={{ marginLeft: 12, marginTop: 6 }}
+          style={{ marginLeft: 12, marginTop: 3 }}
         />
         <IonTitle>{title}</IonTitle>
       </IonToolbar>

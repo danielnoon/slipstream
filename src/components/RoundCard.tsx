@@ -36,7 +36,7 @@ export function RoundCard(props: Props) {
       onClick={() => setEditorOpen(true)}
     >
       <IonCardHeader>
-        <IonCardTitle>Round {id}</IonCardTitle>
+        <IonCardTitle><strong>Round {id + 1}</strong></IonCardTitle>
         {eta && (
           <IonCardSubtitle>
             eta {eta.toTimeString().split(" ").slice(0, 1)}

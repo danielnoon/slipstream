@@ -87,7 +87,7 @@ export function Create() {
           <IonCard className={card}>
             <IonCardContent>
               <IonCardHeader>
-                <IonCardTitle>Create a Tournament</IonCardTitle>
+                <IonCardTitle><strong>Create a Tournament</strong></IonCardTitle>
               </IonCardHeader>
               <form>
                 <IonItem>
