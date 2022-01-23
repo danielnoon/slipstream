@@ -5,9 +5,11 @@ import {
   IonCardContent,
   IonContent,
   IonIcon,
+  IonLabel,
   IonPage,
+  useIonRouter,
 } from "@ionic/react";
-import { close } from "ionicons/icons";
+import { close, trophy } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { Header } from "../components/Header";
 import { getState, useStore } from "../store";
@@ -46,34 +48,47 @@ const cardWrapper = css`
   overflow: hidden;
 `;
 
+const placeName = css`
+  font-size: 27px;
+  font-weight: 600;
+  padding-left: 5px;
+`;
+
 interface SeededParticipant {
   id: number;
   seed: number;
 }
 
-const testData: SeededParticipant[] = [
-  { id: 0, seed: 1 },
-  { id: 1, seed: 2 },
-  { id: 2, seed: 3 },
-  { id: 3, seed: 4 },
-  { id: 4, seed: 5 },
-  { id: 5, seed: 6 },
-  { id: 6, seed: 7 },
-  { id: 7, seed: 8 },
-  { id: 8, seed: 9 },
-];
-
 const PADDING = 16;
 
 export function Eliminations() {
+  const router = useIonRouter();
   const tournament = useStore((state) => state.tournament);
+  const seededParticipants: SeededParticipant[] | undefined = tournament?.participants
+    .slice()
+    .sort((a, b) => b.score - a.score)
+    .map((part, i) => (
+      {
+        id: part.id,
+        seed: i
+      }
+    ));
 
-  const [active, setActive] = useState(testData.slice(-4));
-  const [above, setAbove] = useState(testData.slice(0, -4));
+  if (!seededParticipants) {
+    router.push('/');
+    return null;
+  }
+
+  const [active, setActive] = useState(seededParticipants.slice(-4));
+  const [above, setAbove] = useState(seededParticipants.slice(0, -4));
   const [below, setBelow] = useState([] as SeededParticipant[]);
 
+  const [awardThird, setAwardThird] = useState(-1);
+  const [awardSecond, setAwardSecond] = useState(-1);
+  const [awardFirst, setAwardFirst] = useState(-1);
+
   useEffect(() => {
-    const els = testData.map((p) => document.getElementById(`p-${p.id}`));
+    const els = seededParticipants.map((p) => document.getElementById(`p-${p.id}`));
     const height = els[0]?.getBoundingClientRect().height;
     if (height) {
       const activeHeight = active.length * (height + PADDING) + PADDING;
@@ -98,7 +113,7 @@ export function Eliminations() {
   }, [active, above, below]);
 
   function eliminatePlayer(id: number) {
-    const newBelow = [...below, testData.find((p) => p.id === id)!];
+    const newBelow = [...below, seededParticipants!.find((p) => p.id === id)!];
     const newActive = active.filter((p) => p.id !== id);
     setBelow(newBelow);
     setActive(newActive);
@@ -109,22 +124,42 @@ export function Eliminations() {
     }
   }
 
+  function awardPlace(participant: SeededParticipant) {
+
+    if (awardThird === -1) {
+      setAwardThird(participant.id)
+    } else if (awardSecond === -1 && awardThird != participant.id) {
+      setAwardSecond(participant.id)
+    } else if (awardFirst === -1 && awardSecond != participant.id) {
+      if (awardThird != participant.id) {
+        setAwardFirst(participant.id)
+      }
+    }
+
+  }
+
   return (
     <IonPage>
       <Header title={tournament?.name} showLeaderboard />
       <IonContent className="ion-padding">
         <div className={cardWrapper}>
-          {testData.map((participant) => (
+          {seededParticipants.map((participant) => (
             <IonCard
               key={participant.id}
               className={card}
               id={`p-${participant.id}`}
               color={
-                active.find((a) => participant.id === a.id)
-                  ? "success"
-                  : below.find((b) => participant.id === b.id)
-                    ? "danger"
-                    : "light"
+                participant.id === awardThird
+                  ? "tertiary"
+                  : participant.id === awardSecond
+                    ? "secondary"
+                    : participant.id === awardFirst
+                      ? "primary"
+                      : active.find((a) => participant.id === a.id)
+                        ? "success"
+                        : below.find((b) => participant.id === b.id)
+                          ? "danger"
+                          : "light"
               }
             >
               <IonCardContent className={cardContent}>
@@ -132,7 +167,27 @@ export function Eliminations() {
                   {participant.seed}{" "}
                   {getState().participants.get(participant.id)?.name}
                 </span>
-                {active.find((a) => participant.id === a.id) && (
+                {active.length <= 3 && active.find((a) => participant.id === a.id) &&
+                  <IonButton
+                    size="small"
+                    fill="clear"
+                    color="light"
+                    className={eliminateButton}
+                    onClick={() => awardPlace(participant)}
+                  >
+                    {active.length <= 3 && active.find((a) => participant.id === awardThird) &&
+                      <IonLabel className={placeName}>Third Place!</IonLabel>
+                    }
+                    {active.length <= 3 && active.find((a) => participant.id === awardSecond) &&
+                      <IonLabel className={placeName}>Runner-up!</IonLabel>
+                    }
+                    {active.length <= 3 && active.find((a) => participant.id === awardFirst) &&
+                      <IonLabel className={placeName}> Champion!</IonLabel>
+                    }
+                    <IonIcon slot="icon-only" icon={trophy} />
+                  </IonButton>
+                }
+                {active.find((a) => participant.id === a.id) && active.length > 3 && (
                   <IonButton
                     size="small"
                     fill="clear"
