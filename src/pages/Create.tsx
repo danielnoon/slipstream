@@ -65,7 +65,7 @@ export function Create() {
       participants: formattedParticipants,
       startTime: formattedDateTime,
       setupsCount: screens,
-      platform: platformType
+      platform: platformType,
     });
 
     seed();
@@ -130,11 +130,11 @@ export function Create() {
                   <IonSelect
                     value={platformType}
                     placeholder="Platform"
-                    onIonChange={ev => setPlatformType(ev.detail.value)}
+                    onIonChange={(ev) => setPlatformType(ev.detail.value)}
                   >
                     {Object.values(Platform)
-                      .filter(plat => !(plat === Platform.NONE))
-                      .map(plat => (
+                      .filter((plat) => !(plat === Platform.NONE))
+                      .map((plat) => (
                         <IonSelectOption value={plat}>{plat}</IonSelectOption>
                       ))}
                   </IonSelect>
