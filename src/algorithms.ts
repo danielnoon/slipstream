@@ -91,7 +91,8 @@ const uploadNewScore = (participant_id: number, newScore: number): void => {
     useStore.getState().setParticipantScore(participant_id, newPoints);
 }
 
-export function updatePlayerScores(results: RoundResult): void {
+export function uploadRoundResult(results: RoundResult): void {
+    console.log("in the uploadRoundResult function");
     // functions for assigning points
     const getPoints = (rank: number): number => {
         return 5 - rank;
@@ -111,6 +112,8 @@ export function updatePlayerScores(results: RoundResult): void {
     // set the scores for each round result
     for(let raceResult of results.raceResults.map((mapResult) => mapResult.values()) ) {
         for(let result of raceResult) {
+            console.log(`Logging race result of player ${result.participant}: ${useStore.getState().participants.get(result.participant)?.name}`);
+
             const score = getPoints(result.rank);
             uploadNewScore(result.participant, score);
         }
