@@ -36,6 +36,7 @@ const ImgLabelDivContainerStyle = css`
 `;
 
 const LabelCardHeader = css`
+  padding-left: unset;
   padding-top: 0px;
   padding-bottom: 0px;
 `;
