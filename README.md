@@ -2,8 +2,6 @@
 # [Slipstream](https://slipstreamapp.net)
 An advanced Mario Kart tournament bracket/leaderboard generator.
 
-# [PRESENTATION VIDEO LINK](https://youtu.be/Qh6EyvaaIRw): https://youtu.be/Qh6EyvaaIRw
-
 ## The Problem
 Ever wanted to run a Mario Kart tournament but didn't know where to start? As a tournament organizer (TO), there's *tons* of headaches that will need to be navigated:
 * What do you do if you have a number of players not evenly divisible by 4?
