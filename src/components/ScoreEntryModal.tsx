@@ -49,6 +49,8 @@ export function ScoreEntryModal(props: Props) {
     }
     return entriesCount === requiredEntries;
   }
+
+  const ordinalsMap = ["1st", "2nd", "3rd", "4th"];
   
   const select = (playerID: number, match: number) => {
   const raceResult = results?.raceResults[match]?.get(playerID);
@@ -59,10 +61,11 @@ export function ScoreEntryModal(props: Props) {
         placeholder="Result"
         onIonChange={ev => setRaceResult(id, match, playerID, ev.detail.value)}
       >
-        <IonSelectOption value={1}>1st</IonSelectOption>
-        <IonSelectOption value={2}>2nd</IonSelectOption>
-        <IonSelectOption value={3}>3rd</IonSelectOption>
-        <IonSelectOption value={4}>4th</IonSelectOption>
+        {
+          [...range(participants.length)].map((i) => {
+            return <IonSelectOption value={i}>{ordinalsMap[i]}</IonSelectOption>
+          })
+        }
       </IonSelect>
     )
   }
