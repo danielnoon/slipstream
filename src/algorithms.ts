@@ -88,47 +88,46 @@ export function createSeedingRounds(tournamentDetails: Tournament): Setup[] {
 // useStore.getState().participants.get(participant_id)
 
 const uploadNewScore = (participant_id: number, newScore: number): void => {
-    const newPoints = useStore.getState().participants.get(participant_id)!.score + newScore;
-    useStore.getState().setParticipantScore(participant_id, newPoints);
+  const newPoints = useStore.getState().participants.get(participant_id)!.score + newScore;
+  useStore.getState().setParticipantScore(participant_id, newPoints);
 }
 
 export function uploadRoundResult(results: RoundResult): void {
-    console.log("in the uploadRoundResult function");
-    // functions for assigning points
-    const getPoints = (rank: number): number => {
-        return 4 - rank;
+  // functions for assigning points
+  const getPoints = (rank: number): number => {
+    return 4 - rank;
+  }
+  const getRoundPoints = (rank: number): number => {
+    switch (rank) {
+      case 0:
+        return 6;
+      case 1:
+        return 4;
+      case 2:
+        return 3;
+      default:
+        return 2;
     }
-    const getRoundPoints = (rank: number): number => {
-        switch(rank) {
-            case 0:
-                return 6;
-            case 1:
-                return 4;
-            case 2:
-                return 3;
-            default:
-                return 2;
-        }
+  }
+  // set the scores for each round result
+  const roundScoresMap: Map<number, number> = new Map<number, number>();
+  for (let raceResult of results.raceResults.map((mapResult) => mapResult.values())) {
+    for (let result of raceResult) {
+      const currRoundScore = roundScoresMap.get(result.participant);
+      const score = getPoints(result.rank);
+      // done for determining the ending ranks of everyone
+      if (currRoundScore) {
+        roundScoresMap.set(result.participant, currRoundScore + score);
+      } else {
+        roundScoresMap.set(result.participant, score)
+      }
+      uploadNewScore(result.participant, score);
     }
-    // set the scores for each round result
-    const roundScoresMap: Map<number, number> = new Map<number, number>();
-    for(let raceResult of results.raceResults.map((mapResult) => mapResult.values()) ) {
-        for(let result of raceResult) {
-            const currRoundScore = roundScoresMap.get(result.participant);
-            const score = getPoints(result.rank);
-            // done for determining the ending ranks of everyone
-            if(currRoundScore){
-                roundScoresMap.set(result.participant, currRoundScore + score);
-            } else {
-                roundScoresMap.set(result.participant, score)
-            }
-            uploadNewScore(result.participant, score);
-        }
-    }
-    const roundScores = [...roundScoresMap].sort((a, b) => b[1] - a[1]);
-    for(let i = 0; i < roundScores.length; i++) {
-        uploadNewScore(roundScores[i][0], getRoundPoints(i));
-    }
+  }
+  const roundScores = [...roundScoresMap].sort((a, b) => b[1] - a[1]);
+  for (let i = 0; i < roundScores.length; i++) {
+    uploadNewScore(roundScores[i][0], getRoundPoints(i));
+  }
 }
 
 export const generateCourseSelection = (
