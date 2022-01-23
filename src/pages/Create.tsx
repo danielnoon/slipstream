@@ -17,6 +17,7 @@ import {
   IonRange,
   IonSelect,
   IonSelectOption,
+  IonText,
   IonTextarea,
   IonTitle,
   IonToolbar,
@@ -53,29 +54,39 @@ export function Create() {
   const [dateTime, setDateTime] = useState("");
   const [screens, setScreens] = useState(0);
   const [platformType, setPlatformType] = useState<Platform>(Platform.NONE);
+  const [isErrorShown, setIsErrorShown] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const onSubmit = () => {
     const allEntered = event && participants && dateTime && screens && platformType !== Platform.NONE;
+    const tooManySetups = Math.ceil(participants.length / 4) < screens;
 
     if (allEntered) {
-      const formattedParticipants: Participant[] = participants
-        .split("\n")
-        .map((part, i) => ({ id: i, name: part, score: 0 }));
-      const formattedDateTime: Date = new Date(dateTime);
+      if (tooManySetups) {
+        setIsErrorShown(true);
+        setErrorMessage("Too many setups! You need fewer in order to run the tournament efficiently.");
+      } else {
+        setIsErrorShown(false);
+        const formattedParticipants: Participant[] = participants
+          .split("\n")
+          .map((part, i) => ({ id: i, name: part, score: 0 }));
+        const formattedDateTime: Date = new Date(dateTime);
 
-      createTournament({
-        name: event,
-        participants: formattedParticipants,
-        startTime: formattedDateTime,
-        setupsCount: screens,
-        platform: platformType
-      });
+        createTournament({
+          name: event,
+          participants: formattedParticipants,
+          startTime: formattedDateTime,
+          setupsCount: screens,
+          platform: platformType
+        });
 
-      seed();
+        seed();
 
-      router.push("/seeding");
+        router.push("/seeding");
+      }
     } else {
-      console.log("not all filled out");
+      setIsErrorShown(true);
+      setErrorMessage("Oops! You haven't entered all of the required fields!");
     }
   };
 
@@ -103,8 +114,8 @@ export function Create() {
                 <IonItem>
                   <IonLabel>Date and Time: </IonLabel>
                   <IonLabel>{dateTime !== ""
-                  ? new Date(dateTime).toLocaleString()
-                  : ""
+                    ? new Date(dateTime).toLocaleString()
+                    : ""
                   }</IonLabel>
                   <IonButton fill="clear" id="trigger-button">
                     <IonIcon slot="icon-only" icon={calendarOutline} />
@@ -155,6 +166,7 @@ export function Create() {
                   </IonSelect>
                 </IonItem>
                 <IonItem>
+                  {isErrorShown && <IonText color="danger">{errorMessage}</IonText>}
                   <IonButton
                     size="default"
                     style={{ margin: "auto" }}

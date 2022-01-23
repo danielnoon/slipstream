@@ -51,6 +51,7 @@ export function handleLeftovers<T>(partitions: T[][], n: number): T[][] {
   return partitions;
 }
 
+//TODO: This function only works if  Math.ceil(participants / 4) > setups, as a setup cannot go unused
 export function createSeedingRounds(tournamentDetails: Tournament): Setup[] {
   const participantsShuffled = shuffle(tournamentDetails.participants);
 
@@ -95,33 +96,38 @@ export function uploadRoundResult(results: RoundResult): void {
     console.log("in the uploadRoundResult function");
     // functions for assigning points
     const getPoints = (rank: number): number => {
-        return 5 - rank;
+        return 4 - rank;
     }
     const getRoundPoints = (rank: number): number => {
         switch(rank) {
-            case 1:
+            case 0:
                 return 6;
-            case 2:
+            case 1:
                 return 4;
-            case 3:
+            case 2:
                 return 3;
             default:
                 return 2;
         }
     }
     // set the scores for each round result
+    const roundScoresMap: Map<number, number> = new Map<number, number>();
     for(let raceResult of results.raceResults.map((mapResult) => mapResult.values()) ) {
         for(let result of raceResult) {
-            console.log(`Logging race result of player ${result.participant}: ${useStore.getState().participants.get(result.participant)?.name}`);
-
+            const currRoundScore = roundScoresMap.get(result.participant);
             const score = getPoints(result.rank);
+            // done for determining the ending ranks of everyone
+            if(currRoundScore){
+                roundScoresMap.set(result.participant, currRoundScore + score);
+            } else {
+                roundScoresMap.set(result.participant, score)
+            }
             uploadNewScore(result.participant, score);
         }
     }
-    // set the scores for the final finishes of the round
-    for(let i = 0; i < results.roundStandings.length; i++) {
-        const score = getRoundPoints(i);
-        uploadNewScore(results.roundStandings[i].id, score);
+    const roundScores = [...roundScoresMap].sort((a, b) => b[1] - a[1]);
+    for(let i = 0; i < roundScores.length; i++) {
+        uploadNewScore(roundScores[i][0], getRoundPoints(i));
     }
 }
 

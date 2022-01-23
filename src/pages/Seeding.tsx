@@ -18,17 +18,13 @@ export function Seeding() {
   return (
     <IonPage>
       <Header title={tournament?.name} showLeaderboard />
-      <IonContent>
+      <IonContent className="ion-padding">
         {setups.map((setup, i) => (
           <div key={i}>
             <SetupLabel label={"Setup " + (setup.id + 1)} />
             <div className={roundsWrapper}>
               {setup.rounds.map((round, i) => (
-                <RoundCard
-                  key={round.id}
-                  {...round}
-                  onClick={() => console.log("hai")}
-                />
+                <RoundCard key={round.id} {...round} />
               ))}
             </div>
           </div>
