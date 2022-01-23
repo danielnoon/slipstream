@@ -55,22 +55,28 @@ export function Create() {
   const [platformType, setPlatformType] = useState<Platform>(Platform.NONE);
 
   const onSubmit = () => {
-    const formattedParticipants: Participant[] = participants
-      .split("\n")
-      .map((part, i) => ({ id: i, name: part, score: 0 }));
-    const formattedDateTime: Date = new Date(dateTime);
+    const allEntered = event && participants && dateTime && screens && platformType !== Platform.NONE;
 
-    createTournament({
-      name: event,
-      participants: formattedParticipants,
-      startTime: formattedDateTime,
-      setupsCount: screens,
-      platform: platformType,
-    });
+    if (allEntered) {
+      const formattedParticipants: Participant[] = participants
+        .split("\n")
+        .map((part, i) => ({ id: i, name: part, score: 0 }));
+      const formattedDateTime: Date = new Date(dateTime);
 
-    seed();
+      createTournament({
+        name: event,
+        participants: formattedParticipants,
+        startTime: formattedDateTime,
+        setupsCount: screens,
+        platform: platformType
+      });
 
-    router.push("/seeding");
+      seed();
+
+      router.push("/seeding");
+    } else {
+      console.log("not all filled out");
+    }
   };
 
   return (
@@ -134,8 +140,8 @@ export function Create() {
                   >
                     {Object.values(Platform)
                       .filter((plat) => !(plat === Platform.NONE))
-                      .map((plat) => (
-                        <IonSelectOption value={plat}>{plat}</IonSelectOption>
+                      .map((plat, i) => (
+                        <IonSelectOption key={i} value={plat}>{plat}</IonSelectOption>
                       ))}
                   </IonSelect>
                 </IonItem>
