@@ -1,6 +1,7 @@
-import { IonButton, IonButtons, IonHeader, IonIcon, IonTitle, IonToolbar } from "@ionic/react";
+import { IonButton, IonButtons, IonHeader, IonIcon, IonLabel, IonTitle, IonToolbar } from "@ionic/react";
 import { trophy } from "ionicons/icons";
 import { useState } from "react";
+import { css } from "@emotion/css";
 
 import logo from "../assets/logo/transparent.png";
 import { Leaderboard } from "./Leaderboard";
@@ -10,8 +11,17 @@ interface Props {
   title?: string;
 }
 
+const leaderboardLabel = css`
+  padding-right: 5px;
+
+  @media (max-width: 710px) {
+    display: none;
+  }
+`;
+
 export function Header({ showLeaderboard, title }: Props) {
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+
 
   return (
     <IonHeader>
@@ -28,6 +38,7 @@ export function Header({ showLeaderboard, title }: Props) {
           <>
             <IonButtons slot="end">
               <IonButton onClick={() => setIsLeaderboardOpen(true)}>
+                <IonLabel className={leaderboardLabel}>View Leaderboard</IonLabel>
                 <IonIcon icon={trophy} />
               </IonButton>
             </IonButtons>

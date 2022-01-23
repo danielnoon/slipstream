@@ -9,6 +9,10 @@ const grid = css`
   grid-template-columns: 1fr 1fr;
 `;
 
+const LeaderboardLabel = css`
+  font-size: 20px;
+`;
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -23,7 +27,7 @@ export function Leaderboard(props: Props) {
       <IonContent>
         <IonList>
           <IonItem>
-            <IonListHeader>Leaderboard</IonListHeader>
+            <IonListHeader className={LeaderboardLabel}><strong>Leaderboard</strong></IonListHeader>
             <IonButtons>
               <IonButton onClick={onClose}>
                 <IonIcon icon={close} />
@@ -41,7 +45,7 @@ export function Leaderboard(props: Props) {
               .sort((a, b) => b.score - a.score)
               .map((part, i) => (
                 <Fragment key={part.id}>
-                  <IonItem>{i + 1}. {part.name}</IonItem>
+                  <IonItem><strong>{i + 1}</strong>. {part.name}</IonItem>
                   <IonItem> {part.score} </IonItem>
                 </Fragment>
               ))

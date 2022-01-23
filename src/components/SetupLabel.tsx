@@ -13,15 +13,15 @@ import { useState } from "react";
 import Participant from "../types/Participant";
 import { ScoreEntryModal } from "./ScoreEntryModal";
 
-import header from "../assets/label/header.png"
+import header from "../assets/label/header.svg"
 
-const ImgLabelStyle = css`
+const imgLabel = css`
   min-width: 200px;
   max-width: 200px;
   cursor: pointer;
 `;
 
-const ImgLabelTextStyle = css`
+const imgLabelText = css`
   height: 100%;
   display: block;
   vertical-align: middle;
@@ -29,7 +29,7 @@ const ImgLabelTextStyle = css`
   margin-right: 20px;
 `;
 
-const ImgLabelDivContainerStyle = css`
+const imgLabelDivContainer = css`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -51,17 +51,18 @@ export function SetupLabel(props: Props) {
 
   return (
     <IonCard
-      className={[ImgLabelStyle, "ion-activatable", "ripple-parent"].join(" ")}
+      className={[imgLabel, "ion-activatable", "ripple-parent"].join(" ")}
     >
       <IonCardHeader className={LabelCardHeader}>
-        <div className={ImgLabelDivContainerStyle}>
+        <div className={imgLabelDivContainer}>
           <img
             slot="start"
             src={header}
             alt="Slipstream Logo"
             height="40"
+            style={{paddingLeft:"10px"}}
           />
-          <IonCardTitle className={ImgLabelTextStyle}><strong>{label}</strong></IonCardTitle>
+          <IonCardTitle className={imgLabelText}><strong>{label}</strong></IonCardTitle>
         </div>
       </IonCardHeader>
       <IonRippleEffect />
