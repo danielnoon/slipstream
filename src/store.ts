@@ -160,6 +160,7 @@ export function saveAppData() {
 
 export function load(tournamentId: number) {
   const json = localStorage.getItem(`tournament-${tournamentId}`);
+  console.log(json);
   if (json) {
     const { tournament, participants, rounds, setups } = JSON.parse(
       json,
@@ -178,6 +179,7 @@ export function load(tournamentId: number) {
 
 if (typeof window === "object") {
   (window as any).store = useStore;
+  (window as any).load = load;
 }
 
 interface AppData {
@@ -186,7 +188,7 @@ interface AppData {
   lastId: number;
 }
 
-const appData = localStorage.getItem("data");
+const appData = localStorage.getItem("appData");
 
 if (appData) {
   const { tournaments, idCounter, lastId } = JSON.parse(appData) as AppData;
