@@ -68,9 +68,9 @@ const PADDING = 16;
 export function Eliminations() {
   const tournament = useStore((state) => state.tournament);
 
-  const [active, setActive] = useState(testData.slice(4, 8));
-  const [above, setAbove] = useState(testData.slice(0, 4));
-  const [below, setBelow] = useState(testData.slice(8, 9));
+  const [active, setActive] = useState(testData.slice(-4));
+  const [above, setAbove] = useState(testData.slice(0, -4));
+  const [below, setBelow] = useState([] as SeededParticipant[]);
 
   useEffect(() => {
     const els = testData.map((p) => document.getElementById(`p-${p.id}`));
@@ -130,6 +130,7 @@ export function Eliminations() {
             >
               <IonCardContent className={cardContent}>
                 <span className={name}>
+                  {participant.seed}{" "}
                   {getState().participants.get(participant.id)?.name}
                 </span>
                 {active.find((a) => participant.id === a.id) && (
