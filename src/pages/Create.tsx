@@ -97,7 +97,11 @@ export function Create() {
                   ></IonInput>
                 </IonItem>
                 <IonItem>
-                  <IonLabel>Date and Time</IonLabel>
+                  <IonLabel>Date and Time: </IonLabel>
+                  <IonLabel>{dateTime !== ""
+                  ? new Date(dateTime).toLocaleString()
+                  : ""
+                  }</IonLabel>
                   <IonButton fill="clear" id="trigger-button">
                     <IonIcon slot="icon-only" icon={calendarOutline} />
                   </IonButton>
