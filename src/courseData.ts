@@ -187,4 +187,10 @@ export default class CourseData {
     return selectedCourse
   }
 
+  static getRandomThreshold(): number {
+    let min = Math.ceil(20);
+    let max = Math.floor(4);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
 }

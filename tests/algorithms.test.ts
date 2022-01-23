@@ -109,7 +109,8 @@ const tournament1: Tournament = {
     name: "Test Tournament #1",
     participants: participants1,
     startTime: new Date("March 11, 2021 12:00:00"),
-    setupsCount: 2
+    setupsCount: 2,
+    platform: Platform.Wii
 }
 
 test("Test createSeedingRounds with no leftovers", () => {
@@ -310,7 +311,8 @@ const tournament2: Tournament = {
     name: "Test Tournament #2",
     participants: participants2,
     startTime: new Date("March 11, 2021 12:00:00"),
-    setupsCount: 4
+    setupsCount: 4,
+    platform: Platform.Wii
 }
 
 test("Test createSeedingRounds with 3 leftovers and 4 setups", () => {
@@ -340,7 +342,8 @@ const tournament3: Tournament = {
     name: "Test Tournament #2",
     participants: participants2,
     startTime: new Date("March 11, 2021 12:00:00"),
-    setupsCount: 5
+    setupsCount: 5,
+    platform: Platform.Wii
 }
 
 test("Test createSeedingRounds with 3 leftovers and 5 setups", () => {

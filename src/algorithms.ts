@@ -63,7 +63,7 @@ export function createSeedingRounds(tournamentDetails: Tournament): Setup[] {
   const actualRounds: Round[] = [];
 
   for (let round = 0; round < rounds.length; round++) {
-    actualRounds.push({ id: globalRoundId, participants: rounds[round] });
+    actualRounds.push({ id: globalRoundId, participants: rounds[round], courses: generateCourseSelection(tournamentDetails.platform, CourseData.getRandomThreshold()) });
     globalRoundId += 1;
   }
 
