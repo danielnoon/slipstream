@@ -1,8 +1,10 @@
-import { createSeedingRounds, handleLeftovers } from '../src/algorithms';
+import { createSeedingRounds, generateCourseSelection, handleLeftovers } from '../src/algorithms';
 import Participant from '../src/types/Participant';
 import Round from '../src/types/Round';
 import Tournament from '../src/types/Tournament';
 import Setup from '../src/types/Setup';
+import Course from '../src/types/Course';
+import { Platform } from '../src/types/Platform';
 
 
 test("Test handleLeftovers (no leftovers)", () => {
@@ -121,4 +123,27 @@ test("Test createSeedingRounds with no leftovers", () => {
     expect(setups[0].rounds[0].participants).toHaveLength(4);
     // all rounds in setup 2 have 4 players
     expect(setups[1].rounds[0].participants).toHaveLength(4);
+})
+
+test("Test generateCourseSelection with random threshold 4-20", () => {
+
+    let min = Math.ceil(20);
+    let max = Math.floor(4);
+    let threshold =  Math.floor(Math.random() * (max - min + 1)) + min;
+
+    let actualThreshold = 0
+
+    const courses: Course[] = generateCourseSelection(Platform.Wii, threshold)
+    console.log("Threshold: " + threshold)
+    //have length 4
+    expect(courses).toHaveLength(4);
+
+    courses.forEach(element => {
+        actualThreshold += element.degreeOfDifficulty
+    });
+    //difficulty is correct
+    expect(actualThreshold).toEqual(threshold)
+
+    console.log(courses)
+
 })

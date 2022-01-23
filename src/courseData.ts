@@ -17,7 +17,7 @@ export default class CourseData {
     },
     {
       name: "Mushroom Gorge",
-      degreeOfDifficulty: 4,
+      degreeOfDifficulty: 5,
       platform: Platform.Wii
     },
     {
@@ -167,10 +167,24 @@ export default class CourseData {
     return (this.#WiiCourses)
   }
 
-  static getRandomWiiCourse(threshold: number): Course {
-    const wiiSortedCourse = this.#WiiCourses.filter((course: Course) => course.degreeOfDifficulty == threshold)
+  static getWiiCoursesByDifficulty(threshold: number): Course[] {
+    return this.#WiiCourses.filter((course: Course) => course.degreeOfDifficulty == threshold)
+  }
 
-    return wiiSortedCourse[Math.floor(Math.random()*wiiSortedCourse.length)]
+  static getRandomWiiCourse(threshold: number, chosenCourses?: Course[]): Course {
+    const wiiSortedCourse = this.getWiiCoursesByDifficulty(threshold)
+
+    let selectedCourse = wiiSortedCourse[Math.floor(Math.random()*wiiSortedCourse.length)]
+
+    if(chosenCourses != null) {
+      chosenCourses.forEach(course => {
+        while (course === selectedCourse) {
+          selectedCourse = wiiSortedCourse[Math.floor(Math.random()*wiiSortedCourse.length)]
+        }
+      });
+    }
+
+    return selectedCourse
   }
 
 }
