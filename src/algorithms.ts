@@ -3,7 +3,7 @@ import Participant from "./types/Participant";
 import Round from "./types/Round";
 import Tournament from "./types/Tournament";
 import Setup from "./types/Setup";
-import { chunked, range } from "itertools";
+import { chunked, range, groupby } from "itertools";
 import Course from "./types/Course";
 import { Platform } from "./types/Platform";
 import CourseData from "./courseData";
@@ -82,34 +82,33 @@ export function createSeedingRounds(tournamentDetails: Tournament): Setup[] {
   return setups;
 }
 
+// functions for assigning points
+const getPoints = (rank: number): number => {
+  return 4 - rank;
+}
+
+const getRoundPoints = (rank: number): number => {
+    // 6 - 4 - 2 - 0
+    return ((4 - rank) - 1) * 2;
+}
+
+// assign ranks as an even distribution of what the scores would have been
+const handleTie = (pTied: number, rankTied: number): number => {
+    const totalPoints = [...range(pTied)].map(e => getRoundPoints(e + rankTied)).reduce((prev, curr) => prev + curr);
+    return Math.round(totalPoints / pTied);
+}
+
 // // setting a participant's score
 // useStore.getState().setParticipantScore(participant_id, newScore)
 // // getting a participant from the store
 // useStore.getState().participants.get(participant_id)
-
 const uploadNewScore = (participant_id: number, newScore: number): void => {
   const newPoints = useStore.getState().participants.get(participant_id)!.score + newScore;
   useStore.getState().setParticipantScore(participant_id, newPoints);
 }
 
 export function uploadRoundResult(results: RoundResult): void {
-  // functions for assigning points
-  const getPoints = (rank: number): number => {
-    return 4 - rank;
-  }
-  const getRoundPoints = (rank: number): number => {
-    switch (rank) {
-      case 0:
-        return 6;
-      case 1:
-        return 4;
-      case 2:
-        return 3;
-      default:
-        return 2;
-    }
-  }
-  // set the scores for each round result
+  // set the scores for each race result
   const roundScoresMap: Map<number, number> = new Map<number, number>();
   for (let raceResult of results.raceResults.map((mapResult) => mapResult.values())) {
     for (let result of raceResult) {
@@ -124,9 +123,31 @@ export function uploadRoundResult(results: RoundResult): void {
       uploadNewScore(result.participant, score);
     }
   }
+
+  // set scores for the total round result
   const roundScores = [...roundScoresMap].sort((a, b) => b[1] - a[1]);
-  for (let i = 0; i < roundScores.length; i++) {
-    uploadNewScore(roundScores[i][0], getRoundPoints(i));
+  const roundScoresGB = groupby(roundScores, e => e[1]);
+  let i = 0;
+  for (const [key, values] of roundScoresGB){
+      // not a tie
+      const entriesArr = [...values];
+      if(entriesArr.length === 1){
+        const [pId, score] = entriesArr[0];
+        uploadNewScore(pId, getRoundPoints(i));
+        i++;
+        // keep i consistent
+        continue;
+      } else {
+          // a tie
+          const numTies = entriesArr.length;
+          const tieScore = handleTie(numTies, i);
+          // award shared tie score to each player that tied
+          for (const [pId, score] of entriesArr) {
+              uploadNewScore(pId, tieScore);
+          }
+          // keep i consistent
+          i += numTies;
+      }
   }
 }
 
