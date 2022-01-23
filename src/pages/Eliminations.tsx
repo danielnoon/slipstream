@@ -8,6 +8,7 @@ import {
   IonLabel,
   IonPage,
   useIonRouter,
+  useIonViewDidEnter,
 } from "@ionic/react";
 import { close, trophy } from "ionicons/icons";
 import { useEffect, useState } from "react";
@@ -66,24 +67,12 @@ interface SeededParticipant {
 const PADDING = 16;
 
 export function Eliminations() {
-  const router = useIonRouter();
-  const tournament = useStore((state) => state.tournament);
-  const seededParticipants: SeededParticipant[] | undefined =
-    tournament?.participants
-      .slice()
-      .sort((a, b) => b.score - a.score)
-      .map((part, i) => ({
-        id: part.id,
-        seed: i,
-      }));
+  const tournament = useStore(state => state.tournament);
+  const participants = useStore((state) => [...state.participants.values()]);
+  const [seededParticipants, setSeededParticipants] = useState([] as SeededParticipant[]);
 
-  if (!seededParticipants) {
-    router.push("/");
-    return null;
-  }
-
-  const [active, setActive] = useState(seededParticipants.slice(-4));
-  const [above, setAbove] = useState(seededParticipants.slice(0, -4));
+  const [active, setActive] = useState([] as SeededParticipant[]);
+  const [above, setAbove] = useState([] as SeededParticipant[]);
   const [below, setBelow] = useState([] as SeededParticipant[]);
 
   const [awardThird, setAwardThird] = useState(-1);
@@ -93,35 +82,56 @@ export function Eliminations() {
   const [placeToAward, setPlaceToAward] = useState("Award 3rd");
 
   useEffect(() => {
-    const els = seededParticipants.map((p) =>
-      document.getElementById(`p-${p.id}`)
-    );
-    const height = els[0]?.getBoundingClientRect().height;
-    if (height) {
-      const activeHeight = active.length * (height + PADDING) + PADDING;
-      const activeX = window.innerHeight / 2 - activeHeight / 2;
-      active.forEach((card, i) => {
-        const el = document.getElementById(`p-${card.id}`)!;
-        el.style.top = `${activeX + (height + PADDING) * i}px`;
-      });
-      above
-        .slice()
-        .reverse()
-        .forEach((card, i) => {
+    requestAnimationFrame(() => {
+      const els = seededParticipants.map((p) =>
+        document.getElementById(`p-${p.id}`)
+      ).filter(el => el);
+      const height = els[0]?.getBoundingClientRect().height;
+      if (height) {
+        const activeHeight = active.length * (height + PADDING) + PADDING;
+        const activeX = window.innerHeight / 2 - activeHeight / 2;
+        active.forEach((card, i) => {
           const el = document.getElementById(`p-${card.id}`)!;
-          el.style.top = `${activeX - (height + PADDING) * (i + 1)}px`;
+          el.style.top = `${activeX + (height + PADDING) * i}px`;
         });
-      below.forEach((card, i) => {
-        const el = document.getElementById(`p-${card.id}`)!;
-        el.style.top = `${
-          activeX + activeHeight + (height + PADDING) * i - PADDING
-        }px`;
-      });
-    }
+        above
+          .slice()
+          .reverse()
+          .forEach((card, i) => {
+            const el = document.getElementById(`p-${card.id}`)!;
+            el.style.top = `${activeX - (height + PADDING) * (i + 1)}px`;
+          });
+        below.forEach((card, i) => {
+          const el = document.getElementById(`p-${card.id}`)!;
+          el.style.top = `${activeX + activeHeight + (height + PADDING) * i - PADDING
+            }px`;
+        });
+      }
+    })
+
   }, [active, above, below]);
 
+  useIonViewDidEnter(() => {
+    const participants = [...getState().participants.values()];
+    const seededParticipants: SeededParticipant[] =
+      participants
+        .slice()
+        .sort((a, b) => b.score - a.score)
+        .map((part, i) => ({
+          id: part.id,
+          seed: i,
+        }));
+    setSeededParticipants(seededParticipants);
+    setActive(seededParticipants.slice(-4));
+    setAbove(seededParticipants.slice(0, -4));
+    setBelow([] as SeededParticipant[]);
+    setAwardFirst(-1);
+    setAwardSecond(-1);
+    setAwardThird(-1);
+  })
+
   function eliminatePlayer(id: number) {
-    const newBelow = [...below, seededParticipants!.find((p) => p.id === id)!];
+    const newBelow = [seededParticipants!.find((p) => p.id === id)!, ...below];
     const newActive = active.filter((p) => p.id !== id);
     setBelow(newBelow);
     setActive(newActive);
@@ -173,7 +183,7 @@ export function Eliminations() {
         <div className={cardWrapper}>
           {seededParticipants.map((participant) => (
             <IonCard
-              key={participant.id}
+              key={`${participant.id}-${participant.seed}-${getState().participants.get(participant.id)?.name}`}
               className={card}
               id={`p-${participant.id}`}
               style={{
@@ -212,14 +222,14 @@ export function Eliminations() {
                       {![awardFirst, awardSecond, awardThird].includes(
                         participant.id
                       ) && (
-                        <>
-                          {active.length === 3 && (
-                            <IonLabel className={awardName}>
-                              {placeToAward}
-                            </IonLabel>
-                          )}
-                        </>
-                      )}
+                          <>
+                            {active.length === 3 && (
+                              <IonLabel className={awardName}>
+                                {placeToAward}
+                              </IonLabel>
+                            )}
+                          </>
+                        )}
                       <IonIcon slot="end" icon={trophy} />
                     </IonButton>
                   )}

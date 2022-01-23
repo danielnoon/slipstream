@@ -172,7 +172,9 @@ export function load(tournamentId: number) {
       rounds,
       setups,
       currentId: tournamentId,
+      lastId: tournamentId
     });
+    queueMicrotask(saveAppData);
   }
 }
 
