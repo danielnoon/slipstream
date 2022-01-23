@@ -7,5 +7,6 @@ export enum Platform {
   N64 = "Mario Kart 64",
   WiiU = "Mario Kart 8",
   NDS = "Mario Kart DS",
-  N3DS = "Mario Kart 7"
+  N3DS = "Mario Kart 7",
+  NONE = "None"
 }

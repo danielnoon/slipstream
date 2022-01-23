@@ -15,6 +15,8 @@ import {
   IonPage,
   IonPopover,
   IonRange,
+  IonSelect,
+  IonSelectOption,
   IonTextarea,
   IonTitle,
   IonToolbar,
@@ -26,6 +28,7 @@ import { createSeedingRounds } from "../algorithms";
 import { Header } from "../components/Header";
 import { useStore } from "../store";
 import Participant from "../types/Participant";
+import { Platform } from "../types/Platform";
 
 const wrapper = css`
   display: flex;
@@ -49,6 +52,7 @@ export function Create() {
   const [participants, setParticipants] = useState("");
   const [dateTime, setDateTime] = useState("");
   const [screens, setScreens] = useState(0);
+  const [platformType, setPlatformType] = useState<Platform>(Platform.NONE);
 
   const onSubmit = () => {
     const formattedParticipants: Participant[] = participants
@@ -61,6 +65,7 @@ export function Create() {
       participants: formattedParticipants,
       startTime: formattedDateTime,
       setupsCount: screens,
+      platform: platformType
     });
 
     seed();
@@ -119,6 +124,20 @@ export function Create() {
                     <IonLabel slot="start">0</IonLabel>
                     <IonLabel slot="end">10</IonLabel>
                   </IonRange>
+                </IonItem>
+                <IonItem>
+                  <IonLabel>Platform</IonLabel>
+                  <IonSelect
+                    value={platformType}
+                    placeholder="Platform"
+                    onIonChange={ev => setPlatformType(ev.detail.value)}
+                  >
+                    {Object.values(Platform)
+                      .filter(plat => !(plat === Platform.NONE))
+                      .map(plat => (
+                        <IonSelectOption value={plat}>{plat}</IonSelectOption>
+                      ))}
+                  </IonSelect>
                 </IonItem>
                 <IonItem>
                   <IonButton

@@ -3,6 +3,7 @@ import { range } from "itertools";
 import create from "zustand";
 import { createSeedingRounds } from "./algorithms";
 import Participant from "./types/Participant";
+import { Platform } from "./types/Platform";
 import Round from "./types/Round";
 import Setup from "./types/Setup";
 import Tournament from "./types/Tournament";
@@ -133,6 +134,7 @@ useStore.getState().createTournament({
   participants: testParticipants.map((name, i) => ({ name, id: i, score: 0 })),
   setupsCount: 3,
   startTime: new Date(),
+  platform: Platform.NONE
 });
 
 useStore.getState().seed();
