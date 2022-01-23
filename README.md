@@ -29,4 +29,6 @@ Developed with love in Typescript for [CornHacks 2022](https://unlcornhacks.com/
 ## Disclaimer
 This project is nothing more than a Minimum Viable Product (MVP). While we plan to develop this further, we would not plan a full release until we have ensured full application stability and security and other quality-of-life features.
 
+Obligatory [Figma link](https://www.figma.com/file/fQW7B1Q4ogxKzvBoPFGY9z/Slipstream?node-id=0%3A1) of the prototype.
+
 # Slipstream. Speed past the headaches of planning. 
