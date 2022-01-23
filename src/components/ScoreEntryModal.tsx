@@ -32,6 +32,7 @@ export function ScoreEntryModal(props: Props) {
 
   const { id, isOpen, onClose } = props;
   const participants = useStore(state => state.rounds.get(id)?.participants!);
+  const courses = useStore(state => state.rounds.get(id)?.courses!)
   const setRaceResult = useStore(state => state.setRaceResult);
   const results = useStore(state => state.rounds.get(id)?.result);
 
@@ -77,7 +78,7 @@ export function ScoreEntryModal(props: Props) {
           {[...range(4)].map( i => (
             <Fragment key={i}>
               <div>
-                <IonListHeader>Match {i + 1}</IonListHeader>
+                <IonListHeader>{courses[i].name}</IonListHeader>
               </div>
               {participants.map(participant => <div key={participant.id}>{select(participant.id, i)}</div>)}
             </Fragment>
