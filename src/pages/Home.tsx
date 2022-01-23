@@ -51,7 +51,6 @@ export function Home() {
             </IonCard>
           </div>
         </div>
-        <Leaderboard isOpen></Leaderboard>
       </IonContent>
     </IonPage>
   );
