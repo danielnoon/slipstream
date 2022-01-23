@@ -132,7 +132,7 @@ useStore.getState().createTournament({
   participants: testParticipants.map((name, i) => ({ name, id: i, score: 0 })),
   setupsCount: 3,
   startTime: new Date(),
-  platform: Platform.Wii,
+  platform: Platform.NONE,
 });
 
 useStore.getState().seed();

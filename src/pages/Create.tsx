@@ -15,6 +15,8 @@ import {
   IonPage,
   IonPopover,
   IonRange,
+  IonSelect,
+  IonSelectOption,
   IonTextarea,
   IonTitle,
   IonToolbar,
@@ -50,6 +52,7 @@ export function Create() {
   const [participants, setParticipants] = useState("");
   const [dateTime, setDateTime] = useState("");
   const [screens, setScreens] = useState(0);
+  const [platformType, setPlatformType] = useState<Platform>(Platform.NONE);
 
   const onSubmit = () => {
     const formattedParticipants: Participant[] = participants
@@ -62,7 +65,7 @@ export function Create() {
       participants: formattedParticipants,
       startTime: formattedDateTime,
       setupsCount: screens,
-      platform: Platform.Wii
+      platform: platformType,
     });
 
     seed();
@@ -88,13 +91,6 @@ export function Create() {
                   ></IonInput>
                 </IonItem>
                 <IonItem>
-                  <IonLabel position="floating">Participants</IonLabel>
-                  <IonTextarea
-                    autoGrow
-                    onIonChange={(ev) => setParticipants(ev.detail.value!)}
-                  ></IonTextarea>
-                </IonItem>
-                <IonItem>
                   <IonLabel>Date and Time</IonLabel>
                   <IonButton fill="clear" id="trigger-button">
                     <IonIcon slot="icon-only" icon={calendarOutline} />
@@ -110,6 +106,13 @@ export function Create() {
                   </IonPopover>
                 </IonItem>
                 <IonItem>
+                  <IonLabel position="floating">Participants</IonLabel>
+                  <IonTextarea
+                    autoGrow
+                    onIonChange={(ev) => setParticipants(ev.detail.value!)}
+                  ></IonTextarea>
+                </IonItem>
+                <IonItem>
                   <IonLabel>Available Screens</IonLabel>
                   <IonRange
                     min={0}
@@ -121,6 +124,20 @@ export function Create() {
                     <IonLabel slot="start">0</IonLabel>
                     <IonLabel slot="end">10</IonLabel>
                   </IonRange>
+                </IonItem>
+                <IonItem>
+                  <IonLabel>Platform</IonLabel>
+                  <IonSelect
+                    value={platformType}
+                    placeholder="Platform"
+                    onIonChange={(ev) => setPlatformType(ev.detail.value)}
+                  >
+                    {Object.values(Platform)
+                      .filter((plat) => !(plat === Platform.NONE))
+                      .map((plat) => (
+                        <IonSelectOption value={plat}>{plat}</IonSelectOption>
+                      ))}
+                  </IonSelect>
                 </IonItem>
                 <IonItem>
                   <IonButton
