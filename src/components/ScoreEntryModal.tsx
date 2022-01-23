@@ -39,11 +39,7 @@ export function ScoreEntryModal(props: Props) {
     const requiredEntries = participants.length * 4;
     let entriesCount = 0;
     if(results) {
-        for(let raceResult of results.raceResults.map((mapResult) => mapResult.values()) ) {
-          for(let result of raceResult) {
-            entriesCount++;
-        }
-      }
+        entriesCount = results.raceResults.length;;
     }
     return entriesCount === requiredEntries;
   }
