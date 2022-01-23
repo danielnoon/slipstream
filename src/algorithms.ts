@@ -83,6 +83,12 @@ export const generateCourseSelection = (
   platform: Platform,
   threshold: number
 ): Course[] => {
+
+  if (threshold < 4) {
+    threshold = 4
+  } else if (threshold > 20) {
+    threshold = 20
+  }
   let courseSelection: Course[] = [];
 
   switch (platform) {
