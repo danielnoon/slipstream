@@ -5,6 +5,7 @@ import Tournament from '../src/types/Tournament';
 import Setup from '../src/types/Setup';
 import Course from '../src/types/Course';
 import { Platform } from '../src/types/Platform';
+import CourseData from '../src/courseData';
 
 
 test("Test handleLeftovers (no leftovers)", () => {
@@ -146,6 +147,14 @@ test("Test generateCourseSelection with random threshold 4-20", () => {
     expect(actualThreshold).toEqual(threshold)
 
     console.log(courses)
+
+})
+
+test("Test getRandomThreshold", () => {
+
+    let threshold = CourseData.getRandomThreshold();
+    expect(threshold).toBeLessThan(21)
+    expect(threshold).toBeGreaterThan(3)
 
 })
 
