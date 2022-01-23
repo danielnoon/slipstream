@@ -22,21 +22,22 @@ interface Props {
   id: number;
   eta?: Date;
   participants: Participant[];
-  onClick: () => void;
 }
 
 export function RoundCard(props: Props) {
-  const { id, eta, participants, onClick } = props;
+  const { id, eta, participants } = props;
 
   const [editorOpen, setEditorOpen] = useState(false);
 
   return (
     <IonCard
       className={[cardStyle, "ion-activatable", "ripple-parent"].join(" ")}
-      onClick={() => setEditorOpen(true)}
+      onClick={() => !editorOpen && setEditorOpen(true)}
     >
       <IonCardHeader>
-        <IonCardTitle><strong>Round {id + 1}</strong></IonCardTitle>
+        <IonCardTitle>
+          <strong>Round {id + 1}</strong>
+        </IonCardTitle>
         {eta && (
           <IonCardSubtitle>
             eta {eta.toTimeString().split(" ").slice(0, 1)}
@@ -53,7 +54,11 @@ export function RoundCard(props: Props) {
         ))}
       </IonList>
       <IonRippleEffect />
-      <ScoreEntryModal id={id} isOpen={editorOpen} onClose={() => setEditorOpen(false)} />
-    </IonCard >
+      <ScoreEntryModal
+        id={id}
+        isOpen={editorOpen}
+        onClose={() => setEditorOpen(false)}
+      />
+    </IonCard>
   );
 }
