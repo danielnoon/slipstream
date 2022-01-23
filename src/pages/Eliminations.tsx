@@ -5,9 +5,10 @@ import {
   IonCardContent,
   IonContent,
   IonIcon,
+  IonLabel,
   IonPage,
 } from "@ionic/react";
-import { close } from "ionicons/icons";
+import { close, trophy } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { Header } from "../components/Header";
 import { getState, useStore } from "../store";
@@ -46,6 +47,12 @@ const cardWrapper = css`
   overflow: hidden;
 `;
 
+const placeName = css`
+  font-size: 27px;
+  font-weight: 600;
+  padding-left: 5px;
+`;
+
 interface SeededParticipant {
   id: number;
   seed: number;
@@ -71,6 +78,10 @@ export function Eliminations() {
   const [active, setActive] = useState(testData.slice(-4));
   const [above, setAbove] = useState(testData.slice(0, -4));
   const [below, setBelow] = useState([] as SeededParticipant[]);
+
+  const [awardThird, setAwardThird] = useState(-1);
+  const [awardSecond, setAwardSecond] = useState(-1);
+  const [awardFirst, setAwardFirst] = useState(-1);
 
   useEffect(() => {
     const els = testData.map((p) => document.getElementById(`p-${p.id}`));
@@ -109,6 +120,20 @@ export function Eliminations() {
     }
   }
 
+  function awardPlace(participant: SeededParticipant) {
+
+    if (awardThird === -1) {
+      setAwardThird(participant.id)
+    } else if (awardSecond === -1 && awardThird != participant.id) {
+      setAwardSecond(participant.id)
+    } else if (awardFirst === -1 && awardSecond != participant.id) {
+      if (awardThird != participant.id) {
+        setAwardFirst(participant.id)
+      }
+    }
+
+  }
+
   return (
     <IonPage>
       <Header title={tournament?.name} showLeaderboard />
@@ -120,11 +145,17 @@ export function Eliminations() {
               className={card}
               id={`p-${participant.id}`}
               color={
-                active.find((a) => participant.id === a.id)
-                  ? "success"
-                  : below.find((b) => participant.id === b.id)
-                    ? "danger"
-                    : "light"
+                participant.id === awardThird
+                  ? "tertiary"
+                  : participant.id === awardSecond
+                    ? "secondary"
+                    : participant.id === awardFirst
+                      ? "primary"
+                      : active.find((a) => participant.id === a.id)
+                        ? "success"
+                        : below.find((b) => participant.id === b.id)
+                          ? "danger"
+                          : "light"
               }
             >
               <IonCardContent className={cardContent}>
@@ -132,7 +163,27 @@ export function Eliminations() {
                   {participant.seed}{" "}
                   {getState().participants.get(participant.id)?.name}
                 </span>
-                {active.find((a) => participant.id === a.id) && (
+                {active.length <= 3 && active.find((a) => participant.id === a.id) &&
+                  <IonButton
+                    size="small"
+                    fill="clear"
+                    color="light"
+                    className={eliminateButton}
+                    onClick={() => awardPlace(participant)}
+                  >
+                    {active.length <= 3 && active.find((a) => participant.id === awardThird) &&
+                      <IonLabel className={placeName}>Third Place!</IonLabel>
+                    }
+                    {active.length <= 3 && active.find((a) => participant.id === awardSecond) &&
+                      <IonLabel className={placeName}>Runner-up!</IonLabel>
+                    }
+                    {active.length <= 3 && active.find((a) => participant.id === awardFirst) &&
+                      <IonLabel className={placeName}> Champion!</IonLabel>
+                    }
+                    <IonIcon slot="icon-only" icon={trophy} />
+                  </IonButton>
+                }
+                {active.find((a) => participant.id === a.id) && active.length > 3 && (
                   <IonButton
                     size="small"
                     fill="clear"
