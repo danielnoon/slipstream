@@ -79,6 +79,10 @@ export function Create() {
     }
   };
 
+  const SetupSelector = css`
+  padding-top:10px;
+  `;
+
   return (
     <IonPage>
       <Header />
@@ -130,6 +134,7 @@ export function Create() {
                     snaps={true}
                     pin
                     onIonChange={(ev) => setScreens(ev.detail.value as number)}
+                    className={SetupSelector}
                   >
                     <IonLabel slot="start">1</IonLabel>
                     <IonLabel slot="end">10</IonLabel>
