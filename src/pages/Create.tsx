@@ -121,13 +121,13 @@ export function Create() {
                 <IonItem>
                   <IonLabel>Available Screens</IonLabel>
                   <IonRange
-                    min={0}
+                    min={1}
                     max={10}
                     snaps={true}
                     pin
                     onIonChange={(ev) => setScreens(ev.detail.value as number)}
                   >
-                    <IonLabel slot="start">0</IonLabel>
+                    <IonLabel slot="start">1</IonLabel>
                     <IonLabel slot="end">10</IonLabel>
                   </IonRange>
                 </IonItem>

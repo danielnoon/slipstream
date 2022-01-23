@@ -101,7 +101,9 @@ export const useStore = create<Store>((set) => ({
   },
 }));
 
+if (typeof window === 'object') {
 (window as any).store = useStore;
+}
 export const getState = () => useStore.getState();
 
 export const getTournament = (store: Store) => store.tournament;
