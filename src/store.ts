@@ -2,6 +2,7 @@ import produce, { enableAllPlugins } from "immer";
 import { range } from "itertools";
 import create from "zustand";
 import { createSeedingRounds } from "./algorithms";
+import { replacer, reviver } from "./persistence";
 import Participant from "./types/Participant";
 import { Platform } from "./types/Platform";
 import Round from "./types/Round";
@@ -15,6 +16,10 @@ export interface Store {
   setups: Setup[];
   rounds: Map<number, Round>;
   participants: Map<number, Participant>;
+  idCounter: number;
+  lastId: number;
+  tournamentList: { id: number; name: string }[];
+  currentId: number;
 
   createTournament: (tournament: Tournament) => void;
   seed: () => void;
@@ -33,17 +38,32 @@ export const useStore = create<Store>((set) => ({
   setups: [],
   rounds: new Map(),
   participants: new Map(),
+  idCounter: 0,
+  lastId: 0,
+  currentId: 0,
+  tournamentList: [],
 
   createTournament: (tournament) => {
     set(
       produce<Store>((draft) => {
         draft.tournament = tournament;
         draft.participants = new Map();
+        draft.idCounter += 1;
+        draft.lastId = draft.idCounter;
+        draft.currentId = draft.idCounter;
+        draft.tournamentList.push({
+          id: draft.idCounter,
+          name: tournament.name,
+        });
+
         for (const participant of tournament.participants) {
           draft.participants.set(participant.id, participant);
         }
       })
     );
+
+    queueMicrotask(save);
+    queueMicrotask(saveAppData);
   },
 
   seed: () => {
@@ -58,6 +78,8 @@ export const useStore = create<Store>((set) => ({
         }
       })
     );
+
+    queueMicrotask(save);
   },
 
   updateRound: (round) => {
@@ -66,6 +88,8 @@ export const useStore = create<Store>((set) => ({
         draft.rounds.set(round.id, round);
       })
     );
+
+    queueMicrotask(save);
   },
 
   setParticipantScore(id, score) {
@@ -77,6 +101,8 @@ export const useStore = create<Store>((set) => ({
         });
       })
     );
+
+    queueMicrotask(save);
   },
 
   setRaceResult(roundId, raceId, playerId, place) {
@@ -98,13 +124,10 @@ export const useStore = create<Store>((set) => ({
         });
       })
     );
+
+    queueMicrotask(save);
   },
 }));
-
-if (typeof window === 'object') {
-(window as any).store = useStore;
-}
-export const getState = () => useStore.getState();
 
 export const getTournament = (store: Store) => store.tournament;
 export const getParticipantScore = (id: number) => (store: Store) =>
@@ -113,28 +136,70 @@ export const getRank =
   (roundId: number, raceId: number, playerId: number) => (store: Store) =>
     store.rounds.get(roundId)?.result?.raceResults[raceId].get(playerId)?.rank!;
 
-const testParticipants = [
-  "Ally",
-  "Ben",
-  "Cathy",
-  "Daniel",
-  "Ethan",
-  "Fred",
-  "Gabe",
-  "Hugh",
-  "Iris",
-  "Jacob",
-  "Kathy",
-  "Leo",
-  "Mia",
-];
+export const getState = () => useStore.getState();
 
-useStore.getState().createTournament({
-  name: "Tournament 1",
-  participants: testParticipants.map((name, i) => ({ name, id: i, score: 0 })),
-  setupsCount: 3,
-  startTime: new Date(),
-  platform: Platform.NONE,
-});
+export function save() {
+  const { tournament, participants, rounds, setups, currentId } = getState();
 
-useStore.getState().seed();
+  const json = JSON.stringify(
+    { tournament, participants, rounds, setups },
+    replacer
+  );
+
+  localStorage.setItem(`tournament-${currentId}`, json);
+}
+
+export function saveAppData() {
+  const { tournamentList, idCounter, lastId } = getState();
+  const json = JSON.stringify(
+    { tournaments: tournamentList, idCounter, lastId },
+    replacer
+  );
+  localStorage.setItem("appData", json);
+}
+
+export function load(tournamentId: number) {
+  const json = localStorage.getItem(`tournament-${tournamentId}`);
+  if (json) {
+    const { tournament, participants, rounds, setups } = JSON.parse(
+      json,
+      reviver
+    ) as Store;
+    useStore.setState({
+      ...getState(),
+      tournament,
+      participants,
+      rounds,
+      setups,
+      currentId: tournamentId,
+    });
+  }
+}
+
+if (typeof window === "object") {
+  (window as any).store = useStore;
+}
+
+interface AppData {
+  tournaments: { id: number; name: string }[];
+  idCounter: number;
+  lastId: number;
+}
+
+const appData = localStorage.getItem("data");
+
+if (appData) {
+  const { tournaments, idCounter, lastId } = JSON.parse(appData) as AppData;
+
+  if (lastId > -1) {
+    load(lastId);
+  }
+
+  useStore.setState({
+    ...getState(),
+    tournamentList: tournaments,
+    idCounter,
+    lastId,
+    currentId: lastId > -1 ? lastId : -1,
+  });
+}

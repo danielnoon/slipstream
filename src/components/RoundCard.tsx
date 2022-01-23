@@ -4,11 +4,13 @@ import {
   IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
+  IonIcon,
   IonItem,
   IonLabel,
   IonList,
   IonRippleEffect,
 } from "@ionic/react";
+import { pencil } from "ionicons/icons";
 import { useState } from "react";
 import Participant from "../types/Participant";
 import { ScoreEntryModal } from "./ScoreEntryModal";
@@ -35,8 +37,9 @@ export function RoundCard(props: Props) {
       onClick={() => !editorOpen && setEditorOpen(true)}
     >
       <IonCardHeader>
-        <IonCardTitle>
-          <strong>Round {id + 1}</strong>
+        <IonCardTitle style={{ display: "flex" }}>
+          <strong style={{ flexGrow: 1 }}>Round {id + 1}</strong>
+          <IonIcon icon={pencil} />
         </IonCardTitle>
         {eta && (
           <IonCardSubtitle>
@@ -46,7 +49,7 @@ export function RoundCard(props: Props) {
       </IonCardHeader>
       <IonList>
         {participants.map((part, i) => (
-          <IonItem>
+          <IonItem key={part.id}>
             <IonLabel>
               {i + 1}. {part.name}
             </IonLabel>
