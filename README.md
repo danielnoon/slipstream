@@ -1,6 +1,8 @@
 ![Slipsteam Logo](https://github.com/danielnoon/slipstream/blob/main/src/assets/logo/light.png)
-# Slipstream
+# [Slipstream](https://slipstreamapp.net)
 An advanced Mario Kart tournament bracket/leaderboard generator.
+
+# [PRESENTATION VIDEO LINK](https://youtu.be/Qh6EyvaaIRw): https://youtu.be/Qh6EyvaaIRw
 
 ## The Problem
 Ever wanted to run a Mario Kart tournament but didn't know where to start? As a tournament organizer (TO), there's *tons* of headaches that will need to be navigated:
@@ -31,4 +33,4 @@ This project is nothing more than a Minimum Viable Product (MVP). While we plan 
 
 Obligatory [Figma link](https://www.figma.com/file/fQW7B1Q4ogxKzvBoPFGY9z/Slipstream?node-id=0%3A1) of the prototype.
 
-# Slipstream. Speed past the headaches of planning. 
+# [Slipstream](https://slipstreamapp.net). Speed past the headaches of planning. 
