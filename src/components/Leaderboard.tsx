@@ -29,7 +29,7 @@ interface Props {
 }
 
 const ordinalException = (rank: number): boolean => {
-  switch(rank % 100) {
+  switch (rank % 100) {
     case 11:
     case 12:
     case 13:
@@ -40,10 +40,10 @@ const ordinalException = (rank: number): boolean => {
 }
 
 const getOrdinal = (rank: number): string => {
-  if(ordinalException(rank)) {
+  if (ordinalException(rank)) {
     return "th";
   }
-  switch(rank % 10) {
+  switch (rank % 10) {
     case 1:
       return "st";
     case 2:
@@ -61,15 +61,15 @@ export function Leaderboard(props: Props) {
 
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
-      <IonContent>
+      <IonContent style={{ '--background': 'var(--ion-item-background)' }}>
         <IonList lines="inset">
           <IonItem>
             <IonIcon icon={trophyOutline} />
             <IonIcon icon={trophyOutline} />
             <IonIcon icon={trophyOutline} />
             <IonListHeader className={LeaderboardLabel}>
-              <strong style={{width: "100%", textAlign: "center"}}>Leaderboard</strong>
-              </IonListHeader>
+              <strong style={{ width: "100%", textAlign: "center" }}>Leaderboard</strong>
+            </IonListHeader>
             <IonIcon icon={trophyOutline} />
             <IonIcon icon={trophyOutline} />
             <IonIcon icon={trophyOutline} />
@@ -81,10 +81,10 @@ export function Leaderboard(props: Props) {
           </IonItem>
           <div className={grid}>
             <IonItem>
-                <IonListHeader>Rank</IonListHeader>
+              <IonListHeader>Rank</IonListHeader>
             </IonItem>
             <IonItem>
-                <IonListHeader>Name</IonListHeader>
+              <IonListHeader>Name</IonListHeader>
             </IonItem>
             <IonItem>
               <IonListHeader>Score</IonListHeader>
