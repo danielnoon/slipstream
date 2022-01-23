@@ -15,6 +15,7 @@ import logoLight from "../assets/logo/light.png";
 import logoDark from "../assets/logo/dark.png";
 import { Leaderboard } from "./Leaderboard";
 import { prefersDarkTheme } from "../darkTheme";
+import { useIonRouter } from "@ionic/react";
 
 interface Props {
   showLeaderboard?: boolean;
@@ -31,6 +32,7 @@ const leaderboardLabel = css`
 
 export function Header({ showLeaderboard, title }: Props) {
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const router = useIonRouter();
 
   return (
     <IonHeader>
@@ -40,7 +42,8 @@ export function Header({ showLeaderboard, title }: Props) {
           src={prefersDarkTheme() ? logoDark : logoLight}
           alt="Slipstream Logo"
           height="40"
-          style={{ marginLeft: 12, marginTop: 3 }}
+          style={{ marginLeft: 12, marginTop: 3, cursor: "pointer" }}
+          onClick={() => router.push("/")}
         />
         <IonTitle>{title}</IonTitle>
         {showLeaderboard && (
