@@ -24,7 +24,6 @@ export function Header({ showLeaderboard, title }: Props) {
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const router = useIonRouter();
 
-
   return (
     <IonHeader>
       <IonToolbar>
