@@ -1,4 +1,4 @@
-import { css } from "@emotion/css";
+import { css, keyframes } from "@emotion/css";
 import {
   IonButton,
   IonCard,
@@ -9,11 +9,23 @@ import {
   IonPage,
   useIonRouter,
   useIonViewDidEnter,
+  useIonViewWillEnter,
 } from "@ionic/react";
 import { close, trophy } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { Header } from "../components/Header";
 import { getState, useStore } from "../store";
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-20%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 const card = css`
   max-width: 100%;
@@ -22,6 +34,7 @@ const card = css`
   display: block;
   position: absolute;
   transition: all 0.3s ease-in-out;
+  animation: ${fadeIn} 200ms ease-out;
 `;
 
 const eliminateButton = css`
@@ -124,7 +137,13 @@ export function Eliminations() {
     setSeededParticipants(seededParticipants);
     setActive(seededParticipants.slice(-4));
     setAbove(seededParticipants.slice(0, -4));
-    setBelow([] as SeededParticipant[]);
+  });
+
+  useIonViewWillEnter(() => {
+    setSeededParticipants([]);
+    setActive([]);
+    setAbove([]);
+    setBelow([]);
     setAwardFirst(-1);
     setAwardSecond(-1);
     setAwardThird(-1);
@@ -183,7 +202,7 @@ export function Eliminations() {
         <div className={cardWrapper}>
           {seededParticipants.map((participant) => (
             <IonCard
-              key={`${participant.id}-${participant.seed}-${getState().participants.get(participant.id)?.name}`}
+              key={`${participant.id}-${participant.seed}`}
               className={card}
               id={`p-${participant.id}`}
               style={{
