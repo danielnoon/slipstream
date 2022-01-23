@@ -83,37 +83,29 @@ export const generateCourseSelection = (
   platform: Platform,
   threshold: number
 ): Course[] => {
+
+  if (threshold < 4) {
+    threshold = 4
+  } else if (threshold > 20) {
+    threshold = 20
+  }
   let courseSelection: Course[] = [];
 
   switch (platform) {
     case Platform.Wii:
-      let dividedThreshold = threshold / 4.0;
+      let dividedThreshold = threshold / 4.0
 
-      const firstCourse = CourseData.getRandomWiiCourse(
-        Math.round(dividedThreshold)
-      );
-      const secondCourse = CourseData.getRandomWiiCourse(
-        Math.round((threshold - firstCourse.degreeOfDifficulty) / 3.0)
-      );
-      const thirdCourse = CourseData.getRandomWiiCourse(
-        Math.round(
-          (threshold -
-            firstCourse.degreeOfDifficulty -
-            secondCourse.degreeOfDifficulty) /
-            2.0
-        )
-      );
-      const fourthCourse = CourseData.getRandomWiiCourse(
-        Math.round(
-          threshold -
-            firstCourse.degreeOfDifficulty -
-            secondCourse.degreeOfDifficulty -
-            thirdCourse.degreeOfDifficulty
-        )
-      );
-
-      courseSelection = [firstCourse, secondCourse, thirdCourse, fourthCourse];
+      const firstCourse = CourseData.getRandomWiiCourse(Math.round(dividedThreshold))
+      courseSelection.push(firstCourse)
+      const secondCourse = CourseData.getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty) / 3.0), courseSelection)
+      courseSelection.push(secondCourse)
+      const thirdCourse = CourseData.getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty - secondCourse.degreeOfDifficulty) / 2.0), courseSelection)
+      courseSelection.push(thirdCourse)
+      const fourthCourse = CourseData.getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty - secondCourse.degreeOfDifficulty - thirdCourse.degreeOfDifficulty)), courseSelection)
+      courseSelection.push(fourthCourse)
   }
 
-  return courseSelection;
-};
+  return courseSelection
+}
+
+export { };
