@@ -53,7 +53,6 @@ export function ScoreEntryModal(props: Props) {
     }
     return entriesCount === requiredEntries;
   }
-  console.log(canSubmit());
 
   const ordinalsMap = ["1st", "2nd", "3rd", "4th"];
   
