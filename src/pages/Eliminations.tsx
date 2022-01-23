@@ -54,6 +54,10 @@ const placeName = css`
   padding-left: 5px;
 `;
 
+const awardName = css`
+  padding-left: 5px;
+`;
+
 interface SeededParticipant {
   id: number;
   seed: number;
@@ -86,6 +90,8 @@ export function Eliminations() {
   const [awardThird, setAwardThird] = useState(-1);
   const [awardSecond, setAwardSecond] = useState(-1);
   const [awardFirst, setAwardFirst] = useState(-1);
+
+  const [placeToAward, setPlaceToAward] = useState("Award 3rd")
 
   useEffect(() => {
     const els = seededParticipants.map((p) => document.getElementById(`p-${p.id}`));
@@ -128,14 +134,35 @@ export function Eliminations() {
 
     if (awardThird === -1) {
       setAwardThird(participant.id)
+      setPlaceToAward("Award 2nd")
     } else if (awardSecond === -1 && awardThird != participant.id) {
       setAwardSecond(participant.id)
+      setPlaceToAward("Award 1st")
     } else if (awardFirst === -1 && awardSecond != participant.id) {
       if (awardThird != participant.id) {
         setAwardFirst(participant.id)
       }
     }
+  }
 
+  function getColors(id: number) {
+    if (id === awardThird) {
+      return ['orange', 'white']
+    }
+    if (id === awardSecond) {
+      return ['silver', 'black']
+    }
+    if (id === awardFirst) {
+      return ['gold', 'black']
+    }
+    if (active.find((a) => id === a.id)) {
+      return ['green', 'white']
+    }
+    if ( below.find((b) => id === b.id)) {
+      return ['red', 'white']
+    }
+
+    return ['white', 'black']
   }
 
   return (
@@ -148,23 +175,24 @@ export function Eliminations() {
               key={participant.id}
               className={card}
               id={`p-${participant.id}`}
-              color={
-                participant.id === awardThird
-                  ? "tertiary"
-                  : participant.id === awardSecond
-                    ? "secondary"
-                    : participant.id === awardFirst
-                      ? "primary"
-                      : active.find((a) => participant.id === a.id)
-                        ? "success"
-                        : below.find((b) => participant.id === b.id)
-                          ? "danger"
-                          : "light"
-              }
+              style={{ '--background': getColors(participant.id)[0], '--color': getColors(participant.id)[1]}}
+              // color={
+              //   participant.id === awardThird
+              //     ? "tertiary"
+              //     : participant.id === awardSecond
+              //       ? "primary"
+              //       : participant.id === awardFirst
+              //         ? "warning"
+              //         : active.find((a) => participant.id === a.id)
+              //           ? "success"
+              //           : below.find((b) => participant.id === b.id)
+              //             ? "danger"
+              //             : "light"
+              // }
             >
               <IonCardContent className={cardContent}>
                 <span className={name}>
-                  {participant.seed}{" "}
+                  {participant.seed + 1}{" "}
                   {getState().participants.get(participant.id)?.name}
                 </span>
                 {active.length <= 3 && active.find((a) => participant.id === a.id) &&
@@ -182,8 +210,13 @@ export function Eliminations() {
                       <IonLabel className={placeName}>Runner-up!</IonLabel>
                     }
                     {active.length <= 3 && active.find((a) => participant.id === awardFirst) &&
-                      <IonLabel className={placeName}> Champion!</IonLabel>
+                      <IonLabel className={placeName}>Champion!</IonLabel>
                     }
+                    {![awardFirst, awardSecond, awardThird].includes(participant.id) && <>
+                      {active.length === 3 &&
+                        <IonLabel className={awardName}>{placeToAward}</IonLabel>
+                      }
+                    </>}
                     <IonIcon slot="icon-only" icon={trophy} />
                   </IonButton>
                 }
