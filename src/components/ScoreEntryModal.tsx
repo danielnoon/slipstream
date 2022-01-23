@@ -1,5 +1,6 @@
 import { css } from "@emotion/css";
 import {
+  IonAlert,
   IonButton,
   IonButtons,
   IonContent,
@@ -11,11 +12,13 @@ import {
   IonModal,
   IonSelect,
   IonSelectOption,
+  IonText,
   IonTitle,
   IonToolbar,
+  useIonAlert,
 } from "@ionic/react";
 import { range } from "itertools";
-import React, { Fragment } from "react";
+import React, { useState, Fragment } from "react";
 import { useStore } from "../store";
 import { uploadRoundResult } from "../algorithms";
 import { current } from "immer";
@@ -57,6 +60,8 @@ export function ScoreEntryModal(props: Props) {
   const courses = useStore((state) => state.rounds.get(id)?.courses!);
   const setRaceResult = useStore((state) => state.setRaceResult);
   const results = useStore((state) => state.rounds.get(id)?.result);
+  const [submitted, setSubmitted] = useState(false);
+  const [presentSubmitWarning] = useIonAlert();
 
   const canSubmit = (): boolean => {
     const requiredEntries = participants.length * 4;
@@ -67,7 +72,26 @@ export function ScoreEntryModal(props: Props) {
         0
       );
     }
-    return entriesCount === requiredEntries;
+    return entriesCount === requiredEntries && !submitted;
+  };
+
+  const submitRound = (): void => {
+    presentSubmitWarning({
+      header: "Are you sure?",
+      message: "Rounds cannot be changed once they've been submitted!",
+      buttons: [
+        "Cancel",
+        {
+          text: "Yes",
+          handler: () => {
+            uploadRoundResult(results!);
+            setSubmitted(true);
+            onClose?.();
+          },
+        },
+      ],
+      onDidDismiss: (e) => console.log("did dismiss"),
+    });
   };
 
   const ordinalsMap = ["1st", "2nd", "3rd", "4th"];
@@ -85,7 +109,7 @@ export function ScoreEntryModal(props: Props) {
       >
         {[...range(participants.length)].map((i) => {
           return (
-            <IonSelectOption value={i} key={i}>
+            <IonSelectOption value={i} key={i} disabled={submitted}>
               {ordinalsMap[i]}
             </IonSelectOption>
           );
@@ -93,6 +117,18 @@ export function ScoreEntryModal(props: Props) {
       </IonSelect>
     );
   };
+
+  // const renderSubmitWarning = (warnProps: Props) => {
+  //   const {id: warnId, isOpen: warnIsOpen, onClose: warnOnClose} = warnProps;
+
+  //   const onWarningClose = () => {
+  //     warnOnClose!();
+  //   }
+
+  //   return (
+  //     <IonAlert message="Hello" isOpen={warnIsOpen} onDidDismiss={warnOnClose} />
+  //   )
+  // }
 
   return (
     <IonModal isOpen={isOpen} className={modal} onDidDismiss={onClose}>
@@ -135,13 +171,27 @@ export function ScoreEntryModal(props: Props) {
           </IonGrid>
           {
             <div className={flex}>
-              <IonButton
-                color={canSubmit() && results ? "primary" : "dark"}
-                disabled={!(canSubmit() && results)}
-                onClick={() => uploadRoundResult(results!)}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                }}
               >
-                Submit Round
-              </IonButton>
+                <IonButton
+                  style={{ marginBottom: "1em" }}
+                  color={canSubmit() && results ? "primary" : "dark"}
+                  disabled={!(canSubmit() && results)}
+                  onClick={() => submitRound()}
+                >
+                  Submit Round
+                </IonButton>
+                {submitted && (
+                  <IonText color="medium">
+                    Round {id + 1} has already been submitted!
+                  </IonText>
+                )}
+              </div>
             </div>
           }
         </div>

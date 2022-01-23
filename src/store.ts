@@ -160,7 +160,6 @@ export function saveAppData() {
 
 export function load(tournamentId: number) {
   const json = localStorage.getItem(`tournament-${tournamentId}`);
-  console.log(json);
   if (json) {
     const { tournament, participants, rounds, setups } = JSON.parse(
       json,
