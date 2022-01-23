@@ -32,10 +32,8 @@ export function ScoreEntryModal(props: Props) {
 
   const { id, isOpen, onClose } = props;
   const participants = useStore(state => state.rounds.get(id)?.participants!);
-  console.log(participants);
   const setRaceResult = useStore(state => state.setRaceResult);
   const results = useStore(state => state.rounds.get(id)?.result);
-  console.log(results);
 
   const canSubmit = (): boolean => {
     const requiredEntries = participants.length * 4;
