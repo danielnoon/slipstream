@@ -57,7 +57,7 @@ export function ScoreEntryModal(props: Props) {
       >
         {
           [...range(participants.length)].map((i) => {
-            return <IonSelectOption value={i}>{ordinalsMap[i]}</IonSelectOption>
+            return <IonSelectOption value={i} key={i}>{ordinalsMap[i]}</IonSelectOption>
           })
         }
       </IonSelect>

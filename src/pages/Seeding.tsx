@@ -20,7 +20,7 @@ export function Seeding() {
       <IonContent>
         {setups.map((setup, i) => (
           <div key={i}>
-            <h2>Setup {setup.id}</h2>
+            <h2>Setup {setup.id + 1}</h2>
             <div className={roundsWrapper}>
               {setup.rounds.map((round, i) => (
                 <RoundCard
