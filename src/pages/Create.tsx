@@ -26,6 +26,7 @@ import { createSeedingRounds } from "../algorithms";
 import { Header } from "../components/Header";
 import { useStore } from "../store";
 import Participant from "../types/Participant";
+import { Platform } from "../types/Platform";
 
 const wrapper = css`
   display: flex;
@@ -61,6 +62,7 @@ export function Create() {
       participants: formattedParticipants,
       startTime: formattedDateTime,
       setupsCount: screens,
+      platform: Platform.Wii
     });
 
     seed();

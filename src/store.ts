@@ -3,6 +3,7 @@ import { range } from "itertools";
 import create from "zustand";
 import { createSeedingRounds } from "./algorithms";
 import Participant from "./types/Participant";
+import { Platform } from "./types/Platform";
 import Round from "./types/Round";
 import Setup from "./types/Setup";
 import Tournament from "./types/Tournament";
@@ -82,18 +83,15 @@ export const useStore = create<Store>((set) => ({
     set(
       produce<Store>((draft) => {
         const round = draft.rounds.get(roundId)!;
-        console.log("hello");
         if (!round.result) {
           round.result = {
             raceResults: [],
             roundStandings: [],
           };
         }
-        console.log("helloo")
         if (!round.result.raceResults[raceId]) {
           round.result.raceResults[raceId] = new Map();
         }
-        console.log("hellooo")
         round.result.raceResults[raceId].set(playerId, {
           participant: playerId,
           rank: place,
@@ -104,6 +102,7 @@ export const useStore = create<Store>((set) => ({
 }));
 
 (window as any).store = useStore;
+export const getState = () => useStore.getState();
 
 export const getTournament = (store: Store) => store.tournament;
 export const getParticipantScore = (id: number) => (store: Store) =>
@@ -133,6 +132,7 @@ useStore.getState().createTournament({
   participants: testParticipants.map((name, i) => ({ name, id: i, score: 0 })),
   setupsCount: 3,
   startTime: new Date(),
+  platform: Platform.Wii,
 });
 
 useStore.getState().seed();
