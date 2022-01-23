@@ -5,6 +5,7 @@ import { css } from "@emotion/css";
 
 import logo from "../assets/logo/transparent.png";
 import { Leaderboard } from "./Leaderboard";
+import { useIonRouter } from "@ionic/react";
 
 interface Props {
   showLeaderboard?: boolean;
@@ -21,6 +22,7 @@ const leaderboardLabel = css`
 
 export function Header({ showLeaderboard, title }: Props) {
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const router = useIonRouter();
 
 
   return (
@@ -31,7 +33,8 @@ export function Header({ showLeaderboard, title }: Props) {
           src={logo}
           alt="Slipstream Logo"
           height="40"
-          style={{ marginLeft: 12, marginTop: 3 }}
+          style={{ marginLeft: 12, marginTop: 3, cursor: "pointer"}}
+          onClick={() => router.push("/")}
         />
         <IonTitle>{title}</IonTitle>
         {showLeaderboard && (
