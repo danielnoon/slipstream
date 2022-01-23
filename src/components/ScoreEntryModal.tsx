@@ -1,5 +1,6 @@
 import { css } from "@emotion/css";
 import { IonContent, IonGrid, IonItem, IonListHeader, IonModal, IonSelect, IonSelectOption } from "@ionic/react";
+import { range } from "itertools";
 import React, { Fragment } from "react";
 import { useStore } from "../store";
 
@@ -16,11 +17,12 @@ const grid = (players: number) => css`
 interface Props {
   id: number;
   isOpen: boolean;
+  onClose?: () => void;
 }
 
 export function ScoreEntryModal(props: Props) {
 
-  const { id, isOpen } = props;
+  const { id, isOpen, onClose } = props;
   const participants = useStore(state => state.rounds.get(id)?.participants!);
   const setRaceResult = useStore(state => state.setRaceResult);
   const results = useStore(state => state.rounds.get(id)?.result);
@@ -43,7 +45,7 @@ export function ScoreEntryModal(props: Props) {
   }
 
   return (
-    <IonModal isOpen={isOpen} className={modal}>
+    <IonModal isOpen={isOpen} className={modal} onDidDismiss={onClose}>
       <IonContent>
         <IonGrid className={grid(participants.length)}>
           <div></div>
@@ -57,18 +59,7 @@ export function ScoreEntryModal(props: Props) {
               <div>
                 <IonListHeader>Match {i + 1}</IonListHeader>
               </div>
-              <div>
-                {select(0, i)}
-              </div>
-              <div>
-                {select(1, i)}
-              </div>
-              <div>
-                {select(2, i)}
-              </div>
-              <div>
-                {select(3, i)}
-              </div>
+              {[...range(participants.length)].map(participant => <div key={participant}>{select(participant, i)}</div>)}
             </Fragment>
           ))}
         </IonGrid>

@@ -38,7 +38,7 @@ export function Home() {
             <IonTitle size="large">You don't have any tournaments!</IonTitle>
           </IonCard>
         </div>
-        <ScoreEntryModal id={0} isOpen />
+        {/* <ScoreEntryModal id={0} isOpen /> */}
       </IonContent>
     </IonPage>
   );

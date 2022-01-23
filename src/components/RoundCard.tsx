@@ -9,7 +9,9 @@ import {
   IonList,
   IonRippleEffect,
 } from "@ionic/react";
+import { useState } from "react";
 import Participant from "../types/Participant";
+import { ScoreEntryModal } from "./ScoreEntryModal";
 
 const cardStyle = css`
   min-width: 300px;
@@ -26,10 +28,12 @@ interface Props {
 export function RoundCard(props: Props) {
   const { id, eta, participants, onClick } = props;
 
+  const [editorOpen, setEditorOpen] = useState(false);
+
   return (
     <IonCard
       className={[cardStyle, "ion-activatable", "ripple-parent"].join(" ")}
-      onClick={onClick}
+      onClick={() => setEditorOpen(true)}
     >
       <IonCardHeader>
         <IonCardTitle>Round {id}</IonCardTitle>
@@ -49,6 +53,7 @@ export function RoundCard(props: Props) {
         ))}
       </IonList>
       <IonRippleEffect />
-    </IonCard>
+      <ScoreEntryModal id={id} isOpen={editorOpen} onClose={() => setEditorOpen(false)} />
+    </IonCard >
   );
 }
