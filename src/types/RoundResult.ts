@@ -1,7 +1,11 @@
 import Participant from "./Participant";
-import RaceResult from "./RaceResult";
+
+interface RaceResult {
+  participant: number;
+  rank: number;
+}
 
 export default interface RoundResult {
-  raceResults: RaceResult[]
-  roundStandings: Participant[]
+  raceResults: Map<number, RaceResult>[];
+  roundStandings: Participant[];
 }
