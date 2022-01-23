@@ -91,13 +91,6 @@ export function Create() {
                   ></IonInput>
                 </IonItem>
                 <IonItem>
-                  <IonLabel position="floating">Participants</IonLabel>
-                  <IonTextarea
-                    autoGrow
-                    onIonChange={(ev) => setParticipants(ev.detail.value!)}
-                  ></IonTextarea>
-                </IonItem>
-                <IonItem>
                   <IonLabel>Date and Time</IonLabel>
                   <IonButton fill="clear" id="trigger-button">
                     <IonIcon slot="icon-only" icon={calendarOutline} />
@@ -111,6 +104,13 @@ export function Create() {
                       onIonChange={(ev) => setDateTime(ev.detail.value!)}
                     />
                   </IonPopover>
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="floating">Participants</IonLabel>
+                  <IonTextarea
+                    autoGrow
+                    onIonChange={(ev) => setParticipants(ev.detail.value!)}
+                  ></IonTextarea>
                 </IonItem>
                 <IonItem>
                   <IonLabel>Available Screens</IonLabel>
