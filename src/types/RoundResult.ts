@@ -6,6 +6,7 @@ interface RaceResult {
 }
 
 export default interface RoundResult {
+  // participant_id, RaceResult
   raceResults: Map<number, RaceResult>[];
   roundStandings: Participant[];
 }

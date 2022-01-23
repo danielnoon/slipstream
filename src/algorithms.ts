@@ -86,8 +86,40 @@ export function createSeedingRounds(tournamentDetails: Tournament): Setup[] {
 // // getting a participant from the store
 // useStore.getState().participants.get(participant_id)
 
-export function updatePlayerScores(results: RoundResult[]): void {
-    //
+const uploadNewScore = (participant_id: number, newScore: number): void => {
+    const newPoints = useStore.getState().participants.get(participant_id)!.score + newScore;
+    useStore.getState().setParticipantScore(participant_id, newPoints);
+}
+
+export function updatePlayerScores(results: RoundResult): void {
+    // functions for assigning points
+    const getPoints = (rank: number): number => {
+        return 5 - rank;
+    }
+    const getRoundPoints = (rank: number): number => {
+        switch(rank) {
+            case 1:
+                return 6;
+            case 2:
+                return 4;
+            case 3:
+                return 3;
+            default:
+                return 2;
+        }
+    }
+    // set the scores for each round result
+    for(let raceResult of results.raceResults.map((mapResult) => mapResult.values()) ) {
+        for(let result of raceResult) {
+            const score = getPoints(result.rank);
+            uploadNewScore(result.participant, score);
+        }
+    }
+    // set the scores for the final finishes of the round
+    for(let i = 0; i < results.roundStandings.length; i++) {
+        const score = getRoundPoints(i);
+        uploadNewScore(results.roundStandings[i].id, score);
+    }
 }
 
 export const generateCourseSelection = (
