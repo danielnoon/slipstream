@@ -91,9 +91,8 @@ export function Eliminations() {
         });
       below.forEach((card, i) => {
         const el = document.getElementById(`p-${card.id}`)!;
-        el.style.top = `${
-          activeX + activeHeight + (height + PADDING) * i - PADDING
-        }px`;
+        el.style.top = `${activeX + activeHeight + (height + PADDING) * i - PADDING
+          }px`;
       });
     }
   }, [active, above, below]);
@@ -112,7 +111,7 @@ export function Eliminations() {
 
   return (
     <IonPage>
-      <Header title={tournament?.name} />
+      <Header title={tournament?.name} showLeaderboard />
       <IonContent className="ion-padding">
         <div className={cardWrapper}>
           {testData.map((participant) => (
@@ -124,8 +123,8 @@ export function Eliminations() {
                 active.find((a) => participant.id === a.id)
                   ? "success"
                   : below.find((b) => participant.id === b.id)
-                  ? "danger"
-                  : "light"
+                    ? "danger"
+                    : "light"
               }
             >
               <IonCardContent className={cardContent}>

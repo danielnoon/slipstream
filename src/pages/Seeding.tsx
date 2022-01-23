@@ -17,11 +17,11 @@ export function Seeding() {
 
   return (
     <IonPage>
-      <Header title={tournament?.name} />
+      <Header title={tournament?.name} showLeaderboard />
       <IonContent>
         {setups.map((setup, i) => (
           <div key={i}>
-            <SetupLabel label={"Setup " + (setup.id + 1)}/>
+            <SetupLabel label={"Setup " + (setup.id + 1)} />
             <div className={roundsWrapper}>
               {setup.rounds.map((round, i) => (
                 <RoundCard
