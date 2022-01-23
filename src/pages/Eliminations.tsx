@@ -68,18 +68,17 @@ const PADDING = 16;
 export function Eliminations() {
   const router = useIonRouter();
   const tournament = useStore((state) => state.tournament);
-  const seededParticipants: SeededParticipant[] | undefined = tournament?.participants
-    .slice()
-    .sort((a, b) => b.score - a.score)
-    .map((part, i) => (
-      {
+  const seededParticipants: SeededParticipant[] | undefined =
+    tournament?.participants
+      .slice()
+      .sort((a, b) => b.score - a.score)
+      .map((part, i) => ({
         id: part.id,
-        seed: i
-      }
-    ));
+        seed: i,
+      }));
 
   if (!seededParticipants) {
-    router.push('/');
+    router.push("/");
     return null;
   }
 
@@ -91,10 +90,12 @@ export function Eliminations() {
   const [awardSecond, setAwardSecond] = useState(-1);
   const [awardFirst, setAwardFirst] = useState(-1);
 
-  const [placeToAward, setPlaceToAward] = useState("Award 3rd")
+  const [placeToAward, setPlaceToAward] = useState("Award 3rd");
 
   useEffect(() => {
-    const els = seededParticipants.map((p) => document.getElementById(`p-${p.id}`));
+    const els = seededParticipants.map((p) =>
+      document.getElementById(`p-${p.id}`)
+    );
     const height = els[0]?.getBoundingClientRect().height;
     if (height) {
       const activeHeight = active.length * (height + PADDING) + PADDING;
@@ -112,8 +113,9 @@ export function Eliminations() {
         });
       below.forEach((card, i) => {
         const el = document.getElementById(`p-${card.id}`)!;
-        el.style.top = `${activeX + activeHeight + (height + PADDING) * i - PADDING
-          }px`;
+        el.style.top = `${
+          activeX + activeHeight + (height + PADDING) * i - PADDING
+        }px`;
       });
     }
   }, [active, above, below]);
@@ -131,38 +133,37 @@ export function Eliminations() {
   }
 
   function awardPlace(participant: SeededParticipant) {
-
     if (awardThird === -1) {
-      setAwardThird(participant.id)
-      setPlaceToAward("Award 2nd")
+      setAwardThird(participant.id);
+      setPlaceToAward("Award 2nd");
     } else if (awardSecond === -1 && awardThird != participant.id) {
-      setAwardSecond(participant.id)
-      setPlaceToAward("Award 1st")
+      setAwardSecond(participant.id);
+      setPlaceToAward("Award 1st");
     } else if (awardFirst === -1 && awardSecond != participant.id) {
       if (awardThird != participant.id) {
-        setAwardFirst(participant.id)
+        setAwardFirst(participant.id);
       }
     }
   }
 
   function getColors(id: number) {
     if (id === awardThird) {
-      return ['orange', 'white']
+      return ["#cd7f32", "white"];
     }
     if (id === awardSecond) {
-      return ['silver', 'black']
+      return ["#aaa9ad", "black"];
     }
     if (id === awardFirst) {
-      return ['gold', 'black']
+      return ["#d4af37", "black"];
     }
     if (active.find((a) => id === a.id)) {
-      return ['green', 'white']
+      return ["var(--ion-color-success)", "var(--ion-color-success-contrast)"];
     }
-    if ( below.find((b) => id === b.id)) {
-      return ['red', 'white']
+    if (below.find((b) => id === b.id)) {
+      return ["var(--ion-color-danger)", "var(--ion-color-danger-contrast)"];
     }
 
-    return ['white', 'black']
+    return ["var(--ion-color-light)", "var(--ion-color-light-contrast)"];
   }
 
   return (
@@ -175,62 +176,68 @@ export function Eliminations() {
               key={participant.id}
               className={card}
               id={`p-${participant.id}`}
-              style={{ '--background': getColors(participant.id)[0], '--color': getColors(participant.id)[1]}}
-              // color={
-              //   participant.id === awardThird
-              //     ? "tertiary"
-              //     : participant.id === awardSecond
-              //       ? "primary"
-              //       : participant.id === awardFirst
-              //         ? "warning"
-              //         : active.find((a) => participant.id === a.id)
-              //           ? "success"
-              //           : below.find((b) => participant.id === b.id)
-              //             ? "danger"
-              //             : "light"
-              // }
+              style={{
+                "--background": getColors(participant.id)[0],
+                "--color": getColors(participant.id)[1],
+              }}
             >
               <IonCardContent className={cardContent}>
                 <span className={name}>
                   {participant.seed + 1}{" "}
                   {getState().participants.get(participant.id)?.name}
                 </span>
-                {active.length <= 3 && active.find((a) => participant.id === a.id) &&
-                  <IonButton
-                    size="small"
-                    fill="clear"
-                    color="light"
-                    className={eliminateButton}
-                    onClick={() => awardPlace(participant)}
-                  >
-                    {active.length <= 3 && active.find((a) => participant.id === awardThird) &&
-                      <IonLabel className={placeName}>Third Place!</IonLabel>
-                    }
-                    {active.length <= 3 && active.find((a) => participant.id === awardSecond) &&
-                      <IonLabel className={placeName}>Runner-up!</IonLabel>
-                    }
-                    {active.length <= 3 && active.find((a) => participant.id === awardFirst) &&
-                      <IonLabel className={placeName}>Champion!</IonLabel>
-                    }
-                    {![awardFirst, awardSecond, awardThird].includes(participant.id) && <>
-                      {active.length === 3 &&
-                        <IonLabel className={awardName}>{placeToAward}</IonLabel>
-                      }
-                    </>}
-                    <IonIcon slot="icon-only" icon={trophy} />
-                  </IonButton>
-                }
-                {active.find((a) => participant.id === a.id) && active.length > 3 && (
-                  <IonButton
-                    size="small"
-                    fill="clear"
-                    color="light"
-                    className={eliminateButton}
-                    onClick={() => eliminatePlayer(participant.id)}
-                  >
-                    <IonIcon slot="icon-only" icon={close} />
-                  </IonButton>
-                )}
+                {active.length <= 3 &&
+                  active.find((a) => participant.id === a.id) && (
+                    <IonButton
+                      size="small"
+                      fill="clear"
+                      style={{ "--color": getColors(participant.id)[1] }}
+                      className={eliminateButton}
+                      onClick={() => awardPlace(participant)}
+                    >
+                      {active.length <= 3 &&
+                        active.find((a) => participant.id === awardThird) && (
+                          <IonLabel className={placeName}>
+                            Third Place!
+                          </IonLabel>
+                        )}
+                      {active.length <= 3 &&
+                        active.find((a) => participant.id === awardSecond) && (
+                          <IonLabel className={placeName}>Runner-up!</IonLabel>
+                        )}
+                      {active.length <= 3 &&
+                        active.find((a) => participant.id === awardFirst) && (
+                          <IonLabel className={placeName}>Champion!</IonLabel>
+                        )}
+                      {![awardFirst, awardSecond, awardThird].includes(
+                        participant.id
+                      ) && (
+                        <>
+                          {active.length === 3 && (
+                            <IonLabel className={awardName}>
+                              {placeToAward}
+                            </IonLabel>
+                          )}
+                        </>
+                      )}
+                      <IonIcon slot="end" icon={trophy} />
+                    </IonButton>
+                  )}
+                {active.find((a) => participant.id === a.id) &&
+                  active.length > 3 && (
+                    <IonButton
+                      size="small"
+                      fill="clear"
+                      color="light"
+                      className={eliminateButton}
+                      onClick={() => eliminatePlayer(participant.id)}
+                    >
+                      <IonLabel className={awardName}>
+                        {above.length === 0 ? "4th PLACE" : "ELIMINATE"}
+                      </IonLabel>
+                      <IonIcon size="medium" slot="end" icon={close} />
+                    </IonButton>
+                  )}
               </IonCardContent>
             </IonCard>
           ))}
