@@ -82,15 +82,18 @@ export const useStore = create<Store>((set) => ({
     set(
       produce<Store>((draft) => {
         const round = draft.rounds.get(roundId)!;
+        console.log("hello");
         if (!round.result) {
           round.result = {
             raceResults: [],
             roundStandings: [],
           };
         }
+        console.log("helloo")
         if (!round.result.raceResults[raceId]) {
           round.result.raceResults[raceId] = new Map();
         }
+        console.log("hellooo")
         round.result.raceResults[raceId].set(playerId, {
           participant: playerId,
           rank: place,

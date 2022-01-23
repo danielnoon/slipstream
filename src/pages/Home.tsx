@@ -9,6 +9,7 @@ import {
   IonTitle,
 } from "@ionic/react";
 import { Header } from "../components/Header";
+import { ScoreEntryModal } from "../components/ScoreEntryModal";
 
 const content = css`
   display: grid;
@@ -37,6 +38,7 @@ export function Home() {
             <IonTitle size="large">You don't have any tournaments!</IonTitle>
           </IonCard>
         </div>
+        <ScoreEntryModal id={0} isOpen />
       </IonContent>
     </IonPage>
   );
