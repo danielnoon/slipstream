@@ -32,23 +32,19 @@ export function ScoreEntryModal(props: Props) {
 
   const { id, isOpen, onClose } = props;
   const participants = useStore(state => state.rounds.get(id)?.participants!);
-  console.log(participants);
   const setRaceResult = useStore(state => state.setRaceResult);
   const results = useStore(state => state.rounds.get(id)?.result);
-  console.log(results);
 
   const canSubmit = (): boolean => {
     const requiredEntries = participants.length * 4;
     let entriesCount = 0;
     if(results) {
-        for(let raceResult of results.raceResults.map((mapResult) => mapResult.values()) ) {
-          for(let result of raceResult) {
-            entriesCount++;
-        }
-      }
+        entriesCount = results.raceResults.length;;
     }
     return entriesCount === requiredEntries;
   }
+
+  const ordinalsMap = ["1st", "2nd", "3rd", "4th"];
   
   const select = (playerID: number, match: number) => {
   const raceResult = results?.raceResults[match]?.get(playerID);
@@ -59,10 +55,11 @@ export function ScoreEntryModal(props: Props) {
         placeholder="Result"
         onIonChange={ev => setRaceResult(id, match, playerID, ev.detail.value)}
       >
-        <IonSelectOption value={1}>1st</IonSelectOption>
-        <IonSelectOption value={2}>2nd</IonSelectOption>
-        <IonSelectOption value={3}>3rd</IonSelectOption>
-        <IonSelectOption value={4}>4th</IonSelectOption>
+        {
+          [...range(participants.length)].map((i) => {
+            return <IonSelectOption value={i} key={i}>{ordinalsMap[i]}</IonSelectOption>
+          })
+        }
       </IonSelect>
     )
   }

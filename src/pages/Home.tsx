@@ -9,6 +9,7 @@ import {
   IonTitle,
 } from "@ionic/react";
 import { Header } from "../components/Header";
+import { Leaderboard } from "../components/Leaderboard";
 import { ScoreEntryModal } from "../components/ScoreEntryModal";
 
 const content = css`
@@ -50,6 +51,7 @@ export function Home() {
             </IonCard>
           </div>
         </div>
+        <Leaderboard isOpen></Leaderboard>
       </IonContent>
     </IonPage>
   );
