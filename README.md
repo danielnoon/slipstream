@@ -1,4 +1,4 @@
-![Slipsteam Logo](https://github.com/danielnoon/slipstream/blob/main/src/assets/logo/dark.png)
+![Slipsteam Logo](https://github.com/danielnoon/slipstream/blob/main/src/assets/logo/light.png)
 # Slipstream
 An advanced Mario Kart tournament bracket/leaderboard generator.
 
