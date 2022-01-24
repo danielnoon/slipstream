@@ -7,7 +7,7 @@ import { chunked, range, groupby } from "itertools";
 import Course from "./types/Course";
 import { Platform } from "./types/Platform";
 import CourseData from "./courseData";
-import { useStore } from "./store";
+import { getRound, select, useStore } from "./store";
 import RoundResult from "./types/RoundResult";
 
 function shuffle<T>(arr: T[]): T[] {

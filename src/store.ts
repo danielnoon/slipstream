@@ -136,7 +136,11 @@ export const getRank =
   (roundId: number, raceId: number, playerId: number) => (store: Store) =>
     store.rounds.get(roundId)?.result?.raceResults[raceId].get(playerId)?.rank!;
 
+export const getRound = (roundId: number) => (store: Store) => store.rounds.get(roundId);
+// const round12 = select(getRound(12));
+
 export const getState = () => useStore.getState();
+export const select = <T>(selector: (store: Store) => T) => selector(getState());
 
 export function save() {
   const { tournament, participants, rounds, setups, currentId } = getState();
@@ -179,7 +183,7 @@ export function load(tournamentId: number) {
 }
 
 if (typeof window === "object") {
-  (window as any).store = useStore;
+  (window as any).getState = () => useStore.getState();
   (window as any).load = load;
 }
 

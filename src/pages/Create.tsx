@@ -27,7 +27,7 @@ import { calendarOutline } from "ionicons/icons";
 import { useState } from "react";
 import { createSeedingRounds } from "../algorithms";
 import { Header } from "../components/Header";
-import { useStore } from "../store";
+import { getRound, useStore } from "../store";
 import Participant from "../types/Participant";
 import { Platform } from "../types/Platform";
 

@@ -71,7 +71,7 @@ export function Home() {
           </IonButton>
           <div className="card-wrapper">
             <IonCard className={card}>
-              {!tournaments && (
+              {tournaments.length === 0 && (
                 <div className="center">
                   <IonTitle size="large">
                     You don't have any tournaments!
