@@ -8,6 +8,8 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
+  IonLabel,
+  IonList,
   IonListHeader,
   IonModal,
   IonSelect,
@@ -17,9 +19,9 @@ import {
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
-import { range } from "itertools";
+import { groupby, range, flatten } from "itertools";
 import React, { useState, Fragment } from "react";
-import { useStore } from "../store";
+import { useStore, select, getRound } from "../store";
 import { uploadRoundResult } from "../algorithms";
 import { current } from "immer";
 import { save } from "ionicons/icons";
@@ -96,9 +98,8 @@ export function ScoreEntryModal(props: Props) {
 
   const ordinalsMap = ["1st", "2nd", "3rd", "4th"];
 
-  const select = (playerID: number, match: number) => {
+  const selectRank = (playerID: number, match: number, round_id: number) => {
     const raceResult = results?.raceResults[match]?.get(playerID);
-
     return (
       <IonSelect
         value={raceResult?.rank}
@@ -117,6 +118,33 @@ export function ScoreEntryModal(props: Props) {
       </IonSelect>
     );
   };
+
+  const duplicateRanks = (round_id: number, match: number) => {
+    const round = select(getRound(round_id));
+    const errorEls = [];
+    if(round && round.result){
+      console.log([...[...round.result.raceResults][match].values()])
+      const course = round.courses;
+      const finishes = [...[...round.result.raceResults][match].values()].sort((a, b) => a.rank - b.rank);
+      const groups = groupby(finishes, (finish) => finish.rank);
+      for(const [key, value] of groups){
+        const sharedRank = [...value]
+        console.log(sharedRank);
+        if(sharedRank.length > 1){
+          const guiltyParticipants = [...sharedRank.map(result => participants.find((p) => p.id === result.participant)?.name)].join(", ");
+          const errorItem = <IonItem>
+            <IonLabel color="danger">
+            {`Error: ${guiltyParticipants} in Race #${match} cannot ${sharedRank.length === 2 ? "both" : "all"} finish ${ordinalsMap[key]}!`}
+            </IonLabel>
+            </IonItem>;
+          errorEls.push(errorItem);
+          // console.log(``)
+          // console.log(participants);
+        }
+      }
+    }
+    return errorEls;
+  }
 
   // const renderSubmitWarning = (warnProps: Props) => {
   //   const {id: warnId, isOpen: warnIsOpen, onClose: warnOnClose} = warnProps;
@@ -164,11 +192,19 @@ export function ScoreEntryModal(props: Props) {
                   <IonListHeader>{courses[i].name}</IonListHeader>
                 </div>
                 {participants.map((participant) => (
-                  <div key={participant.id}>{select(participant.id, i)}</div>
+                  <div key={participant.id}>{
+                    selectRank(participant.id, i, id)
+                    }</div>
                 ))}
               </Fragment>
             ))}
           </IonGrid>
+          <IonList>
+            {
+              // for now only displaying errors from Race # 1 in each round
+              duplicateRanks(id, 0)
+            }
+          </IonList>
           {
             <div className={flex}>
               <div
