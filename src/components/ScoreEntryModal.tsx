@@ -19,12 +19,13 @@ import {
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
-import { groupby, range, flatten } from "itertools";
+import { groupby, range, flatten, roundrobin } from "itertools";
 import React, { useState, Fragment } from "react";
 import { useStore, select, getRound } from "../store";
 import { uploadRoundResult } from "../algorithms";
 import { current } from "immer";
 import { save } from "ionicons/icons";
+import RaceResult from "../types/RaceResult";
 
 const modal = css`
   --width: 800px;
@@ -36,6 +37,7 @@ const grid = (players: number) => css`
   grid-template-columns: 12em repeat(${players}, 1fr);
   grid-template-rows: repeat(5, 4em);
   width: 100%;
+  place-items: center normal;
 `;
 
 const flex = css`
@@ -49,6 +51,14 @@ const flex = css`
 const disableButton = css`
   transition: 200ms linear;
 `;
+
+const error = css`
+  --background: transparent;
+  --border-color: transparent;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --min-height: min-content;
+`
 
 interface Props {
   id: number;
@@ -65,6 +75,50 @@ export function ScoreEntryModal(props: Props) {
   const [submitted, setSubmitted] = useState(false);
   const [presentSubmitWarning] = useIonAlert();
 
+  const hasAnyDuplicates = (): boolean => {
+    const round = select(getRound(id));
+    const matchHasDuplicates = (match: number): boolean => {
+      if(round && round.result && round.result.raceResults[match]) {
+        const finishes = [...round.result.raceResults[match].values()].sort((a, b) => a.rank - b.rank);
+        const groups = groupby(finishes, (finish) => finish.rank);
+        for(const [key, value] of groups) {
+          const sharedRank = [...value]
+          if(sharedRank.length > 1){
+            return true;
+          }
+        }
+        return false;
+      }
+      return true;
+    }
+    return [...range(courses.length)].map((i) => matchHasDuplicates(i)).some(e => e);
+  }
+
+  // checks if there are duplicate ranks in a race entered
+  const displayDuplicateErrors = (match: number) => {
+    const round = select(getRound(id));
+    const errorEls = [];
+    if(round && round.result && round.result.raceResults[match]){
+      const finishes = [...round.result.raceResults[match].values()].sort((a, b) => a.rank - b.rank);
+      const groups = groupby(finishes, (finish) => finish.rank);
+      for(const [key, value] of groups){
+        const sharedRank = [...value]
+        if(sharedRank.length > 1){
+          const guiltyParticipants = [...sharedRank.map(result => participants.find((p) => p.id === result.participant)?.name)];
+          guiltyParticipants[guiltyParticipants.length - 1] = "and " + guiltyParticipants[guiltyParticipants.length - 1];
+          const guiltyPartString = guiltyParticipants.join(guiltyParticipants.length === 2 ? " " : ", ")
+          const errorItem = <IonItem className={error}>
+            <IonLabel color="danger" style={{'margin': 4}}>
+            {`Error: ${guiltyPartString} in Race #${match + 1} cannot ${sharedRank.length === 2 ? "both" : "all"} finish ${ordinalsMap[key]}!`}
+            </IonLabel>
+            </IonItem>;
+          errorEls.push(errorItem);
+        }
+      }
+    }
+    return errorEls;
+  }
+
   const canSubmit = (): boolean => {
     const requiredEntries = participants.length * 4;
     let entriesCount = 0;
@@ -74,7 +128,7 @@ export function ScoreEntryModal(props: Props) {
         0
       );
     }
-    return entriesCount === requiredEntries && !submitted;
+    return entriesCount === requiredEntries && !submitted && !hasAnyDuplicates();
   };
 
   const submitRound = (): void => {
@@ -119,28 +173,6 @@ export function ScoreEntryModal(props: Props) {
     );
   };
 
-  const duplicateRanks = (round_id: number, match: number) => {
-    const round = select(getRound(round_id));
-    const errorEls = [];
-    if(round && round.result && round.result.raceResults[match]){
-      const finishes = [...round.result.raceResults[match].values()].sort((a, b) => a.rank - b.rank);
-      const groups = groupby(finishes, (finish) => finish.rank);
-      for(const [key, value] of groups){
-        const sharedRank = [...value]
-        console.log(sharedRank);
-        if(sharedRank.length > 1){
-          const guiltyParticipants = [...sharedRank.map(result => participants.find((p) => p.id === result.participant)?.name)].join(", ");
-          const errorItem = <IonItem>
-            <IonLabel color="danger">
-            {`Error: ${guiltyParticipants} in Race #${match} cannot ${sharedRank.length === 2 ? "both" : "all"} finish ${ordinalsMap[key]}!`}
-            </IonLabel>
-            </IonItem>;
-          errorEls.push(errorItem);
-        }
-      }
-    }
-    return errorEls;
-  }
 
   // const renderSubmitWarning = (warnProps: Props) => {
   //   const {id: warnId, isOpen: warnIsOpen, onClose: warnOnClose} = warnProps;
@@ -195,12 +227,13 @@ export function ScoreEntryModal(props: Props) {
               </Fragment>
             ))}
           </IonGrid>
-          <IonList>
+          {
+            hasAnyDuplicates() && <IonList style={{ 'background': 'transparent', 'padding-bottom': 16}}>
             {
-              // for now only displaying errors from Race # 1 in each round
-              [...range(courses.length)].map(c => duplicateRanks(id, c)).flat()
+              [...range(courses.length)].map(c => displayDuplicateErrors(c)).flat()
             }
           </IonList>
+          }
           {
             <div className={flex}>
               <div
