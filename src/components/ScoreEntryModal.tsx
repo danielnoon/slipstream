@@ -122,10 +122,8 @@ export function ScoreEntryModal(props: Props) {
   const duplicateRanks = (round_id: number, match: number) => {
     const round = select(getRound(round_id));
     const errorEls = [];
-    if(round && round.result){
-      console.log([...[...round.result.raceResults][match].values()])
-      const course = round.courses;
-      const finishes = [...[...round.result.raceResults][match].values()].sort((a, b) => a.rank - b.rank);
+    if(round && round.result && round.result.raceResults[match]){
+      const finishes = [...round.result.raceResults[match].values()].sort((a, b) => a.rank - b.rank);
       const groups = groupby(finishes, (finish) => finish.rank);
       for(const [key, value] of groups){
         const sharedRank = [...value]
@@ -138,8 +136,6 @@ export function ScoreEntryModal(props: Props) {
             </IonLabel>
             </IonItem>;
           errorEls.push(errorItem);
-          // console.log(``)
-          // console.log(participants);
         }
       }
     }
@@ -202,7 +198,7 @@ export function ScoreEntryModal(props: Props) {
           <IonList>
             {
               // for now only displaying errors from Race # 1 in each round
-              duplicateRanks(id, 0)
+              [...range(courses.length)].map(c => duplicateRanks(id, c)).flat()
             }
           </IonList>
           {
