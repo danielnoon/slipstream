@@ -3,6 +3,7 @@ import { IonButton, IonButtons, IonContent, IonIcon, IonItem, IonList, IonListHe
 import { close, trophyOutline } from "ionicons/icons";
 import { Fragment } from "react";
 import { useStore } from "../store";
+import { getOrdinal } from "../utility/rankFormatting";
 
 const grid = css`
   display: grid;
@@ -26,33 +27,6 @@ const flex = css`
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-}
-
-const ordinalException = (rank: number): boolean => {
-  switch (rank % 100) {
-    case 11:
-    case 12:
-    case 13:
-      return true;
-    default:
-      return false;
-  }
-}
-
-const getOrdinal = (rank: number): string => {
-  if (ordinalException(rank)) {
-    return "th";
-  }
-  switch (rank % 10) {
-    case 1:
-      return "st";
-    case 2:
-      return "nd";
-    case 3:
-      return "rd";
-    default:
-      return "th";
-  }
 }
 
 export function Leaderboard(props: Props) {

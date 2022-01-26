@@ -36,8 +36,8 @@ export function Seeding() {
         return false;
       }
       totalCount += result.raceResults.reduce(
-        (prev, curr) => prev + curr.size,
-        0
+        // strange bug where null is sometimes in the race results
+        (prev, curr) => prev + (curr ? curr.size : 0), 0
       );
     }
 

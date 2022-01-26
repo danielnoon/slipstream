@@ -124,7 +124,8 @@ export function ScoreEntryModal(props: Props) {
     let entriesCount = 0;
     if (results) {
       entriesCount = results.raceResults.reduce(
-        (prev, curr) => prev + curr.size,
+        // strange error where null is sometimes an item in raceResults
+        (prev, curr) => prev + (curr ? curr.size : 0),
         0
       );
     }

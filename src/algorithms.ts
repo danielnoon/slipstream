@@ -83,7 +83,7 @@ export function createSeedingRounds(tournamentDetails: Tournament): Setup[] {
 }
 
 // functions for assigning points
-const getPoints = (rank: number): number => {
+export const getPoints = (rank: number): number => {
   return 4 - rank;
 }
 
