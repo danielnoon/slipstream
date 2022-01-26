@@ -159,6 +159,7 @@ export function ScoreEntryModal(props: Props) {
       <IonSelect
         value={raceResult?.rank}
         placeholder="Result"
+        interface="popover"
         onIonChange={(ev) =>
           setRaceResult(id, match, playerID, ev.detail.value)
         }
