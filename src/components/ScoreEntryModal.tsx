@@ -21,8 +21,9 @@ import {
 } from "@ionic/react";
 import { groupby, range, flatten, roundrobin } from "itertools";
 import React, { useState, Fragment } from "react";
-import { useStore, select, getRound } from "../store";
+import { useStore, select, getRound, getState } from "../store";
 import { uploadRoundResult } from "../algorithms";
+import { getOrdinal } from "../utility/rankFormatting";
 import { current } from "immer";
 import { save } from "ionicons/icons";
 import RaceResult from "../types/RaceResult";
@@ -72,7 +73,8 @@ export function ScoreEntryModal(props: Props) {
   const courses = useStore((state) => state.rounds.get(id)?.courses!);
   const setRaceResult = useStore((state) => state.setRaceResult);
   const results = useStore((state) => state.rounds.get(id)?.result);
-  const [submitted, setSubmitted] = useState(false);
+  const round = useStore(getRound(id));
+  const submitted = round?.submitted ?? false;
   const [presentSubmitWarning] = useIonAlert();
 
   const hasAnyDuplicates = (): boolean => {
@@ -109,7 +111,7 @@ export function ScoreEntryModal(props: Props) {
           const guiltyPartString = guiltyParticipants.join(guiltyParticipants.length === 2 ? " " : ", ")
           const errorItem = <IonItem className={error}>
             <IonLabel color="danger" style={{'margin': 4}}>
-            {`Error: ${guiltyPartString} in Race #${match + 1} cannot ${sharedRank.length === 2 ? "both" : "all"} finish ${ordinalsMap[key]}!`}
+            {`Error: ${guiltyPartString} in Race #${match + 1} cannot ${sharedRank.length === 2 ? "both" : "all"} finish ${ (key + 1) + getOrdinal(key + 1)}!`}
             </IonLabel>
             </IonItem>;
           errorEls.push(errorItem);
@@ -142,7 +144,7 @@ export function ScoreEntryModal(props: Props) {
           text: "Yes",
           handler: () => {
             uploadRoundResult(results!);
-            setSubmitted(true);
+            getState().submitRound(id);
             onClose?.();
           },
         },
@@ -150,8 +152,6 @@ export function ScoreEntryModal(props: Props) {
       onDidDismiss: (e) => console.log("did dismiss"),
     });
   };
-
-  const ordinalsMap = ["1st", "2nd", "3rd", "4th"];
 
   const selectRank = (playerID: number, match: number, round_id: number) => {
     const raceResult = results?.raceResults[match]?.get(playerID);
@@ -167,7 +167,7 @@ export function ScoreEntryModal(props: Props) {
         {[...range(participants.length)].map((i) => {
           return (
             <IonSelectOption value={i} key={i} disabled={submitted}>
-              {ordinalsMap[i]}
+              {(i + 1) + getOrdinal(i + 1)}
             </IonSelectOption>
           );
         })}

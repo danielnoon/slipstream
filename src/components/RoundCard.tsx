@@ -110,7 +110,7 @@ export function RoundCard(props: Props) {
         {roundStandings().map((part, i) => (
           <IonItem key={part.id}>
             {
-              part.rank === 0 ? <IonLabel>{part.name}</IonLabel> : <IonLabel>{`${part.rank + getOrdinal(part.rank)} ${part.tie ?` (tie)`:''} - ${part.name}`}</IonLabel>
+              part.rank === 0 ? <IonLabel>{part.name}</IonLabel> : (<><IonLabel>{part.name}</IonLabel><IonLabel slot="end">{`${part.rank + getOrdinal(part.rank)}${part.tie ?` (tie)`:''}`}</IonLabel></>)
             }
           </IonItem>
         ))}

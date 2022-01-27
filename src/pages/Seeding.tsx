@@ -5,7 +5,7 @@ import { Header } from "../components/Header";
 import { RoundCard } from "../components/RoundCard";
 import { SetupLabel } from "../components/SetupLabel";
 import { prefersDarkTheme } from "../darkTheme";
-import { useStore } from "../store";
+import { useStore, getState } from "../store";
 
 const roundsWrapper = css`
   display: flex;
@@ -65,27 +65,49 @@ export function Seeding() {
         ))}
       </IonContent>
       <div className={buttonWrapper}>
-        <div style={{ width: "min-content", margin: "30px" }}
-          data-tip
-          data-for="continueTip">
-          <IonButton
-            style={{ position: "relative" }}
-            size="large"
-            color={canContinue() ? "primary" : "dark"}
-            disabled={!canContinue()}
-            onClick={() => router.push("/elims")}
-          >
-            Continue to Elims
-          </IonButton>
+        <div style={{display: 'flex'}}>
+          <div style={{ width: "min-content", margin: "30px" }}
+            data-tip
+            data-for="reseedTip">
+            <IonButton
+              style={{ position: "relative" }}
+              size="large"
+              color="warning"
+              onClick={() => getState().seed()}
+            >
+              Next Round
+            </IonButton>
+          </div>
+          {
+            <ReactTooltip
+              id="reseedTip"
+              type={prefersDarkTheme() ? "light" : "dark"}
+            >
+              Generate another seeding round for this tournament!
+            </ReactTooltip>
+          }
+          <div style={{ width: "min-content", margin: "30px" }}
+            data-tip
+            data-for="continueTip">
+            <IonButton
+              style={{ position: "relative" }}
+              size="large"
+              color={canContinue() ? "primary" : "dark"}
+              disabled={!canContinue()}
+              onClick={() => router.push("/elims")}
+            >
+              Continue to Elims
+            </IonButton>
+          </div>
+          {!canContinue() &&
+            <ReactTooltip
+              id="continueTip"
+              type={prefersDarkTheme() ? "light" : "dark"}
+            >
+              Finish all rounds to continue!
+            </ReactTooltip>
+          }
         </div>
-        {!canContinue() &&
-          <ReactTooltip
-            id="continueTip"
-            type={prefersDarkTheme() ? "light" : "dark"}
-          >
-            Finish all rounds to continue!
-          </ReactTooltip>
-        }
       </div>
     </IonPage>
   );

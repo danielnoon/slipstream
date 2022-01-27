@@ -23,6 +23,7 @@ export interface Store {
 
   createTournament: (tournament: Tournament) => void;
   seed: () => void;
+  submitRound: (id: number) => void;
   updateRound: (round: Round) => void;
   setParticipantScore: (id: number, score: number) => void;
   setRaceResult: (
@@ -90,6 +91,17 @@ export const useStore = create<Store>((set) => ({
     );
 
     queueMicrotask(save);
+  },
+
+  submitRound: (id) => {
+    set(
+      produce<Store>((draft) => {
+        const round = draft.rounds.get(id);
+        if (round) {
+          round.submitted = true;
+        }
+      })
+    )
   },
 
   setParticipantScore(id, score) {
