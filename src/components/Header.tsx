@@ -46,7 +46,7 @@ export function Header({ showLeaderboard, title, currentRound }: Props) {
           style={{ marginLeft: 12, marginTop: 3, cursor: "pointer" }}
           onClick={() => router.push("/")}
         />
-        <IonTitle>{`${title} - Round ${currentRound ?? ''}`}</IonTitle>
+        <IonTitle>{`${title ? title + " - Round " : ''}${currentRound ?? ''}`}</IonTitle>
         {showLeaderboard && (
           <>
             <IonButtons slot="end">

@@ -50,12 +50,14 @@ export function RoundCard(props: Props) {
           continue;
         }
         if(race.size === participants.length){
-          [...race.values()].forEach(result => {
+          const raceArr = [...race.values()];
+          const abnormalRound = round.participants.length !== 4;
+          raceArr.forEach(result => {
             const partRoundScore = standings.get(result.participant);
             if(partRoundScore){
-              standings.set(result.participant, partRoundScore + getPoints(result.rank));
+              standings.set(result.participant, partRoundScore + getPoints(result.rank, 4, abnormalRound));
             } else {
-              standings.set(result.participant, getPoints(result.rank));
+              standings.set(result.participant, getPoints(result.rank, 4, abnormalRound));
             }
           })
         }

@@ -143,7 +143,7 @@ export function ScoreEntryModal(props: Props) {
         {
           text: "Yes",
           handler: () => {
-            uploadRoundResult(results!);
+            uploadRoundResult(round!, 4);
             getState().submitRound(id);
             onClose?.();
           },

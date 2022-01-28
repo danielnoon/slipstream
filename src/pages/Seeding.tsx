@@ -82,7 +82,7 @@ export function Seeding() {
               id="reseedTip"
               type={prefersDarkTheme() ? "light" : "dark"}
             >
-              Generate another seeding round for this tournament!
+              Generate another seeding round for this tournament
             </ReactTooltip>
           }
           <div style={{ width: "min-content", margin: "30px" }}

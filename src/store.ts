@@ -1,7 +1,7 @@
 import produce, { enableAllPlugins } from "immer";
 import { range } from "itertools";
 import create from "zustand";
-import { createSeedingRounds } from "./algorithms";
+import { createSwissSeedingRounds } from "./algorithms";
 import { replacer, reviver } from "./persistence";
 import Participant from "./types/Participant";
 import { Platform } from "./types/Platform";
@@ -70,7 +70,7 @@ export const useStore = create<Store>((set) => ({
   seed: (seeding_round: number) => {
     set(
       produce<Store>((draft) => {
-        draft.setups = createSeedingRounds(draft.tournament!, seeding_round);
+        draft.setups = createSwissSeedingRounds({...draft.tournament!, participants: [...draft.participants.values()]}, 4, seeding_round);
         // handle legacy tournaments
         if(draft.tournament){
           if(draft.tournament.currRound === 0 || draft.tournament.currRound){

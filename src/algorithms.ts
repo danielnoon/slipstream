@@ -6,8 +6,8 @@ import Setup from "./types/Setup";
 import { chunked, range, groupby } from "itertools";
 import Course from "./types/Course";
 import { Platform } from "./types/Platform";
-import CourseData from "./courseData";
-import { getRound, select, useStore } from "./store";
+import COURSE_DATA, { getRandomThreshold, getRandomWiiCourse } from "./data/courseData";
+import { getRound, getState, select, useStore } from "./store";
 import RoundResult from "./types/RoundResult";
 
 function shuffle<T>(arr: T[]): T[] {
@@ -30,36 +30,47 @@ function shuffle<T>(arr: T[]): T[] {
   return arr;
 }
 
-export function handleLeftovers<T>(partitions: T[][], n: number): T[][] {
-  const leftovers = partitions[partitions.length - 1].length;
-  // deal with dispersing leftovers into more rounds
-  // cases:
-  //    3 people round [[1,2,3,4], [5,6,7,8], [9,10,11]] => [[1,2,3,4], [5,6,7,8], [9,10,11]]
-  //        have one 3 person round (no change)
-  //    2 people round [[1,2,3,4], [5,6,7,8], [9,10]] => [[1,2,3,4], [5,6,7], [9,10,8]]
-  //        have two 3 person rounds (pick 1 from a 4 person round and add to last round)
-  //    1 person round [[1,2,3,4], [5,6,7,8], [9]] => [[1,2,3], [5,6,7], [9,8,4]]
-  //        have three 3 person rounds (pick 1 from 2nd to last round, 1 from 3rd to last round)
-  for (let i = 1; i < 4 - leftovers; i++) {
-    // pick from one round back
-    // TODO: This will break ONLY on tournaments with 5, 6 players, but this ternary should fix it
-    const roundToPickFrom = partitions.length - (i + 1);
-    const filler = partitions[roundToPickFrom >= 0 ? roundToPickFrom : 0].pop();
-    // fill the last round with that filler player
-    partitions[partitions.length - 1].push(filler!);
+function generateEvenMatchups(parts: Participant[], partsPerMatch: number): Participant[][] {
+  if(partsPerMatch >= parts.length) {
+    return [parts];
   }
-  return partitions;
+  const matchups = []
+  const numMatches = Math.ceil(parts.length / partsPerMatch);
+  for(let i = 0; i < numMatches; i++){
+    const currMatchup = [];
+    for(let j = i; j < parts.length; j+=numMatches){
+      currMatchup.push(parts[j]);
+    }
+    matchups.push(currMatchup);
+  }
+  return matchups;
 }
 
-//TODO: This function only works if  Math.ceil(participants / 4) > setups, as a setup cannot go unused
-export function createSeedingRounds(tournamentDetails: Tournament, seeding_round: number): Setup[] {
-  const participantsShuffled = shuffle(tournamentDetails.participants);
-
+/**
+ * A function that generates an array of Setup objects that contain generated rounds done in the Swiss-style method of matchup generation
+ * It takes in a Tournament object, which should contain the tournament, which has all of the participants that the function will use 
+ * to generate rounds from, as well as the number of setups, so it can allocate the ideal amount of rounds to each setup for maximum
+ * resource efficiency. Swiss seeded rounds are generated purely randomly for the first round, but then are generated fairly (according to Swiss style)
+ * by being based off of the current standings for players.
+ * This function only works if  Math.ceil(participants / 4) > setups, as a setup cannot go unused
+ * @param tournamentDetails - a Tournament object that contains details about the tournament to generate rounds for. Must contain a list of participants, number of setups
+ * @param partsPerMatch - The amount of participants per race. For most Mariokart Tournaments, this will be 4, but it is passed as a parameter to allow flexibility
+ * @param seeding_round - The round in the tournament you are seeding for. Should not be repeated for a given tournament
+ * 
+ * @link Swiss-System Tournament Wikipedia https://en.wikipedia.org/wiki/Swiss-system_tournament
+ * 
+ * @author Liam Seper
+ * @returns - an array of Setup objects holding what rounds they will hold during this seeding round of the tournament
+ */
+export function createSwissSeedingRounds(tournamentDetails: Tournament, partsPerMatch: number, seeding_round: number): Setup[] {
+  let participants = tournamentDetails.participants;
+  if(seeding_round === 0){
+    participants = shuffle(participants);
+  } else {
+    participants = participants.sort((a, b) => b.score - a.score);
+  }
   // disperse rounds correctly
-  let rounds: Participant[][] = handleLeftovers(
-    [...chunked(participantsShuffled, 4)],
-    4
-  );
+  let rounds: Participant[][] = generateEvenMatchups(participants, partsPerMatch)
 
   let globalRoundId;
   if(tournamentDetails.currRound){
@@ -71,7 +82,10 @@ export function createSeedingRounds(tournamentDetails: Tournament, seeding_round
   const actualRounds: Round[] = [];
 
   for (let round = 0; round < rounds.length; round++) {
-    actualRounds.push({ id: globalRoundId, participants: rounds[round], submitted: false, courses: generateCourseSelection(tournamentDetails.platform, CourseData.getRandomThreshold()) });
+    actualRounds.push({ id: globalRoundId, 
+      participants: rounds[round], 
+      submitted: false, 
+      courses: generateCourseSelection(tournamentDetails.platform, getRandomThreshold(), partsPerMatch) });
     globalRoundId += 1;
   }
 
@@ -89,38 +103,101 @@ export function createSeedingRounds(tournamentDetails: Tournament, seeding_round
   return setups;
 }
 
-// functions for assigning points
-export const getPoints = (rank: number): number => {
-  return 4 - rank;
-}
-
-const getRoundPoints = (rank: number): number => {
+/**
+ * A function for rewarding points for a given finish in a single race within a round in a tournament
+ * Scales so that in a normal race, 1st place will have a score of (2 * (people_in_race - 1)) and last place
+ * will have a score of 0. In an abnormal race (explained below), 1st place will havea score of (2 * (people_in_race - 1.5))
+ * and last place will have a score of 1
+ * @param rank - the rank that the player finished in the race (0 for 1st, partsPerMatch - 1 for last)
+ * @param partsPerMatch - the number of players competing at once in a given match
+ * @param abnormalRound - if a round has an abnormal amount of players in it ( === partsPerMatch - 1)
+ * 
+ * @returns - the points to be awarded
+ * 
+ * @author Liam Seper
+ */
+export const getPoints = (rank: number, partsPerMatch: number, abnormalRound: boolean): number => {
+  if(abnormalRound){
+    // 5 - 3 - 1
+    return (((partsPerMatch - rank) - 1.5) * 2);
+  }
     // 6 - 4 - 2 - 0
-    return ((4 - rank) - 1) * 2;
+  return (((partsPerMatch - rank) - 1) * 2);
 }
 
-// assign ranks as an even distribution of what the scores would have been
-const handleTie = (pTied: number, rankTied: number): number => {
-    const totalPoints = [...range(pTied)].map(e => getRoundPoints(e + rankTied)).reduce((prev, curr) => prev + curr);
+/**
+ * A function for rewarding points for a given overall finish for a complete round of races in the tournament 
+ * @param rank - the rank that the participant finished in the round overall (0 for 1st, partsPerMatch - 1 for last)
+ * @param partsPerMatch - the number of participants competing at once in a given match
+ * @param abnormalRound - if a round has an abnormal amound of participants in it ( === partsPerMatch - 1)
+ * 
+ * @returns - the points to be awarded
+ * 
+ * @author Liam Seper
+ */
+const getRoundPoints = (rank: number, partsPerMatch: number, abnormalRound: boolean): number => {
+  if(abnormalRound){
+    // for when there is one less participant in the round than usual
+    return (((partsPerMatch - rank) - 1.5) * 4);
+  }
+  // for when there is the normal (expected) number of participants per match
+  // 2 * (pPerRace - 1), 2 * (pPerRace - 2), ... 2 * (pPerRace - pPerRace) 
+  return (((partsPerMatch - rank) - 1) * 4);
+}
+
+/**
+ * A function to distribute points in accordance to when two or more participants tie overall for a given round in the tournament
+ * This function distributes points by computing the average points that would have been awarded had each player finished in a consecutive manner
+ * For example, with partsPerMatch, if three people were tied for 2nd in a 6-person race, the average points would be computed as such:
+ * 2nd = 8 points, 3rd = 6 points, 4th = 2 points | average = round(sum(2nd, 3rd, 4th) / 3) = 5 points
+ * @param pTied - the number of participants tied for a single rank in a round 
+ * @param rankTied - the rank they are all tied for
+ * @param partsPerMatch - the number of participants that play in a normal round of the tournament
+ * @param abnormalRound - if the round has an abnormal amount of participants in it ( === partsPerMatch - 1)
+ * 
+ * @returns the points to be awarded to each tied participant
+ * 
+ * @author Liam Seper
+ */
+const handleTie = (pTied: number, rankTied: number, partsPerMatch: number, abnormalRound: boolean): number => {
+    const totalPoints = [...range(pTied)].map(e => getRoundPoints(e + rankTied, partsPerMatch, abnormalRound)).reduce((prev, curr) => prev + curr);
     return Math.round(totalPoints / pTied);
 }
 
-// // setting a participant's score
-// useStore.getState().setParticipantScore(participant_id, newScore)
-// // getting a participant from the store
-// useStore.getState().participants.get(participant_id)
+/**
+ * A function to interface with store.ts to add a new score for a given participant in the tournament
+ * NOTE: this function does NOT overwrite the players score, it simply adds the new score to the existing score
+ * @param participant_id - the id of the participant you are changing the score for
+ * @param newScore - the score you would like to add to the player's current score
+ * 
+ * @author Liam Seper
+ */
 const uploadNewScore = (participant_id: number, newScore: number): void => {
   const newPoints = useStore.getState().participants.get(participant_id)!.score + newScore;
   useStore.getState().setParticipantScore(participant_id, newPoints);
 }
 
-export function uploadRoundResult(results: RoundResult): void {
+/**
+ * A function to interface with store.ts to add the results of a round to each respective participant's scores
+ * Adds both the individual race scores and the overall round score to each participant, respectively
+ * @param round - the round you are submitting scores for
+ * @param partsPerMatch - the participants playing in a normal match in the tournament
+ * 
+ * @author Liam Seper
+ */
+export function uploadRoundResult(round: Round, partsPerMatch: number): void {
+  if(!round.result){
+    return;
+  }
+  const results = round.result;
   // set the scores for each race result
+  let abnormalRound = round.participants.length === partsPerMatch;
   const roundScoresMap: Map<number, number> = new Map<number, number>();
-  for (let raceResult of results.raceResults.map((mapResult) => mapResult.values())) {
-    for (let result of raceResult) {
+  for (let raceResult of results.raceResults) {
+    abnormalRound = raceResult.size !== partsPerMatch;
+    for (let result of raceResult.values()) {
       const currRoundScore = roundScoresMap.get(result.participant);
-      const score = getPoints(result.rank);
+      const score = getPoints(result.rank, partsPerMatch, abnormalRound);
       // done for determining the ending ranks of everyone
       if (currRoundScore) {
         roundScoresMap.set(result.participant, currRoundScore + score);
@@ -140,14 +217,14 @@ export function uploadRoundResult(results: RoundResult): void {
       const entriesArr = [...values];
       if(entriesArr.length === 1){
         const [pId, score] = entriesArr[0];
-        uploadNewScore(pId, getRoundPoints(i));
+        uploadNewScore(pId, getRoundPoints(i, partsPerMatch, abnormalRound));
         i++;
         // keep i consistent
         continue;
       } else {
           // a tie
           const numTies = entriesArr.length;
-          const tieScore = handleTie(numTies, i);
+          const tieScore = handleTie(numTies, i, partsPerMatch, abnormalRound);
           // award shared tie score to each player that tied
           for (const [pId, score] of entriesArr) {
               uploadNewScore(pId, tieScore);
@@ -158,9 +235,26 @@ export function uploadRoundResult(results: RoundResult): void {
   }
 }
 
+function getRandomCourse(coursePool: Course[], diffThreshold: number, chosenCourses: Course[]): Course {
+  const availableCourses = coursePool.filter((course: Course) => course.degreeOfDifficulty == diffThreshold && !chosenCourses.some((c) => c.name === course.name));
+  if (availableCourses.length > 0){
+    return availableCourses[Math.floor(Math.random() * availableCourses.length)];
+  }
+  return coursePool[Math.floor(Math.random() * coursePool.length)];
+}
+
+/**
+ * A function that generates courses randomly for a given platform using a difficulty threshold to select courses semi-randomly
+ * @param platform - the platform you are playing on
+ * @param threshold - the amount of difficulty you desire for your courses selection (varies 4(easiest for 4 race round) - 20(hardest for 4 race round))
+ * @returns an array of selected courses
+ * 
+ * @author Andrew Herold, Liam Seper
+ */
 export const generateCourseSelection = (
   platform: Platform,
-  threshold: number
+  threshold: number,
+  partsPerMatch: number
 ): Course[] => {
 
   if (threshold < 4) {
@@ -168,23 +262,30 @@ export const generateCourseSelection = (
   } else if (threshold > 20) {
     threshold = 20
   }
-  let courseSelection: Course[] = [];
+  const courseSelection: Course[] = [];
+  const coursesToChoose = COURSE_DATA.get(platform)!;
 
-  switch (platform) {
-    // TODO: the default case is for Mario Kart Wii (RevoKart). Make this work with other platforms
-
-    default:
-      let dividedThreshold = threshold / 4.0
-
-      const firstCourse = CourseData.getRandomWiiCourse(Math.round(dividedThreshold))
-      courseSelection.push(firstCourse)
-      const secondCourse = CourseData.getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty) / 3.0), courseSelection)
-      courseSelection.push(secondCourse)
-      const thirdCourse = CourseData.getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty - secondCourse.degreeOfDifficulty) / 2.0), courseSelection)
-      courseSelection.push(thirdCourse)
-      const fourthCourse = CourseData.getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty - secondCourse.degreeOfDifficulty - thirdCourse.degreeOfDifficulty)), courseSelection)
-      courseSelection.push(fourthCourse)
+  for(let courseChoice = 0; courseChoice < partsPerMatch; courseChoice++){
+    // cycle thresholds in groups of 4 for now, but this should be extendable in the future
+    const cThreshold = Math.round((threshold - courseSelection.reduce((c1, c2) => c1 + c2.degreeOfDifficulty, 0)) / (4 - courseChoice % 4));
+    courseSelection.push(getRandomCourse(coursesToChoose, cThreshold, courseSelection));
   }
+
+  // switch (platform) {
+  //   // TODO: the default case is for Mario Kart Wii (RevoKart). Make this work with other platforms
+
+  //   default:
+  //     let dividedThreshold = threshold / 4.0
+
+  //     const firstCourse = getRandomWiiCourse(Math.round(dividedThreshold))
+  //     courseSelection.push(firstCourse)
+  //     const secondCourse = getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty) / 3.0), courseSelection)
+  //     courseSelection.push(secondCourse)
+  //     const thirdCourse = getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty - secondCourse.degreeOfDifficulty) / 2.0), courseSelection)
+  //     courseSelection.push(thirdCourse)
+  //     const fourthCourse = getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty - secondCourse.degreeOfDifficulty - thirdCourse.degreeOfDifficulty)), courseSelection)
+  //     courseSelection.push(fourthCourse)
+  // }
 
   return courseSelection;
 };

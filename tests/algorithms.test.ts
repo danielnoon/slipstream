@@ -1,4 +1,4 @@
-import { createSeedingRounds, generateCourseSelection, handleLeftovers } from '../src/algorithms';
+import { createSwissSeedingRounds, generateCourseSelection } from '../src/algorithms';
 import Participant from '../src/types/Participant';
 import Round from '../src/types/Round';
 import Tournament from '../src/types/Tournament';
@@ -8,60 +8,6 @@ import { Platform } from '../src/types/Platform';
 import CourseData from '../src/courseData';
 
 
-test("Test handleLeftovers (no leftovers)", () => {
-    const numbers = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]];
-    const partition = handleLeftovers(numbers, 4);
-    console.log(partition);
-    // should be 4 rounds
-    expect(partition).toHaveLength(4);
-    // each round should have 4 entries
-    expect(partition[0]).toHaveLength(4);
-    expect(partition[1]).toHaveLength(4);
-    expect(partition[2]).toHaveLength(4);
-    expect(partition[3]).toHaveLength(4);
-});
-
-test("Test handleLeftovers (leftover round of 3)", () => {
-    const numbers = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15]];
-    const partition = handleLeftovers(numbers, 4);
-    console.log(partition);
-    // should be 4 rounds
-    expect(partition).toHaveLength(4);
-    // each round should have 4 entries
-    expect(partition[0]).toHaveLength(4);
-    expect(partition[1]).toHaveLength(4);
-    expect(partition[2]).toHaveLength(4);
-    // last round should have 3 entries
-    expect(partition[3]).toHaveLength(3);
-});
-
-test("Test handleLeftovers (leftover round of 2)", () => {
-    const numbers = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14]];
-    const partition = handleLeftovers(numbers, 4);
-    console.log(partition);
-    // should be 4 rounds
-    expect(partition).toHaveLength(4);
-    // each round should have 4 entries
-    expect(partition[0]).toHaveLength(4);
-    expect(partition[1]).toHaveLength(4);
-    // last two rounds should have 3 entries
-    expect(partition[2]).toHaveLength(3);
-    expect(partition[3]).toHaveLength(3);
-});
-
-test("Test handleLeftovers (leftover round of 1)", () => {
-    const numbers = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13]];
-    const partition = handleLeftovers(numbers, 4);
-    console.log(partition);
-    // should be 4 rounds
-    expect(partition).toHaveLength(4);
-    // each round should have 4 entries
-    expect(partition[0]).toHaveLength(4);
-    // last two rounds should have 3 entries
-    expect(partition[1]).toHaveLength(3);
-    expect(partition[2]).toHaveLength(3);
-    expect(partition[3]).toHaveLength(3);
-});
 
 const participants1: Participant[] = [
     { 
@@ -109,13 +55,16 @@ const participants1: Participant[] = [
 const tournament1: Tournament = {
     name: "Test Tournament #1",
     participants: participants1,
+    currRound: 0,
     startTime: new Date("March 11, 2021 12:00:00"),
     setupsCount: 2,
     platform: Platform.Wii
 }
 
 test("Test createSeedingRounds with no leftovers", () => {
-    const setups: Setup[] = createSeedingRounds(tournament1);
+    const partsPerMatch = 4;
+    const seedingRound = 0;
+    const setups: Setup[] = createSwissSeedingRounds(tournament1, partsPerMatch, seedingRound);
     // only 2 setups
     expect(setups).toHaveLength(2);
     // both setups have 1 round
@@ -319,13 +268,16 @@ const participants2: Participant[] = [
 const tournament2: Tournament = {
     name: "Test Tournament #2",
     participants: participants2,
+    currRound: 0,
     startTime: new Date("March 11, 2021 12:00:00"),
     setupsCount: 4,
     platform: Platform.Wii
 }
 
 test("Test createSeedingRounds with 3 leftovers and 4 setups", () => {
-    const setups: Setup[] = createSeedingRounds(tournament2);
+    const partsPerMatch = 4;
+    const currRound = 0;
+    const setups: Setup[] = createSwissSeedingRounds(tournament2, partsPerMatch, currRound);
     // only 2 setups
     expect(setups).toHaveLength(4);
     // both setups have 1 round
@@ -350,13 +302,16 @@ test("Test createSeedingRounds with 3 leftovers and 4 setups", () => {
 const tournament3: Tournament = {
     name: "Test Tournament #2",
     participants: participants2,
+    currRound: 0,
     startTime: new Date("March 11, 2021 12:00:00"),
     setupsCount: 5,
     platform: Platform.Wii
 }
 
 test("Test createSeedingRounds with 3 leftovers and 5 setups", () => {
-    const setups: Setup[] = createSeedingRounds(tournament3);
+    const partsPerMatch = 4;
+    const currRound = 0;
+    const setups: Setup[] = createSwissSeedingRounds(tournament3, partsPerMatch, currRound);
     // only 2 setups
     expect(setups).toHaveLength(5);
     // both setups have 1 round

@@ -59,7 +59,7 @@ export function Create() {
 
   const onSubmit = () => {
     const allEntered = event && participants && dateTime && screens && platformType !== Platform.NONE;
-    const tooManySetups = Math.ceil(participants.length / 4) < screens;
+    const tooManySetups = Math.ceil(participants.split('\n').length / 4) < screens;
 
     if (allEntered) {
       if (tooManySetups) {
