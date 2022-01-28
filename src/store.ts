@@ -22,7 +22,7 @@ export interface Store {
   currentId: number;
 
   createTournament: (tournament: Tournament) => void;
-  seed: () => void;
+  seed: (seeding_round: number) => void;
   submitRound: (id: number) => void;
   updateRound: (round: Round) => void;
   setParticipantScore: (id: number, score: number) => void;
@@ -67,10 +67,18 @@ export const useStore = create<Store>((set) => ({
     queueMicrotask(saveAppData);
   },
 
-  seed: () => {
+  seed: (seeding_round: number) => {
     set(
       produce<Store>((draft) => {
-        draft.setups = createSeedingRounds(draft.tournament!);
+        draft.setups = createSeedingRounds(draft.tournament!, seeding_round);
+        // handle legacy tournaments
+        if(draft.tournament){
+          if(draft.tournament.currRound === 0 || draft.tournament.currRound){
+            draft.tournament.currRound += 1;
+          } else {
+            draft.tournament.currRound = 0;
+          }
+        }
         draft.rounds = new Map();
         for (const setup of draft.setups) {
           for (const round of setup.rounds) {

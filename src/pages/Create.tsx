@@ -76,11 +76,12 @@ export function Create() {
           name: event,
           participants: formattedParticipants,
           startTime: formattedDateTime,
+          currRound: 0,
           setupsCount: screens,
           platform: platformType
         });
-
-        seed();
+        // seeding the first round of the tournament
+        seed(0);
 
         router.push("/seeding");
       }

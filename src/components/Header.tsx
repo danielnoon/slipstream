@@ -20,6 +20,7 @@ import { useIonRouter } from "@ionic/react";
 interface Props {
   showLeaderboard?: boolean;
   title?: string;
+  currentRound?: number;
 }
 
 const leaderboardLabel = css`
@@ -30,7 +31,7 @@ const leaderboardLabel = css`
   }
 `;
 
-export function Header({ showLeaderboard, title }: Props) {
+export function Header({ showLeaderboard, title, currentRound }: Props) {
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const router = useIonRouter();
 
@@ -45,7 +46,7 @@ export function Header({ showLeaderboard, title }: Props) {
           style={{ marginLeft: 12, marginTop: 3, cursor: "pointer" }}
           onClick={() => router.push("/")}
         />
-        <IonTitle>{title}</IonTitle>
+        <IonTitle>{`${title} - Round ${currentRound ?? ''}`}</IonTitle>
         {showLeaderboard && (
           <>
             <IonButtons slot="end">

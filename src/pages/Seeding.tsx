@@ -48,10 +48,9 @@ export function Seeding() {
     router.push("/");
     return null;
   }
-
   return (
     <IonPage>
-      <Header title={tournament?.name} showLeaderboard />
+      <Header title={tournament?.name} showLeaderboard currentRound={tournament.currRound}/>
       <IonContent className="ion-padding">
         {setups.map((setup, i) => (
           <div key={i}>
@@ -73,7 +72,7 @@ export function Seeding() {
               style={{ position: "relative" }}
               size="large"
               color="warning"
-              onClick={() => getState().seed()}
+              onClick={() => getState().seed(tournament.currRound)}
             >
               Next Round
             </IonButton>

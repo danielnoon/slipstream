@@ -52,7 +52,7 @@ export function handleLeftovers<T>(partitions: T[][], n: number): T[][] {
 }
 
 //TODO: This function only works if  Math.ceil(participants / 4) > setups, as a setup cannot go unused
-export function createSeedingRounds(tournamentDetails: Tournament): Setup[] {
+export function createSeedingRounds(tournamentDetails: Tournament, seeding_round: number): Setup[] {
   const participantsShuffled = shuffle(tournamentDetails.participants);
 
   // disperse rounds correctly
@@ -60,7 +60,14 @@ export function createSeedingRounds(tournamentDetails: Tournament): Setup[] {
     [...chunked(participantsShuffled, 4)],
     4
   );
-  let globalRoundId = 0;
+
+  let globalRoundId;
+  if(tournamentDetails.currRound){
+    globalRoundId = tournamentDetails.currRound * rounds.length;
+  } else {
+    globalRoundId = 0;
+  }
+
   const actualRounds: Round[] = [];
 
   for (let round = 0; round < rounds.length; round++) {
