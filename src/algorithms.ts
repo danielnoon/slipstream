@@ -7,7 +7,7 @@ import { chunked, range, groupby } from "itertools";
 import Course from "./types/Course";
 import { Platform } from "./types/Platform";
 import COURSE_DATA, { getRandomThreshold, getRandomWiiCourse } from "./data/courseData";
-import { getRound, getState, select, useStore } from "./store";
+import { useStore } from "./store";
 import RoundResult from "./types/RoundResult";
 
 function shuffle<T>(arr: T[]): T[] {
@@ -30,7 +30,15 @@ function shuffle<T>(arr: T[]): T[] {
   return arr;
 }
 
-function generateEvenMatchups(parts: Participant[], partsPerMatch: number): Participant[][] {
+/**
+ * Helper function for createSwissSeedingRounds, which creates the swiss matchups for a swiss seeding round
+ * @param parts - the sorted participants for the matchup creation (top ranked players should be lower index)
+ * @param partsPerMatch - the number of participants per match
+ * @return an array of participant arrays, each one representing an even matchup for the round
+ * 
+ * @author Liam Seper
+ */
+export function createSwissMatchups(parts: Participant[], partsPerMatch: number): Participant[][] {
   if(partsPerMatch >= parts.length) {
     return [parts];
   }
@@ -70,7 +78,7 @@ export function createSwissSeedingRounds(tournamentDetails: Tournament, partsPer
     participants = participants.sort((a, b) => b.score - a.score);
   }
   // disperse rounds correctly
-  let rounds: Participant[][] = generateEvenMatchups(participants, partsPerMatch)
+  let rounds: Participant[][] = createSwissMatchups(participants, partsPerMatch)
 
   let globalRoundId;
   if(tournamentDetails.currRound){
@@ -136,13 +144,7 @@ export const getPoints = (rank: number, partsPerMatch: number, abnormalRound: bo
  * @author Liam Seper
  */
 const getRoundPoints = (rank: number, partsPerMatch: number, abnormalRound: boolean): number => {
-  if(abnormalRound){
-    // for when there is one less participant in the round than usual
-    return (((partsPerMatch - rank) - 1.5) * 4);
-  }
-  // for when there is the normal (expected) number of participants per match
-  // 2 * (pPerRace - 1), 2 * (pPerRace - 2), ... 2 * (pPerRace - pPerRace) 
-  return (((partsPerMatch - rank) - 1) * 4);
+  return getPoints(rank, partsPerMatch, abnormalRound) * 2;
 }
 
 /**

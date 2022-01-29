@@ -213,20 +213,23 @@ interface AppData {
   lastId: number;
 }
 
-const appData = localStorage.getItem("appData");
-
-if (appData) {
-  const { tournaments, idCounter, lastId } = JSON.parse(appData) as AppData;
-
-  if (lastId > -1) {
-    load(lastId);
+// for making this file work with tests
+if (typeof window === 'object' && window.localStorage) {
+  const appData = localStorage.getItem("appData");
+  
+  if (appData) {
+    const { tournaments, idCounter, lastId } = JSON.parse(appData) as AppData;
+  
+    if (lastId > -1) {
+      load(lastId);
+    }
+  
+    useStore.setState({
+      ...getState(),
+      tournamentList: tournaments,
+      idCounter,
+      lastId,
+      currentId: lastId > -1 ? lastId : -1,
+    });
   }
-
-  useStore.setState({
-    ...getState(),
-    tournamentList: tournaments,
-    idCounter,
-    lastId,
-    currentId: lastId > -1 ? lastId : -1,
-  });
 }
