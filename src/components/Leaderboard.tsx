@@ -1,13 +1,14 @@
 import { css } from "@emotion/css";
 import { IonButton, IonButtons, IonContent, IonIcon, IonItem, IonList, IonListHeader, IonModal } from "@ionic/react";
-import { close, trophyOutline } from "ionicons/icons";
+import { close, trophyOutline, trophy } from "ionicons/icons";
 import { Fragment } from "react";
 import { useStore } from "../store";
-import { getOrdinal } from "../utility/rankFormatting";
+import { getOrdinal, getRankCSS, rankColors} from "../utility/rankFormatting";
+import { range } from "itertools";
 
 const grid = css`
   display: grid;
-  grid-template-columns: 1fr 3fr 3fr;
+  grid-template-columns: 1.25fr 3fr 2fr;
 `;
 
 const LeaderboardLabel = css`
@@ -24,6 +25,11 @@ const flex = css`
   flex-grow: 1;
 `;
 
+const circleCSS = (rank: number) => css`
+border-radius: 50%;
+background-color: ${rankColors[rank]};
+`
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -38,16 +44,16 @@ export function Leaderboard(props: Props) {
       <IonContent style={{ '--background': 'var(--ion-item-background)' }}>
         <IonList lines="inset">
           <IonItem>
-            <IonIcon icon={trophyOutline} />
-            <IonIcon icon={trophyOutline} />
-            <IonIcon icon={trophyOutline} />
+            {/* <IonIcon slot="start" icon={trophy} color="third"/>
+            <IonIcon slot="start" icon={trophy} color="second"/>
+            <IonIcon slot="start" icon={trophy} color="first"/> */}
             <IonListHeader className={LeaderboardLabel}>
               <strong style={{ width: "100%", textAlign: "center" }}>Leaderboard</strong>
             </IonListHeader>
-            <IonIcon icon={trophyOutline} />
-            <IonIcon icon={trophyOutline} />
-            <IonIcon icon={trophyOutline} />
-            <IonButtons>
+            {/* <IonIcon slot="end" icon={trophy} color="first"/>
+            <IonIcon slot="end" icon={trophy} color="second"/>
+            <IonIcon slot="end" icon={trophy} color="third"/> */}
+            <IonButtons >
               <IonButton onClick={onClose}>
                 <IonIcon icon={close} />
               </IonButton>
@@ -67,14 +73,14 @@ export function Leaderboard(props: Props) {
               .sort((a, b) => b.score - a.score)
               .map((part, i) => (
                 <Fragment key={part.id}>
-                  <div>
-                    <IonItem><strong>{(i + 1) + getOrdinal(i + 1)}</strong></IonItem>
-                  </div>
+                  <IonItem lines="none">
+                    <strong style={{color: "white", marginRight: 8}}>{(i + 1) + getOrdinal(i + 1)}</strong>
+                    {
+                      i < 3 && <IonIcon slot="end" icon={trophy} color={rankColors[i]}/>
+                    }
+                    </IonItem>
                   <div className={flex}>
                     <IonItem>{part.name}</IonItem>
-                    {
-                      i === 0 && <IonIcon icon={trophyOutline}></IonIcon>
-                    }
                   </div>
                   <div className={flex}>
                     <IonItem> {part.score} </IonItem>

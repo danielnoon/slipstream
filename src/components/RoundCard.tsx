@@ -10,18 +10,19 @@ import {
   IonList,
   IonRippleEffect,
 } from "@ionic/react";
-import { pencil } from "ionicons/icons";
+import { pencil, trophy, trophyOutline } from "ionicons/icons";
 import { useState } from "react";
 import Participant from "../types/Participant";
 import { ScoreEntryModal } from "./ScoreEntryModal";
-import { select, getRound } from '../store';
+import { select, getRound, getRank } from '../store';
 import { getPoints } from '../algorithms';
 import { groupby } from "itertools";
-import { getOrdinal } from "../utility/rankFormatting";
+import { getOrdinal, textColor, getRankCSS, rankColors } from "../utility/rankFormatting";
 
 const cardStyle = css`
   min-width: 300px;
   cursor: pointer;
+  padding: 10
 `;
 
 interface Props {
@@ -29,6 +30,8 @@ interface Props {
   eta?: Date;
   participants: Participant[];
 }
+
+const roundStandingsColors = [css`--background: transparent`, css`--background: #131313`, css`--background: #aaa9ad`, css`--background: #d4af37`]
 
 export function RoundCard(props: Props) {
   const { id, eta, participants } = props;
@@ -107,12 +110,15 @@ export function RoundCard(props: Props) {
           </IonCardSubtitle>
         )}
       </IonCardHeader>
-      
-      <IonList>
+      <IonIcon name="trophy"></IonIcon>
+      <IonList style={{paddingLeft: 10, paddingRight: 10}}>
         {roundStandings().map((part, i) => (
-          <IonItem key={part.id}>
+          <IonItem shape="round" lines="none" key={part.id}>
             {
-              part.rank === 0 ? <IonLabel>{part.name}</IonLabel> : (<><IonLabel>{part.name}</IonLabel><IonLabel slot="end">{`${part.rank + getOrdinal(part.rank)}${part.tie ?` (tie)`:''}`}</IonLabel></>)
+              [1, 2, 3].includes(part.rank) ? (<>
+              <IonLabel>{part.name}</IonLabel>
+              <IonIcon icon={trophyOutline} slot="end" color={rankColors[part.rank - 1]}/></>):  <IonLabel>{part.name}</IonLabel>
+              // <IonLabel  slot="end">{`${part.rank + getOrdinal(part.rank)}${part.tie ?` (tie)`:''}`}</IonLabel>
             }
           </IonItem>
         ))}
