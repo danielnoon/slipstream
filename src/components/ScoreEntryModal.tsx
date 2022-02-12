@@ -27,6 +27,7 @@ import { getOrdinal } from "../utility/rankFormatting";
 import { current } from "immer";
 import { save } from "ionicons/icons";
 import RaceResult from "../types/RaceResult";
+import { closeCircleOutline } from "ionicons/icons";
 
 const modal = css`
   --width: 800px;
@@ -209,11 +210,21 @@ export function ScoreEntryModal(props: Props) {
               </IonButtons>
             </IonToolbar>
           </IonHeader>
+  
           <IonGrid className={grid(participants.length)}>
             <div></div>
             {participants.map((part) => (
               <IonItem key={part.id}>
-                <IonListHeader>{part.name}</IonListHeader>
+                <IonListHeader>
+                  <IonLabel>{part.name}</IonLabel>
+                  
+                    <IonButton onClick={() => {
+                      getState().deleteParticipant(part.id)
+                    }}>
+                      <IonIcon color="danger" slot="icon-only" icon={closeCircleOutline}/>
+                    </IonButton>
+              
+                  </IonListHeader>
               </IonItem>
             ))}
             {[...range(4)].map((i) => (

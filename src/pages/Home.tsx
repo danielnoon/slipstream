@@ -6,17 +6,18 @@ import {
   IonContent,
   IonIcon,
   IonItem,
+  IonLabel,
   IonNavLink,
   IonPage,
   IonRouterLink,
   IonTitle,
   useIonRouter,
 } from "@ionic/react";
-import { arrowForward, list } from "ionicons/icons";
+import { arrowForward, list, removeCircleOutline } from "ionicons/icons";
 import { Header } from "../components/Header";
 import { Leaderboard } from "../components/Leaderboard";
 import { ScoreEntryModal } from "../components/ScoreEntryModal";
-import { load, useStore } from "../store";
+import { load, useStore, getState } from "../store";
 
 const content = css`
   display: grid;
@@ -83,16 +84,23 @@ export function Home() {
                   <IonItem
                     key={tournament.id}
                     className={listing}
-                    button
-                    onClick={() => openTournament(tournament.id)}
                   >
-                    {tournament.name}
-                    <IonIcon
-                      color="dark"
-                      slot="end"
-                      size="large"
-                      icon={arrowForward}
-                    />
+                    <IonLabel>
+                      {tournament.name}
+                    </IonLabel>
+                    <IonButtons>
+                      <IonButton slot="start" onClick={() => openTournament(tournament.id)}>
+                        <IonIcon
+                          color="dark"
+                          slot="icon-only"
+                          size="large"
+                          icon={arrowForward}
+                        />
+                      </IonButton>
+                      <IonButton slot="end" onClick={() => getState().deleteTournament(tournament.id)}>
+                        <IonIcon color="danger" slot="icon-only" icon={removeCircleOutline}/>
+                      </IonButton>
+                    </IonButtons>
                   </IonItem>
                 ))}
             </IonCard>

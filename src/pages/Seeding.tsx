@@ -28,20 +28,8 @@ export function Seeding() {
   const router = useIonRouter();
 
   const canContinue = (): boolean => {
-    const results = [...rounds.values()].map(round => round.result);
-    const totalRounds = tournament!.participants.length * 4;
-    let totalCount = 0;
-    for (let result of results) {
-      if (!result) {
-        return false;
-      }
-      totalCount += result.raceResults.reduce(
-        // strange bug where null is sometimes in the race results
-        (prev, curr) => prev + (curr ? curr.size : 0), 0
-      );
-    }
-
-    return totalRounds === totalCount;
+    // true if every round has been submitted, false if not
+    return [...rounds.values()].every(r => r.submitted)
   }
 
   if (!tournament) {
@@ -98,7 +86,7 @@ export function Seeding() {
               Continue to Elims
             </IonButton>
           </div>
-          {!canContinue() &&
+          {canContinue() &&
             <ReactTooltip
               id="continueTip"
               type={prefersDarkTheme() ? "light" : "dark"}

@@ -22,10 +22,13 @@ export interface Store {
   currentId: number;
 
   createTournament: (tournament: Tournament) => void;
+  // TODO: should also delete tournament from local storage, but for now just deleting from home list should be ok
+  deleteTournament: (id: number) => void;
   seed: (seeding_round: number) => void;
   submitRound: (id: number) => void;
   updateRound: (round: Round) => void;
   setParticipantScore: (id: number, score: number) => void;
+  deleteParticipant: (id: number) => void;
   setRaceResult: (
     round: number,
     race: number,
@@ -65,6 +68,15 @@ export const useStore = create<Store>((set) => ({
 
     queueMicrotask(save);
     queueMicrotask(saveAppData);
+  },
+
+  deleteTournament: (id: number) => {
+    set(
+      produce<Store>((draft) => {
+        const tournamentIndex = draft.tournamentList.findIndex(t => t.id === id);
+        draft.tournamentList.splice(tournamentIndex, 1);
+      })
+    )
   },
 
   seed: (seeding_round: number) => {
@@ -122,6 +134,55 @@ export const useStore = create<Store>((set) => ({
       })
     );
 
+    queueMicrotask(save);
+  },
+
+  deleteParticipant(id) {
+    set(
+      produce<Store>((draft) => {
+        // have to remove the partipant from multiple things within the tournament
+        // remove participant from participants map
+        draft.participants.delete(id);
+        // remove participant from tournament.participants array within tournament
+        draft.tournament?.participants.splice(draft.tournament.participants.findIndex(p => p.id === id), 1);
+        // remove from rounds, remove RoundResult from each round that has participant
+        let roundId = 0;
+        for(const [rId, round] of draft.rounds) {
+          if(round.participants.some(p => p.id === id)){
+            roundId = rId;
+            const round = draft.rounds.get(rId)!;
+            const pToRemoveIndex = round.participants.findIndex(p => p.id === id)!;
+            round.participants.splice(pToRemoveIndex, 1);
+            // remove all the raceresults of this participant
+            if(round.result) {
+              const raceResults = round.result.raceResults;
+              for(const map of raceResults){
+                for(const [pId, raceResult] of map){
+                  // update the ranks of the other participants
+                  if(pId === id){
+                    const rank = raceResult.rank;
+                    [...map.values()].forEach(rr => rr.rank -= rr.rank > rank ? 1 : 0);
+                    map.delete(pId);
+                    break;
+                  }
+                }
+              }
+            }
+            break;
+          }
+        }
+        // remove from setups
+        for(const setup of draft.setups){
+          const roundToChangeIndex = setup.rounds.findIndex(r => r.id === roundId);
+          if(roundToChangeIndex > 0){
+            const participants = setup.rounds[roundToChangeIndex].participants;
+            const pToRemoveIndex = participants.findIndex(p => p.id === id);
+            setup.rounds[roundToChangeIndex].participants.splice(pToRemoveIndex, 1);
+            break;
+          }
+        }
+      })
+    )
     queueMicrotask(save);
   },
 

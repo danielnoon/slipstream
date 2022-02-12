@@ -10,7 +10,7 @@ import {
   IonList,
   IonRippleEffect,
 } from "@ionic/react";
-import { pencil, trophy, trophyOutline } from "ionicons/icons";
+import { pencil, trophyOutline } from "ionicons/icons";
 import { useState } from "react";
 import Participant from "../types/Participant";
 import { ScoreEntryModal } from "./ScoreEntryModal";
@@ -28,14 +28,14 @@ const cardStyle = css`
 interface Props {
   id: number;
   eta?: Date;
-  participants: Participant[];
 }
 
 const roundStandingsColors = [css`--background: transparent`, css`--background: #131313`, css`--background: #aaa9ad`, css`--background: #d4af37`]
 
 export function RoundCard(props: Props) {
-  const { id, eta, participants } = props;
+  const { id, eta } = props;
   const round = select(getRound(id));
+  const participants = round?.participants!;
   const [editorOpen, setEditorOpen] = useState(false);
 
   interface RoundParticipant extends Participant {
@@ -118,7 +118,6 @@ export function RoundCard(props: Props) {
               [1, 2, 3].includes(part.rank) ? (<>
               <IonLabel>{part.name}</IonLabel>
               <IonIcon icon={trophyOutline} slot="end" color={rankColors[part.rank - 1]}/></>):  <IonLabel>{part.name}</IonLabel>
-              // <IonLabel  slot="end">{`${part.rank + getOrdinal(part.rank)}${part.tie ?` (tie)`:''}`}</IonLabel>
             }
           </IonItem>
         ))}
