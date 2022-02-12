@@ -47,6 +47,7 @@ export function Create() {
   const router = useIonRouter();
 
   const createTournament = useStore((state) => state.createTournament);
+  const totalTournaments = useStore(state => state.tournamentList.length);
   const seed = useStore((state) => state.seed);
 
   const [event, setEvent] = useState("");
@@ -73,6 +74,7 @@ export function Create() {
         const formattedDateTime: Date = new Date(dateTime);
 
         createTournament({
+          id: totalTournaments + 1,
           name: event,
           participants: formattedParticipants,
           startTime: formattedDateTime,

@@ -110,7 +110,7 @@ export function ScoreEntryModal(props: Props) {
           const guiltyParticipants = [...sharedRank.map(result => participants.find((p) => p.id === result.participant)?.name)];
           guiltyParticipants[guiltyParticipants.length - 1] = "and " + guiltyParticipants[guiltyParticipants.length - 1];
           const guiltyPartString = guiltyParticipants.join(guiltyParticipants.length === 2 ? " " : ", ")
-          const errorItem = <IonItem className={error}>
+          const errorItem = <IonItem className={error} key={key}>
             <IonLabel color="danger" style={{'margin': 4}}>
             {`Error: ${guiltyPartString} in Race #${match + 1} cannot ${sharedRank.length === 2 ? "both" : "all"} finish ${ (key + 1) + getOrdinal(key + 1)}!`}
             </IonLabel>

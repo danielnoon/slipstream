@@ -73,6 +73,7 @@ export const useStore = create<Store>((set) => ({
   deleteTournament: (id: number) => {
     set(
       produce<Store>((draft) => {
+        // delete from tournamentList
         const tournamentIndex = draft.tournamentList.findIndex(t => t.id === id);
         draft.tournamentList.splice(tournamentIndex, 1);
       })
