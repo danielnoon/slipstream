@@ -25,7 +25,6 @@ import {
 } from "@ionic/react";
 import { calendarOutline } from "ionicons/icons";
 import { useState } from "react";
-import { createSwissSeedingRounds } from "../algorithms";
 import { Header } from "../components/Header";
 import { getRound, useStore } from "../store";
 import Participant from "../types/Participant";
@@ -52,15 +51,16 @@ export function Create() {
 
   const [event, setEvent] = useState("");
   const [participants, setParticipants] = useState("");
+  const [partsPerRace, setPartsPerRace] = useState(4);
   const [dateTime, setDateTime] = useState("");
-  const [screens, setScreens] = useState(0);
+  const [screens, setScreens] = useState(1);
   const [platformType, setPlatformType] = useState<Platform>(Platform.NONE);
   const [isErrorShown, setIsErrorShown] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const onSubmit = () => {
     const allEntered = event && participants && dateTime && screens && platformType !== Platform.NONE;
-    const tooManySetups = Math.ceil(participants.split('\n').length / 4) < screens;
+    const tooManySetups = Math.ceil(participants.split('\n').length / partsPerRace) < screens;
 
     if (allEntered) {
       if (tooManySetups) {
@@ -77,6 +77,7 @@ export function Create() {
           id: totalTournaments + 1,
           name: event,
           participants: formattedParticipants,
+          partsPerRound: partsPerRace,
           startTime: formattedDateTime,
           currRound: 0,
           setupsCount: screens,
@@ -93,8 +94,8 @@ export function Create() {
     }
   };
 
-  const SetupSelector = css`
-  padding-top:25px;
+  const selectableRange = css`
+  padding-top:0;
   `;
 
   return (
@@ -140,20 +141,36 @@ export function Create() {
                     onIonChange={(ev) => setParticipants(ev.detail.value!)}
                   ></IonTextarea>
                 </IonItem>
-                <IonItem>
-                  <IonLabel>Available Screens</IonLabel>
-                  <IonRange
-                    min={1}
-                    max={10}
-                    snaps={true}
-                    pin
-                    onIonChange={(ev) => setScreens(ev.detail.value as number)}
-                    className={SetupSelector}
-                  >
-                    <IonLabel slot="start">1</IonLabel>
-                    <IonLabel slot="end">10</IonLabel>
-                  </IonRange>
+                <IonItem lines="none" style={{marginBottom: 0}}>
+                  <IonLabel>Players-Per-Race</IonLabel>
                 </IonItem>
+                <IonRange
+                  min={2}
+                  max={12}
+                  snaps={true}
+                  pin
+                  value={partsPerRace}
+                  onIonChange={(ev) => setPartsPerRace(ev.detail.value as number)}
+                  className={selectableRange}
+                >
+                  <IonLabel slot="start">2</IonLabel>
+                  <IonLabel slot="end">12</IonLabel>
+                </IonRange>
+                <IonItem lines="none" style={{marginBottom: 0}}>
+                  <IonLabel>Available Screens</IonLabel>
+                </IonItem>
+                <IonRange
+                  min={1}
+                  max={10}
+                  snaps={true}
+                  pin
+                  value={screens}
+                  onIonChange={(ev) => setScreens(ev.detail.value as number)}
+                  className={selectableRange}
+                >
+                  <IonLabel slot="start">1</IonLabel>
+                  <IonLabel slot="end">10</IonLabel>
+                </IonRange>
                 <IonItem>
                   <IonLabel>Platform</IonLabel>
                   <IonSelect

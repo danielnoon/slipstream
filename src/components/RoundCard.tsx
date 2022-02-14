@@ -14,10 +14,10 @@ import { pencil, trophyOutline } from "ionicons/icons";
 import { useState } from "react";
 import Participant from "../types/Participant";
 import { ScoreEntryModal } from "./ScoreEntryModal";
-import { select, getRound, getRank } from '../store';
+import { select, getRound, getTournament } from '../store';
 import { getPoints } from '../algorithms';
 import { groupby } from "itertools";
-import { getOrdinal, textColor, getRankCSS, rankColors } from "../utility/rankFormatting";
+import { rankColors } from "../utility/rankFormatting";
 
 const cardStyle = css`
   min-width: 300px;
@@ -30,12 +30,12 @@ interface Props {
   eta?: Date;
 }
 
-const roundStandingsColors = [css`--background: transparent`, css`--background: #131313`, css`--background: #aaa9ad`, css`--background: #d4af37`]
-
 export function RoundCard(props: Props) {
   const { id, eta } = props;
   const round = select(getRound(id));
   const participants = round?.participants!;
+  // legacy support for tournaments that had 4 as default
+  const partsPerRace = select(getTournament)!.partsPerRound ?? 4;
   const [editorOpen, setEditorOpen] = useState(false);
 
   interface RoundParticipant extends Participant {
@@ -54,13 +54,13 @@ export function RoundCard(props: Props) {
         }
         if(race.size === participants.length){
           const raceArr = [...race.values()];
-          const abnormalRound = round.participants.length !== 4;
+          const abnormalRound = round.participants.length !== partsPerRace;
           raceArr.forEach(result => {
             const partRoundScore = standings.get(result.participant);
             if(partRoundScore){
-              standings.set(result.participant, partRoundScore + getPoints(result.rank, 4, abnormalRound));
+              standings.set(result.participant, partRoundScore + getPoints(result.rank, partsPerRace, participants.length));
             } else {
-              standings.set(result.participant, getPoints(result.rank, 4, abnormalRound));
+              standings.set(result.participant, getPoints(result.rank, partsPerRace, participants.length));
             }
           })
         }

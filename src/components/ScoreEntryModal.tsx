@@ -21,11 +21,11 @@ import {
 } from "@ionic/react";
 import { groupby, range, flatten, roundrobin } from "itertools";
 import React, { useState, Fragment } from "react";
-import { useStore, select, getRound, getState } from "../store";
+import { useStore, select, getRound, getState, getTournament } from "../store";
 import { uploadRoundResult } from "../algorithms";
 import { getOrdinal } from "../utility/rankFormatting";
 import { current } from "immer";
-import { save } from "ionicons/icons";
+import { save, share } from "ionicons/icons";
 import RaceResult from "../types/RaceResult";
 import { closeCircleOutline } from "ionicons/icons";
 
@@ -75,11 +75,12 @@ export function ScoreEntryModal(props: Props) {
   const setRaceResult = useStore((state) => state.setRaceResult);
   const results = useStore((state) => state.rounds.get(id)?.result);
   const round = useStore(getRound(id));
+  // legacy handler
+  const partsPerRace = select(getTournament)!.partsPerRound ?? 4
   const submitted = round?.submitted ?? false;
   const [presentSubmitWarning] = useIonAlert();
 
   const hasAnyDuplicates = (): boolean => {
-    const round = select(getRound(id));
     const matchHasDuplicates = (match: number): boolean => {
       if(round && round.result && round.result.raceResults[match]) {
         const finishes = [...round.result.raceResults[match].values()].sort((a, b) => a.rank - b.rank);
@@ -87,6 +88,7 @@ export function ScoreEntryModal(props: Props) {
         for(const [key, value] of groups) {
           const sharedRank = [...value]
           if(sharedRank.length > 1){
+            console.log(sharedRank)
             return true;
           }
         }
@@ -94,7 +96,8 @@ export function ScoreEntryModal(props: Props) {
       }
       return true;
     }
-    return [...range(courses.length)].map((i) => matchHasDuplicates(i)).some(e => e);
+    // TODO: Change this to be variable amount of courses-per-round, not just always 4
+    return [...range(4)].map((i) => matchHasDuplicates(i)).some(e => e);
   }
 
   // checks if there are duplicate ranks in a race entered
@@ -123,6 +126,7 @@ export function ScoreEntryModal(props: Props) {
   }
 
   const canSubmit = (): boolean => {
+    // TODO: Change to variable course amount per round
     const requiredEntries = participants.length * 4;
     let entriesCount = 0;
     if (results) {
@@ -131,7 +135,9 @@ export function ScoreEntryModal(props: Props) {
         (prev, curr) => prev + (curr ? curr.size : 0),
         0
       );
+      console.log(`Entries Count: ${entriesCount}, Required Entries: ${requiredEntries}`);
     }
+    console.log(hasAnyDuplicates());
     return entriesCount === requiredEntries && !submitted && !hasAnyDuplicates();
   };
 
@@ -144,7 +150,7 @@ export function ScoreEntryModal(props: Props) {
         {
           text: "Yes",
           handler: () => {
-            uploadRoundResult(round!, 4);
+            uploadRoundResult(round!, partsPerRace, participants.length);
             getState().submitRound(id);
             onClose?.();
           },
@@ -176,19 +182,6 @@ export function ScoreEntryModal(props: Props) {
     );
   };
 
-
-  // const renderSubmitWarning = (warnProps: Props) => {
-  //   const {id: warnId, isOpen: warnIsOpen, onClose: warnOnClose} = warnProps;
-
-  //   const onWarningClose = () => {
-  //     warnOnClose!();
-  //   }
-
-  //   return (
-  //     <IonAlert message="Hello" isOpen={warnIsOpen} onDidDismiss={warnOnClose} />
-  //   )
-  // }
-
   return (
     <IonModal isOpen={isOpen} className={modal} onDidDismiss={onClose}>
       <IonContent>
@@ -218,22 +211,23 @@ export function ScoreEntryModal(props: Props) {
                 <IonListHeader>
                   <IonLabel>{part.name}</IonLabel>
                   
-                    <IonButton onClick={() => {
+                    {/* <IonButton onClick={() => {
                       getState().deleteParticipant(part.id)
                     }}>
                       <IonIcon color="danger" slot="icon-only" icon={closeCircleOutline}/>
-                    </IonButton>
+                    </IonButton> */}
               
                   </IonListHeader>
               </IonItem>
             ))}
+            {/* TODO: Change this to be a variable amount of courses per race, not just 4 */}
             {[...range(4)].map((i) => (
               <Fragment key={i}>
                 <div>
                   <IonListHeader>{courses[i].name}</IonListHeader>
                 </div>
                 {participants.map((participant) => (
-                  <div key={participant.id}>{
+                <div key={participant.id}>{
                     selectRank(participant.id, i, id)
                     }</div>
                 ))}
