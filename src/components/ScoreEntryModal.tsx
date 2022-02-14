@@ -29,11 +29,6 @@ import { save, share } from "ionicons/icons";
 import RaceResult from "../types/RaceResult";
 import { closeCircleOutline } from "ionicons/icons";
 
-const modal = css`
-  --width: 800px;
-  --height: 32em;
-`;
-
 const grid = (players: number) => css`
   display: grid;
   grid-template-columns: 12em repeat(${players}, 1fr);
@@ -75,10 +70,20 @@ export function ScoreEntryModal(props: Props) {
   const setRaceResult = useStore((state) => state.setRaceResult);
   const results = useStore((state) => state.rounds.get(id)?.result);
   const round = useStore(getRound(id));
-  // legacy handler
-  const partsPerRace = select(getTournament)!.partsPerRound ?? 4
+  console.log(courses, round?.id);
+  // legacy handlers
+  const partsPerRace = select(getTournament)!.partsPerRound ?? 4;
+  const racesPerRound = select(getTournament)!.racesPerRound ?? 4;
   const submitted = round?.submitted ?? false;
   const [presentSubmitWarning] = useIonAlert();
+
+  const modalWidth = participants.length * 200;
+  const modal = css`
+  --min-width: 800px;
+  --width: ${modalWidth < window.innerWidth ? modalWidth : (window.innerWidth - 100)}px;
+  --height: 32em;
+  `;
+
 
   const hasAnyDuplicates = (): boolean => {
     const matchHasDuplicates = (match: number): boolean => {
@@ -97,7 +102,7 @@ export function ScoreEntryModal(props: Props) {
       return true;
     }
     // TODO: Change this to be variable amount of courses-per-round, not just always 4
-    return [...range(4)].map((i) => matchHasDuplicates(i)).some(e => e);
+    return [...range(racesPerRound)].map((i) => matchHasDuplicates(i)).some(e => e);
   }
 
   // checks if there are duplicate ranks in a race entered
@@ -126,8 +131,7 @@ export function ScoreEntryModal(props: Props) {
   }
 
   const canSubmit = (): boolean => {
-    // TODO: Change to variable course amount per round
-    const requiredEntries = participants.length * 4;
+    const requiredEntries = participants.length * racesPerRound;
     let entriesCount = 0;
     if (results) {
       entriesCount = results.raceResults.reduce(
@@ -211,17 +215,17 @@ export function ScoreEntryModal(props: Props) {
                 <IonListHeader>
                   <IonLabel>{part.name}</IonLabel>
                   
-                    {/* <IonButton onClick={() => {
+                    <IonButton onClick={() => {
                       getState().deleteParticipant(part.id)
                     }}>
                       <IonIcon color="danger" slot="icon-only" icon={closeCircleOutline}/>
-                    </IonButton> */}
+                    </IonButton>
               
                   </IonListHeader>
               </IonItem>
             ))}
             {/* TODO: Change this to be a variable amount of courses per race, not just 4 */}
-            {[...range(4)].map((i) => (
+            {[...range(racesPerRound)].map((i) => (
               <Fragment key={i}>
                 <div>
                   <IonListHeader>{courses[i].name}</IonListHeader>

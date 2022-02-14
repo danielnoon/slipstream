@@ -70,7 +70,7 @@ export function createSwissMatchups(parts: Participant[], partsPerMatch: number)
  * @author Liam Seper
  * @returns - an array of Setup objects holding what rounds they will hold during this seeding round of the tournament
  */
-export function createSwissSeedingRounds(tournamentDetails: Tournament, partsPerMatch: number, seeding_round: number): Setup[] {
+export function createSwissSeedingRounds(tournamentDetails: Tournament, seeding_round: number): Setup[] {
   let participants = tournamentDetails.participants;
   if(seeding_round === 0){
     participants = shuffle(participants);
@@ -78,7 +78,7 @@ export function createSwissSeedingRounds(tournamentDetails: Tournament, partsPer
     participants = participants.sort((a, b) => b.score - a.score);
   }
   // disperse rounds correctly
-  let rounds: Participant[][] = createSwissMatchups(participants, partsPerMatch)
+  let rounds: Participant[][] = createSwissMatchups(participants, tournamentDetails.partsPerRound)
 
   let globalRoundId;
   if(tournamentDetails.currRound){
@@ -93,7 +93,7 @@ export function createSwissSeedingRounds(tournamentDetails: Tournament, partsPer
     actualRounds.push({ id: globalRoundId, 
       participants: rounds[round], 
       submitted: false, 
-      courses: generateCourseSelection(tournamentDetails.platform, getRandomThreshold(), partsPerMatch) });
+      courses: generateCourseSelection(tournamentDetails.platform, getRandomThreshold(), tournamentDetails.racesPerRound) });
     globalRoundId += 1;
   }
 
@@ -254,7 +254,7 @@ function getRandomCourse(coursePool: Course[], diffThreshold: number, chosenCour
 export const generateCourseSelection = (
   platform: Platform,
   threshold: number,
-  partsPerMatch: number
+  racesPerMatch: number
 ): Course[] => {
 
   if (threshold < 4) {
@@ -265,27 +265,11 @@ export const generateCourseSelection = (
   const courseSelection: Course[] = [];
   const coursesToChoose = COURSE_DATA.get(platform)!;
 
-  for(let courseChoice = 0; courseChoice < partsPerMatch; courseChoice++){
+  for(let courseChoice = 0; courseChoice < racesPerMatch; courseChoice++){
     // cycle thresholds in groups of 4 for now, but this should be extendable in the future
     const cThreshold = Math.round((threshold - courseSelection.reduce((c1, c2) => c1 + c2.degreeOfDifficulty, 0)) / (4 - courseChoice % 4));
     courseSelection.push(getRandomCourse(coursesToChoose, cThreshold, courseSelection));
   }
-
-  // switch (platform) {
-  //   // TODO: the default case is for Mario Kart Wii (RevoKart). Make this work with other platforms
-
-  //   default:
-  //     let dividedThreshold = threshold / 4.0
-
-  //     const firstCourse = getRandomWiiCourse(Math.round(dividedThreshold))
-  //     courseSelection.push(firstCourse)
-  //     const secondCourse = getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty) / 3.0), courseSelection)
-  //     courseSelection.push(secondCourse)
-  //     const thirdCourse = getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty - secondCourse.degreeOfDifficulty) / 2.0), courseSelection)
-  //     courseSelection.push(thirdCourse)
-  //     const fourthCourse = getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty - secondCourse.degreeOfDifficulty - thirdCourse.degreeOfDifficulty)), courseSelection)
-  //     courseSelection.push(fourthCourse)
-  // }
 
   return courseSelection;
 };

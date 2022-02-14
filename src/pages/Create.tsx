@@ -32,14 +32,16 @@ import { Platform } from "../types/Platform";
 
 const wrapper = css`
   display: flex;
+  margin: 0 auto;
   justify-content: center;
-  align-items: center;
   height: 100%;
+  width: 100%;
 `;
 
 const card = css`
   max-width: 100%;
   width: 600px;
+  overflow-y: auto;
 `;
 
 export function Create() {
@@ -52,6 +54,7 @@ export function Create() {
   const [event, setEvent] = useState("");
   const [participants, setParticipants] = useState("");
   const [partsPerRace, setPartsPerRace] = useState(4);
+  const [racesPerRound, setRacesPerRound] = useState(4);
   const [dateTime, setDateTime] = useState("");
   const [screens, setScreens] = useState(1);
   const [platformType, setPlatformType] = useState<Platform>(Platform.NONE);
@@ -78,6 +81,7 @@ export function Create() {
           name: event,
           participants: formattedParticipants,
           partsPerRound: partsPerRace,
+          racesPerRound: racesPerRound,
           startTime: formattedDateTime,
           currRound: 0,
           setupsCount: screens,
@@ -137,6 +141,7 @@ export function Create() {
                 <IonItem>
                   <IonLabel position="floating">Participants</IonLabel>
                   <IonTextarea
+                    placeholder="Enter Participants Here"
                     autoGrow
                     onIonChange={(ev) => setParticipants(ev.detail.value!)}
                   ></IonTextarea>
@@ -155,6 +160,21 @@ export function Create() {
                 >
                   <IonLabel slot="start">2</IonLabel>
                   <IonLabel slot="end">12</IonLabel>
+                </IonRange>
+                <IonItem lines="none" style={{marginBottom: 0}}>
+                  <IonLabel>Races-Per-Round</IonLabel>
+                </IonItem>
+                <IonRange
+                  min={1}
+                  max={8}
+                  snaps={true}
+                  pin
+                  value={racesPerRound}
+                  onIonChange={(ev) => setRacesPerRound(ev.detail.value as number)}
+                  className={selectableRange}
+                >
+                  <IonLabel slot="start">1</IonLabel>
+                  <IonLabel slot="end">8</IonLabel>
                 </IonRange>
                 <IonItem lines="none" style={{marginBottom: 0}}>
                   <IonLabel>Available Screens</IonLabel>

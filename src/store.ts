@@ -2,7 +2,7 @@ import produce, { enableAllPlugins } from "immer";
 import { WritableDraft } from "immer/dist/internal";
 import { range } from "itertools";
 import create from "zustand";
-import { createSwissSeedingRounds } from "./algorithms";
+import { createSwissMatchups, createSwissSeedingRounds } from "./algorithms";
 import { replacer, reviver } from "./persistence";
 import Participant from "./types/Participant";
 import { Platform } from "./types/Platform";
@@ -114,7 +114,7 @@ export const useStore = create<Store>((set) => ({
       produce<Store>((draft) => {
         // handle legacy tournaments
         legacyHandler(draft);
-        draft.setups = createSwissSeedingRounds({...draft.tournament!, participants: [...draft.participants.values()]}, draft.tournament!.partsPerRound, seeding_round);
+        draft.setups = createSwissSeedingRounds(draft.tournament!, seeding_round);
         // handle legacy tournaments
         if(draft.tournament){
           if(draft.tournament.currRound === 0 || draft.tournament.currRound){
