@@ -54,6 +54,7 @@ export interface Store {
   seed: (seeding_round: number) => void;
   submitRound: (id: number) => void;
   updateRound: (round: Round) => void;
+  deleteRound: (id: number) => void;
   setParticipantScore: (id: number, score: number) => void;
   deleteParticipant: (id: number) => void;
   setRaceResult: (
@@ -150,6 +151,18 @@ export const useStore = create<Store>((set) => ({
         if (round) {
           round.submitted = true;
         }
+      })
+    )
+  },
+
+  deleteRound: (id) => {
+    set(
+      produce<Store>((draft) => {
+        const result = draft.rounds.delete(id);
+        console.log(result);
+        const setupWithRound = draft.setups.find(s => s.rounds.some(r => r.id === id))!;
+        console.log(setupWithRound);
+        setupWithRound.rounds = setupWithRound.rounds.filter(r => r.id !== id);
       })
     )
   },

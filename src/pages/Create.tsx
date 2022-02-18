@@ -68,8 +68,12 @@ export function Create() {
   const [step, setStep] = useState(0);
   const [present, dismiss] = useIonToast();
 
-  const {event, participants, dateTime, screens, platform, partsPerRace, racesPerRound} = formRef.current;
-  const allEntered = event && participants && dateTime && screens && platform !== Platform.NONE;
+  const allEntered = formRef.current.event
+   && formRef.current.participants
+   && formRef.current.dateTime
+   && formRef.current.screens
+   && formRef.current.platform
+   !== Platform.NONE;
 
   const prevStep = (): void => {
     if(step > 0){
@@ -110,7 +114,7 @@ export function Create() {
   } 
 
   const onSubmit = () => {
-    const tooManySetups = Math.ceil(participants.split('\n').length / partsPerRace) < screens;
+    const tooManySetups = Math.ceil(formRef.current.participants.split('\n').length / formRef.current.partsPerRace) < formRef.current.screens;
 
     if (allEntered) {
       if (tooManySetups) {
@@ -118,21 +122,21 @@ export function Create() {
           duration: 3000,
           color: "danger"});
       } else {
-        const formattedParticipants: Participant[] = participants
+        const formattedParticipants: Participant[] = formRef.current.participants
           .split("\n")
           .map((part, i) => ({ id: i, name: part, score: 0 }));
-        const formattedDateTime: Date = new Date(dateTime);
+        const formattedDateTime: Date = new Date(formRef.current.dateTime);
 
         createTournament({
           id: totalTournaments + 1,
-          name: event,
+          name: formRef.current.event,
           participants: formattedParticipants,
-          partsPerRound: partsPerRace,
-          racesPerRound: racesPerRound,
+          partsPerRound: formRef.current.partsPerRace,
+          racesPerRound: formRef.current.racesPerRound,
           startTime: formattedDateTime,
           currRound: 0,
-          setupsCount: screens,
-          platform: platform
+          setupsCount: formRef.current.screens,
+          platform: formRef.current.platform
         });
         // seeding the first round of the tournament
         seed(0);

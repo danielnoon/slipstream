@@ -70,7 +70,6 @@ export function ScoreEntryModal(props: Props) {
   const setRaceResult = useStore((state) => state.setRaceResult);
   const results = useStore((state) => state.rounds.get(id)?.result);
   const round = useStore(getRound(id));
-  console.log(courses, round?.id);
   // legacy handlers
   const partsPerRace = select(getTournament)!.partsPerRound ?? 4;
   const racesPerRound = select(getTournament)!.racesPerRound ?? 4;
@@ -139,9 +138,7 @@ export function ScoreEntryModal(props: Props) {
         (prev, curr) => prev + (curr ? curr.size : 0),
         0
       );
-      console.log(`Entries Count: ${entriesCount}, Required Entries: ${requiredEntries}`);
     }
-    console.log(hasAnyDuplicates());
     return entriesCount === requiredEntries && !submitted && !hasAnyDuplicates();
   };
 
@@ -216,7 +213,13 @@ export function ScoreEntryModal(props: Props) {
                   <IonLabel>{part.name}</IonLabel>
                   
                     <IonButton onClick={() => {
-                      getState().deleteParticipant(part.id)
+                      getState().deleteParticipant(part.id);
+                      // round no longer has anyone in it, we can delete it
+                      console.log(participants);
+                      if(participants.length <= 1){
+                        getState().deleteRound(id);
+                        onClose!();
+                      }
                     }}>
                       <IonIcon color="danger" slot="icon-only" icon={closeCircleOutline}/>
                     </IonButton>
