@@ -13,28 +13,39 @@ import {
   import { calendarOutline } from "ionicons/icons";
 import { Platform } from '../../types/Platform';
 import { wizardPage } from '../../utility/css';
+import { useState } from 'react';
 
 interface Props {
     dateTime: string,
-    setDateTime: React.Dispatch<React.SetStateAction<string>>
-    setEvent: React.Dispatch<React.SetStateAction<string>>
+    setDateTime: (newDate: string) => void; 
+    event: string,
+    setEvent: (newEvent: string) => void; 
     platform: Platform,
-    setPlatform: React.Dispatch<React.SetStateAction<Platform>>
+    setPlatform: (newPlat: Platform) => void;
 }
 
-export default function MetaInfo({ dateTime, setDateTime, setEvent, platform, setPlatform } : Props) {
+export default function MetaInfo({ dateTime, setDateTime, event, setEvent, platform, setPlatform } : Props) {
+
+    const [date, setDate] = useState(dateTime);
+    const [eventName, setEventName] = useState(event);
+    const [plat, setPlat] = useState(platform);
+
     return (
         <IonList className={wizardPage}>
             <IonItem>
                 <IonLabel position="floating">Event Title</IonLabel>
                 <IonInput
-                onIonChange={(ev) => setEvent(ev.detail.value!)}
+                value={eventName}
+                onIonChange={(ev) => {
+                    setEventName(ev.detail.value!); 
+                    setEvent(ev.detail.value!);
+                }}
                  />
             </IonItem>
             <IonItem>
                 <IonLabel>Date and Time: </IonLabel>
-                <IonLabel>{dateTime !== ""
-                ? new Date(dateTime).toLocaleString()
+                <IonLabel>{date !== ""
+                ? new Date(date).toLocaleString()
                 : ""
                 }</IonLabel>
                 <IonButton fill="clear" id="trigger-button">
@@ -46,21 +57,27 @@ export default function MetaInfo({ dateTime, setDateTime, setEvent, platform, se
                 alignment="end"
                 >
                 <IonDatetime
-                    onIonChange={(ev) => setDateTime(ev.detail.value!)}
+                    onIonChange={(ev) => {
+                        setDateTime(ev.detail.value!);
+                        setDate(ev.detail.value!)
+                    }}
                 />
                 </IonPopover>
             </IonItem>
             <IonItem>
                 <IonLabel>Platform</IonLabel>
                 <IonSelect
-                value={platform}
+                value={plat}
                 placeholder="Platform"
-                onIonChange={(ev) => setPlatform(ev.detail.value)}
+                onIonChange={(ev) => {
+                    setPlatform(ev.detail.value);
+                    setPlat(ev.detail.value);
+                }}
                 >
                 {Object.values(Platform)
-                    .filter((plat) => !(plat === Platform.NONE))
-                    .map((plat, i) => (
-                    <IonSelectOption key={i} value={plat}>{plat}</IonSelectOption>
+                    .filter((platOpt) => !(platOpt === Platform.NONE))
+                    .map((platOption, i) => (
+                    <IonSelectOption key={i} value={platOption}>{platOption}</IonSelectOption>
                     ))}
                 </IonSelect>
             </IonItem>

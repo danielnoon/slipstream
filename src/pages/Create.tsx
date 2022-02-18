@@ -12,9 +12,10 @@ import {
   IonIcon,
   IonText,
   useIonRouter,
+  useIonToast
 } from "@ionic/react";
 import { calendarOutline, arrowForward, arrowBack } from "ionicons/icons";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Header } from "../components/Header";
 import { useStore } from "../store";
 import Participant from "../types/Participant";
@@ -55,16 +56,20 @@ export function Create() {
   const seed = useStore((state) => state.seed);
 
   // for wizard state
+  const formRef = useRef({
+    event: "",
+    participants: "",
+    partsPerRace: 4,
+    racesPerRound: 4,
+    dateTime: "",
+    screens: 1,
+    platform: Platform.NONE,
+  });
   const [step, setStep] = useState(0);
-  const [event, setEvent] = useState("");
-  const [participants, setParticipants] = useState("");
-  const [partsPerRace, setPartsPerRace] = useState(4);
-  const [racesPerRound, setRacesPerRound] = useState(4);
-  const [dateTime, setDateTime] = useState("");
-  const [screens, setScreens] = useState(1);
-  const [platform, setPlatform] = useState<Platform>(Platform.NONE);
-  const [isErrorShown, setIsErrorShown] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [present, dismiss] = useIonToast();
+
+  const {event, participants, dateTime, screens, platform, partsPerRace, racesPerRound} = formRef.current;
+  const allEntered = event && participants && dateTime && screens && platform !== Platform.NONE;
 
   const prevStep = (): void => {
     if(step > 0){
@@ -81,26 +86,38 @@ export function Create() {
   const Wizard = () => {
     switch(step) {
       case 0:
-        return <MetaInfo dateTime={dateTime} setDateTime={setDateTime} setEvent={setEvent} platform={platform} setPlatform={setPlatform} />;
+        return <MetaInfo dateTime={formRef.current.dateTime} 
+        setDateTime={(newDate) => formRef.current.dateTime = newDate} 
+        event={formRef.current.event}
+        setEvent={(newEvent) => formRef.current.event = newEvent} 
+        platform={formRef.current.platform} 
+        setPlatform={(newPlat) => formRef.current.platform = newPlat} />;
       case 1:
-        return <Participants setParticipants={setParticipants} screens={screens} setScreens={setScreens} />;
+        return <Participants 
+        participants={formRef.current.participants} 
+        setParticipants={(newParts) => formRef.current.participants = newParts} 
+        screens={formRef.current.screens} 
+        setScreens={(newScreens) => formRef.current.screens = newScreens} />;
       case 2:
-        return <Advanced partsPerRace={partsPerRace} setPartsPerRace={setPartsPerRace} racesPerRound={racesPerRound} setRacesPerRound={setRacesPerRound} />
+        return <Advanced 
+        partsPerRace={formRef.current.partsPerRace} 
+        setPartsPerRace={(newPPR) => formRef.current.partsPerRace = newPPR} 
+        racesPerRound={formRef.current.racesPerRound} 
+        setRacesPerRound={(newRPR) => formRef.current.racesPerRound = newRPR} />
       default:
         return <></>;
     }
   } 
 
   const onSubmit = () => {
-    const allEntered = event && participants && dateTime && screens && platform !== Platform.NONE;
     const tooManySetups = Math.ceil(participants.split('\n').length / partsPerRace) < screens;
 
     if (allEntered) {
       if (tooManySetups) {
-        setIsErrorShown(true);
-        setErrorMessage("Too many setups! You need fewer in order to run the tournament efficiently.");
+        present({message: "Too many setups! You need fewer in order to run the tournament efficiently.",
+          duration: 3000,
+          color: "danger"});
       } else {
-        setIsErrorShown(false);
         const formattedParticipants: Participant[] = participants
           .split("\n")
           .map((part, i) => ({ id: i, name: part, score: 0 }));
@@ -123,8 +140,9 @@ export function Create() {
         router.push("/seeding");
       }
     } else {
-      setIsErrorShown(true);
-      setErrorMessage("Oops! You haven't entered all of the required fields!");
+      present({message: "Oops! You haven't entered all of the required fields!",
+      duration: 3000,
+      color: "danger"});
     }
   };
 
@@ -149,13 +167,12 @@ export function Create() {
                     </IonItem>
                   </IonButtons>
                   <IonItem>
-                    {isErrorShown && <IonText color="danger">{errorMessage}</IonText>}
                     <IonButton
                       size="default"
                       style={{ margin: "auto" }}
                       color="success"
                       onClick={onSubmit}
-                      disabled={isErrorShown}
+                      disabled={!allEntered}
                     >
                       Submit
                     </IonButton>
