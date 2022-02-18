@@ -1,11 +1,9 @@
 import produce, { enableAllPlugins } from "immer";
 import { WritableDraft } from "immer/dist/internal";
-import { range } from "itertools";
 import create from "zustand";
-import { createSwissMatchups, createSwissSeedingRounds } from "./algorithms";
+import { createSwissSeedingRounds } from "./algorithms";
 import { replacer, reviver } from "./persistence";
 import Participant from "./types/Participant";
-import { Platform } from "./types/Platform";
 import Round from "./types/Round";
 import Setup from "./types/Setup";
 import Tournament from "./types/Tournament";
