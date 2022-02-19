@@ -214,12 +214,6 @@ export function ScoreEntryModal(props: Props) {
                   
                     <IonButton onClick={() => {
                       getState().deleteParticipant(part.id);
-                      // round no longer has anyone in it, we can delete it
-                      console.log(participants);
-                      if(participants.length <= 1){
-                        getState().deleteRound(id);
-                        onClose!();
-                      }
                     }}>
                       <IonIcon color="danger" slot="icon-only" icon={closeCircleOutline}/>
                     </IonButton>

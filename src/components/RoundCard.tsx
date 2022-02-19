@@ -1,5 +1,7 @@
 import { css } from "@emotion/css";
 import {
+  IonButtons,
+  IonButton,
   IonCard,
   IonCardHeader,
   IonCardSubtitle,
@@ -10,11 +12,11 @@ import {
   IonList,
   IonRippleEffect,
 } from "@ionic/react";
-import { pencil, trophyOutline } from "ionicons/icons";
+import { pencil, trophyOutline, closeCircle } from "ionicons/icons";
 import { useState } from "react";
 import Participant from "../types/Participant";
 import { ScoreEntryModal } from "./ScoreEntryModal";
-import { select, getRound, getTournament } from '../store';
+import { getState, select, getRound, getTournament } from '../store';
 import { getPoints } from '../algorithms';
 import { groupby } from "itertools";
 import { rankColors } from "../utility/rankFormatting";
@@ -102,6 +104,7 @@ export function RoundCard(props: Props) {
       <IonCardHeader>
         <IonCardTitle style={{ display: "flex" }}>
           <strong style={{ flexGrow: 1 }}>Round {id + 1}</strong>
+          <IonIcon onClick={() => getState().deleteRound(id)} icon={closeCircle} color="danger" style={{marginRight: 20}}/>
           <IonIcon icon={pencil} />
         </IonCardTitle>
         {eta && (
