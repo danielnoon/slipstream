@@ -29,6 +29,7 @@ import "@ionic/react/css/display.css";
 import "./theme.css";
 import { Seeding } from "./pages/Seeding";
 import { Eliminations } from "./pages/Eliminations";
+import CourseGenerator from "./pages/CourseGenerator";
 
 setupIonicReact();
 
@@ -49,6 +50,9 @@ function App() {
             </Route>
             <Route path="/elims">
               <Eliminations />
+            </Route>
+            <Route path="/tests">
+              <CourseGenerator />
             </Route>
           </IonRouterOutlet>
         </IonSplitPane>
