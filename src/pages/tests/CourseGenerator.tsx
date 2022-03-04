@@ -23,10 +23,11 @@ import {
   useIonRouter,
 } from "@ionic/react";
 import { useState } from "react";
-import { generateCourseSelection } from "../algorithms";
-import { Header } from "../components/Header";
-import Course from "../types/Course";
-import { Platform } from "../types/Platform";
+import { generateCourseSelection } from "../../algorithms";
+import { Header } from "../../components/Header";
+import Course from "../../types/Course";
+import { Platform } from "../../types/Platform";
+
 
 const content = css`
 display: flex;
@@ -84,6 +85,7 @@ const CourseGenerator = () => {
               >
                 <IonCardHeader>
                   <IonCardTitle><strong>Generated Courses</strong></IonCardTitle>
+                  <IonLabel>Chosen Threshold: {threshold}</IonLabel>
                 </IonCardHeader>
                 {
                   courses.map(course => {
