@@ -7,7 +7,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { trophy } from "ionicons/icons";
+import { cog, trophy } from "ionicons/icons";
 import { useState } from "react";
 import { css } from "@emotion/css";
 
@@ -18,6 +18,7 @@ import { prefersDarkTheme } from "../darkTheme";
 import { useIonRouter } from "@ionic/react";
 
 interface Props {
+  showTestMenu?: boolean;
   showLeaderboard?: boolean;
   title?: string;
   currentRound?: number;
@@ -31,7 +32,7 @@ const leaderboardLabel = css`
   }
 `;
 
-export function Header({ showLeaderboard, title, currentRound }: Props) {
+export function Header({ showTestMenu, showLeaderboard, title, currentRound }: Props) {
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const router = useIonRouter();
 
@@ -61,6 +62,18 @@ export function Header({ showLeaderboard, title, currentRound }: Props) {
               isOpen={isLeaderboardOpen}
               onClose={() => setIsLeaderboardOpen(false)}
             />
+          </>
+        )}
+        {showTestMenu && (
+          <>
+            <IonButtons slot="end">
+              <IonButton onClick={() => router.push("/tests")}>
+                <IonLabel className={leaderboardLabel}>
+                  Test Menu
+                </IonLabel>
+                <IonIcon icon={cog} />
+              </IonButton>
+            </IonButtons>
           </>
         )}
       </IonToolbar>
