@@ -98,7 +98,7 @@ const wiiCourseData: Course[] = [{
   },
   {
     name: "N64 Sherbet Land",
-    degreeOfDifficulty: 4,
+    degreeOfDifficulty: 5,
     platform: Platform.Wii
   },
   {

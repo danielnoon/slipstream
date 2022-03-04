@@ -7,12 +7,15 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonContent,
+  IonHeader,
   IonIcon,
   IonInput,
   IonItem,
   IonLabel,
+  IonModal,
   IonNavLink,
   IonPage,
+  IonRange,
   IonRouterLink,
   IonSelect,
   IonSelectOption,
@@ -20,23 +23,16 @@ import {
   useIonRouter,
 } from "@ionic/react";
 import { useState } from "react";
+import { generateCourseSelection } from "../algorithms";
 import { Header } from "../components/Header";
+import Course from "../types/Course";
 import { Platform } from "../types/Platform";
 
 const content = css`
-  display: grid;
-  grid-template-rows: 200px 1fr;
-  place-items: center;
-  width: 100vw;
-  margin-top: 20px;
-
-  & > .card-wrapper {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
+display: flex;
+margin: 0 auto;
+justify-content: center;
+width: 100%;
 `;
 
 const card = css`
@@ -49,33 +45,81 @@ const card = css`
   }
 `;
 
-const listing = css`
-  font-size: 32px;
-  --inner-padding-top: 12px;
-  --inner-padding-bottom: 12px;
-  --inner-padding-start: 16px;
-  --inner-padding-end: 16px;
+const modal = css`
+--min-width: 800px;
+--height: 32em;
 `;
-
 
 const CourseGenerator = () => {
 
   const [platform, setPlatform] = useState(Platform.NONE)
   const [plat, setPlat] = useState(platform)
+  const [threshold, setThreshold] = useState(4)
+
+  const [generatedCoursesModal, setGeneratedCoursesModal] = useState(false)
+  const showGeneratedCoursesModal = () => setGeneratedCoursesModal(true)
+  const hideGeneratedCoursesModal = () => setGeneratedCoursesModal(false)
+
+  const [courses, setCourses] = useState<Course[]>([])
+
+  const handleGenerateSelection = () => {
+    setCourses(generateCourseSelection(platform, threshold, 4))
+    showGeneratedCoursesModal()
+  }
 
   return (
     <IonPage>
       <Header />
       <IonContent>
-        <div>
+        <div className={content}>
+          <IonModal isOpen={generatedCoursesModal} className={modal} onDidDismiss={hideGeneratedCoursesModal}>
+            <IonContent>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                  paddingBottom: 24,
+                }}
+              >
+                <IonCardHeader>
+                  <IonCardTitle><strong>Generated Courses</strong></IonCardTitle>
+                </IonCardHeader>
+                {
+                  courses.map(course => {
+                      return (
+                        <IonItem>
+                          <IonLabel>{course.name}</IonLabel>
+                          <IonLabel>Degree of Difficulty: </IonLabel>
+                          <IonLabel>{course.degreeOfDifficulty}</IonLabel>
+                        </IonItem>
+                      )
+                    })
+                }
+              </div>
+            </IonContent>
+          </IonModal>
           <IonCard className={card}>
             <IonCardContent>
               <IonCardHeader>
-                <IonCardTitle><strong>Create a Tournament</strong></IonCardTitle>
+                <IonCardTitle><strong>Test Course Generation</strong></IonCardTitle>
               </IonCardHeader>
               <IonItem>
                 <IonLabel>Threshold</IonLabel>
-                <IonInput
+
+                <IonRange
+                  min={4}
+                  max={20}
+                  snaps={true}
+                  pin
+                  value={threshold}
+                  onIonChange={(ev) => {
+                    setThreshold(ev.detail.value as number);
+                  }}
+                >
+                  <IonLabel slot="start">4</IonLabel>
+                  <IonLabel slot="end">20</IonLabel>
+                </IonRange>
               </IonItem>
               <IonItem>
                 <IonLabel>Platform</IonLabel>
@@ -99,8 +143,8 @@ const CourseGenerator = () => {
                   size="default"
                   style={{ margin: "auto" }}
                   color="success"
-                  onClick={onSubmit}
-                  disabled={!allEntered}
+                  onClick={handleGenerateSelection}
+                  disabled={platform == Platform.NONE}
                 >
                   Generate Courses
                 </IonButton>

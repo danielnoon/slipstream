@@ -51,7 +51,7 @@ function App() {
             <Route path="/elims">
               <Eliminations />
             </Route>
-            <Route path="/tests">
+            <Route path="/tests/coursegen">
               <CourseGenerator />
             </Route>
           </IonRouterOutlet>
