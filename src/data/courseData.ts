@@ -1,19 +1,21 @@
 import Course from "../types/Course";
 import { Platform } from "../types/Platform";
+import switchCourseData from "./course_data/switchCourseData";
 import wiiCourseData from "./course_data/wiiCourseData";
 
 const COURSE_DATA: Map<Platform, Course[]> =  new Map();
-// Add wii courses to course data
+
 COURSE_DATA.set(Platform.Wii, wiiCourseData);
+COURSE_DATA.set(Platform.Switch, switchCourseData);
 
 export default COURSE_DATA;
 
-export function getWiiCoursesByDifficulty(threshold: number): Course[] {
-  return COURSE_DATA.get(Platform.Wii)!.filter((course: Course) => course.degreeOfDifficulty == threshold)
+export function getCoursesByDifficulty(platform: Platform, threshold: number): Course[] {
+  return COURSE_DATA.get(platform)!.filter((course: Course) => course.degreeOfDifficulty == threshold);
 }
 
-export function getRandomWiiCourse(threshold: number, chosenCourses?: Course[]): Course {
-  const wiiSortedCourse = getWiiCoursesByDifficulty(threshold)
+export function getRandomCourse(platform: Platform, threshold: number, chosenCourses?: Course[]): Course {
+  const wiiSortedCourse = getCoursesByDifficulty(platform, threshold);
 
   let selectedCourse = wiiSortedCourse[Math.floor(Math.random()*wiiSortedCourse.length)]
 

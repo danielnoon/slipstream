@@ -6,7 +6,7 @@ import Setup from "./types/Setup";
 import { chunked, range, groupby } from "itertools";
 import Course from "./types/Course";
 import { Platform } from "./types/Platform";
-import COURSE_DATA, { getRandomThreshold, getRandomWiiCourse } from "./data/courseData";
+import COURSE_DATA, { getRandomThreshold } from "./data/courseData";
 import { useStore } from "./store";
 import RoundResult from "./types/RoundResult";
 
@@ -235,7 +235,7 @@ export function uploadRoundResult(round: Round, partsPerMatch: number, partsInMa
   }
 }
 
-function getRandomCourse(coursePool: Course[], diffThreshold: number, chosenCourses: Course[]): Course {
+function getRandomCourseFromPool(coursePool: Course[], diffThreshold: number, chosenCourses: Course[]): Course {
   const availableCourses = coursePool.filter((course: Course) => course.degreeOfDifficulty == diffThreshold && !chosenCourses.some((c) => c.name === course.name));
   if (availableCourses.length > 0){
     return availableCourses[Math.floor(Math.random() * availableCourses.length)];
@@ -268,7 +268,7 @@ export const generateCourseSelection = (
   for(let courseChoice = 0; courseChoice < racesPerMatch; courseChoice++){
     // cycle thresholds in groups of 4 for now, but this should be extendable in the future
     const cThreshold = Math.round((threshold - courseSelection.reduce((c1, c2) => c1 + c2.degreeOfDifficulty, 0)) / (4 - courseChoice % 4));
-    courseSelection.push(getRandomCourse(coursesToChoose, cThreshold, courseSelection));
+    courseSelection.push(getRandomCourseFromPool(coursesToChoose, cThreshold, courseSelection));
   }
 
   return courseSelection;
