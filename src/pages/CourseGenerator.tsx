@@ -89,9 +89,8 @@ const CourseGenerator = () => {
                   courses.map(course => {
                       return (
                         <IonItem>
-                          <IonLabel>{course.name}</IonLabel>
-                          <IonLabel>Degree of Difficulty: </IonLabel>
-                          <IonLabel>{course.degreeOfDifficulty}</IonLabel>
+                          <IonLabel><strong>{course.name}</strong></IonLabel>
+                          <IonLabel>Degree of Difficulty: <strong>{course.degreeOfDifficulty}</strong></IonLabel>
                         </IonItem>
                       )
                     })
