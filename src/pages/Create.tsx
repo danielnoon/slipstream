@@ -6,42 +6,47 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonContent,
-  IonDatetime,
-  IonHeader,
-  IonIcon,
-  IonInput,
   IonItem,
-  IonLabel,
   IonPage,
-  IonPopover,
-  IonRange,
-  IonSelect,
-  IonSelectOption,
+  IonButtons,
+  IonIcon,
   IonText,
-  IonTextarea,
-  IonTitle,
-  IonToolbar,
   useIonRouter,
+  useIonToast
 } from "@ionic/react";
-import { calendarOutline } from "ionicons/icons";
-import { useState } from "react";
-import { createSwissSeedingRounds } from "../algorithms";
+import { calendarOutline, arrowForward, arrowBack } from "ionicons/icons";
+import { useState, useRef } from "react";
 import { Header } from "../components/Header";
-import { getRound, useStore } from "../store";
+import { useStore } from "../store";
 import Participant from "../types/Participant";
 import { Platform } from "../types/Platform";
 
+import MetaInfo from "./wizards/MetaInfo";
+import Participants from "./wizards/Participants";
+import Advanced from "./wizards/Advanced";
+
 const wrapper = css`
   display: flex;
+  margin: 0 auto;
   justify-content: center;
-  align-items: center;
-  height: 100%;
+  width: 100%;
 `;
 
 const card = css`
   max-width: 100%;
   width: 600px;
+  overflow-y: auto;
 `;
+
+const buttonRow = css`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  margin-bottom: 16px;
+`
+
+const WIZARD_STEPS = 2;
 
 export function Create() {
   const router = useIonRouter();
@@ -50,37 +55,88 @@ export function Create() {
   const totalTournaments = useStore(state => state.tournamentList.length);
   const seed = useStore((state) => state.seed);
 
-  const [event, setEvent] = useState("");
-  const [participants, setParticipants] = useState("");
-  const [dateTime, setDateTime] = useState("");
-  const [screens, setScreens] = useState(0);
-  const [platformType, setPlatformType] = useState<Platform>(Platform.NONE);
-  const [isErrorShown, setIsErrorShown] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  // for wizard state
+  const formRef = useRef({
+    event: "",
+    participants: "",
+    partsPerRace: 4,
+    racesPerRound: 4,
+    dateTime: "",
+    screens: 1,
+    platform: Platform.NONE,
+  });
+  const [step, setStep] = useState(0);
+  const [present, dismiss] = useIonToast();
+
+  const allEntered = formRef.current.event
+   && formRef.current.participants
+   && formRef.current.dateTime
+   && formRef.current.screens
+   && formRef.current.platform
+   !== Platform.NONE;
+
+  const prevStep = (): void => {
+    if(step > 0){
+      setStep(step - 1)
+    }
+  }
+
+  const nextStep = (): void => {
+    if(step < WIZARD_STEPS){
+      setStep(step + 1);
+    }
+  }
+
+  const Wizard = () => {
+    switch(step) {
+      case 0:
+        return <MetaInfo dateTime={formRef.current.dateTime} 
+        setDateTime={(newDate) => formRef.current.dateTime = newDate} 
+        event={formRef.current.event}
+        setEvent={(newEvent) => formRef.current.event = newEvent} 
+        platform={formRef.current.platform} 
+        setPlatform={(newPlat) => formRef.current.platform = newPlat} />;
+      case 1:
+        return <Participants 
+        participants={formRef.current.participants} 
+        setParticipants={(newParts) => formRef.current.participants = newParts} 
+        screens={formRef.current.screens} 
+        setScreens={(newScreens) => formRef.current.screens = newScreens} />;
+      case 2:
+        return <Advanced 
+        partsPerRace={formRef.current.partsPerRace} 
+        setPartsPerRace={(newPPR) => formRef.current.partsPerRace = newPPR} 
+        racesPerRound={formRef.current.racesPerRound} 
+        setRacesPerRound={(newRPR) => formRef.current.racesPerRound = newRPR} />
+      default:
+        return <></>;
+    }
+  } 
 
   const onSubmit = () => {
-    const allEntered = event && participants && dateTime && screens && platformType !== Platform.NONE;
-    const tooManySetups = Math.ceil(participants.split('\n').length / 4) < screens;
+    const tooManySetups = Math.ceil(formRef.current.participants.split('\n').length / formRef.current.partsPerRace) < formRef.current.screens;
 
     if (allEntered) {
       if (tooManySetups) {
-        setIsErrorShown(true);
-        setErrorMessage("Too many setups! You need fewer in order to run the tournament efficiently.");
+        present({message: "Too many setups! You need fewer in order to run the tournament efficiently.",
+          duration: 3000,
+          color: "danger"});
       } else {
-        setIsErrorShown(false);
-        const formattedParticipants: Participant[] = participants
+        const formattedParticipants: Participant[] = formRef.current.participants
           .split("\n")
           .map((part, i) => ({ id: i, name: part, score: 0 }));
-        const formattedDateTime: Date = new Date(dateTime);
+        const formattedDateTime: Date = new Date(formRef.current.dateTime);
 
         createTournament({
           id: totalTournaments + 1,
-          name: event,
+          name: formRef.current.event,
           participants: formattedParticipants,
+          partsPerRound: formRef.current.partsPerRace,
+          racesPerRound: formRef.current.racesPerRound,
           startTime: formattedDateTime,
           currRound: 0,
-          setupsCount: screens,
-          platform: platformType
+          setupsCount: formRef.current.screens,
+          platform: formRef.current.platform
         });
         // seeding the first round of the tournament
         seed(0);
@@ -88,14 +144,11 @@ export function Create() {
         router.push("/seeding");
       }
     } else {
-      setIsErrorShown(true);
-      setErrorMessage("Oops! You haven't entered all of the required fields!");
+      present({message: "Oops! You haven't entered all of the required fields!",
+      duration: 3000,
+      color: "danger"});
     }
   };
-
-  const SetupSelector = css`
-  padding-top:25px;
-  `;
 
   return (
     <IonPage>
@@ -108,76 +161,34 @@ export function Create() {
                 <IonCardTitle><strong>Create a Tournament</strong></IonCardTitle>
               </IonCardHeader>
               <form>
-                <IonItem>
-                  <IonLabel position="floating">Event Title</IonLabel>
-                  <IonInput
-                    onIonChange={(ev) => setEvent(ev.detail.value!)}
-                  ></IonInput>
-                </IonItem>
-                <IonItem>
-                  <IonLabel>Date and Time: </IonLabel>
-                  <IonLabel>{dateTime !== ""
-                    ? new Date(dateTime).toLocaleString()
-                    : ""
-                  }</IonLabel>
-                  <IonButton fill="clear" id="trigger-button">
-                    <IonIcon slot="icon-only" icon={calendarOutline} />
-                  </IonButton>
-                  <IonPopover
-                    trigger="trigger-button"
-                    side="top"
-                    alignment="end"
-                  >
-                    <IonDatetime
-                      onIonChange={(ev) => setDateTime(ev.detail.value!)}
-                    />
-                  </IonPopover>
-                </IonItem>
-                <IonItem>
-                  <IonLabel position="floating">Participants</IonLabel>
-                  <IonTextarea
-                    autoGrow
-                    onIonChange={(ev) => setParticipants(ev.detail.value!)}
-                  ></IonTextarea>
-                </IonItem>
-                <IonItem>
-                  <IonLabel>Available Screens</IonLabel>
-                  <IonRange
-                    min={1}
-                    max={10}
-                    snaps={true}
-                    pin
-                    onIonChange={(ev) => setScreens(ev.detail.value as number)}
-                    className={SetupSelector}
-                  >
-                    <IonLabel slot="start">1</IonLabel>
-                    <IonLabel slot="end">10</IonLabel>
-                  </IonRange>
-                </IonItem>
-                <IonItem>
-                  <IonLabel>Platform</IonLabel>
-                  <IonSelect
-                    value={platformType}
-                    placeholder="Platform"
-                    onIonChange={(ev) => setPlatformType(ev.detail.value)}
-                  >
-                    {Object.values(Platform)
-                      .filter((plat) => !(plat === Platform.NONE))
-                      .map((plat, i) => (
-                        <IonSelectOption key={i} value={plat}>{plat}</IonSelectOption>
-                      ))}
-                  </IonSelect>
-                </IonItem>
-                <IonItem>
-                  {isErrorShown && <IonText color="danger">{errorMessage}</IonText>}
-                  <IonButton
-                    size="default"
-                    style={{ margin: "auto" }}
-                    onClick={onSubmit}
-                  >
-                    Submit
-                  </IonButton>
-                </IonItem>
+                <Wizard />
+                <div className={buttonRow}>
+                  <IonButtons>
+                    <IonItem>
+                      <IonButton onClick={prevStep} disabled={step === 0}>
+                        <IonIcon slot="icon-only" icon={arrowBack}/>
+                      </IonButton>
+                    </IonItem>
+                  </IonButtons>
+                  <IonItem>
+                    <IonButton
+                      size="default"
+                      style={{ margin: "auto" }}
+                      color="success"
+                      onClick={onSubmit}
+                      disabled={!allEntered}
+                    >
+                      Submit
+                    </IonButton>
+                  </IonItem>
+                  <IonItem>
+                    <IonButtons>
+                      <IonButton onClick={nextStep} disabled={step === WIZARD_STEPS}>
+                        <IonIcon slot="icon-only" icon={arrowForward}/>
+                      </IonButton>
+                    </IonButtons>
+                  </IonItem>
+                </div>
               </form>
             </IonCardContent>
           </IonCard>

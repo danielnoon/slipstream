@@ -1,15 +1,42 @@
 import produce, { enableAllPlugins } from "immer";
-import { range } from "itertools";
+import { WritableDraft } from "immer/dist/internal";
 import create from "zustand";
 import { createSwissSeedingRounds } from "./algorithms";
 import { replacer, reviver } from "./persistence";
 import Participant from "./types/Participant";
-import { Platform } from "./types/Platform";
 import Round from "./types/Round";
 import Setup from "./types/Setup";
 import Tournament from "./types/Tournament";
 
 enableAllPlugins();
+
+/**
+ * A function that handles missing tournament meta data, such as a missing participants per race, or missing id
+ * @param draft - The draft object to be modified
+ * 
+ * @author Liam Seper
+ */
+const legacyTournamentMetaDataHandler = (draft: WritableDraft<Store>): void => {
+  if(draft.tournament){
+    if(!draft.tournament.id) {
+      draft.tournament.id = draft.tournamentList.findIndex(t => t.name === draft.tournament!.name);
+    }
+    if(!draft.tournament.partsPerRound){
+      // back when 4 was the default
+      draft.tournament.partsPerRound = 4;
+    }
+  }
+}
+
+/**
+ * A function who's purpose is to update legacy tournaments with new, required parameters
+ * @param draft - the draft object to be modified
+ * 
+ * @author Liam Seper
+ */
+function legacyHandler(draft : WritableDraft<Store>) : void {
+  legacyTournamentMetaDataHandler(draft);
+}
 
 export interface Store {
   tournament: Tournament | null;
@@ -27,6 +54,7 @@ export interface Store {
   seed: (seeding_round: number) => void;
   submitRound: (id: number) => void;
   updateRound: (round: Round) => void;
+  deleteRound: (id: number) => void;
   setParticipantScore: (id: number, score: number) => void;
   deleteParticipant: (id: number) => void;
   setRaceResult: (
@@ -83,7 +111,9 @@ export const useStore = create<Store>((set) => ({
   seed: (seeding_round: number) => {
     set(
       produce<Store>((draft) => {
-        draft.setups = createSwissSeedingRounds({...draft.tournament!, participants: [...draft.participants.values()]}, 4, seeding_round);
+        // handle legacy tournaments
+        legacyHandler(draft);
+        draft.setups = createSwissSeedingRounds(draft.tournament!, seeding_round);
         // handle legacy tournaments
         if(draft.tournament){
           if(draft.tournament.currRound === 0 || draft.tournament.currRound){
@@ -121,6 +151,18 @@ export const useStore = create<Store>((set) => ({
         if (round) {
           round.submitted = true;
         }
+      })
+    )
+  },
+
+  deleteRound: (id) => {
+    set(
+      produce<Store>((draft) => {
+        const result = draft.rounds.delete(id);
+        console.log(result);
+        const setupWithRound = draft.setups.find(s => s.rounds.some(r => r.id === id))!;
+        console.log(setupWithRound);
+        setupWithRound.rounds = setupWithRound.rounds.filter(r => r.id !== id);
       })
     )
   },

@@ -7,7 +7,6 @@ import Course from '../src/types/Course';
 import { Platform } from '../src/types/Platform';
 import CourseData, { getRandomThreshold } from '../src/data/courseData';
 import { range } from 'itertools';
-// require('jest-localstorage-mock');
 
 const participants1: Participant[] = [...range(8)].map(i => ({id: i, name: `Racer ${i}`, score: 0}));
 
@@ -17,15 +16,15 @@ describe("Algorithms.ts Tests", () => {
     describe("getPoints() Point Calculation Tests", () => {
         // parameters to test if function stays up when changed
         let partsPerMatch: number;
-        let abnormalRound: boolean;
+        let partsInMatch: number;
         describe("8-player Match", () => {
             beforeAll(() => partsPerMatch = 8);
             describe("Normal Match", () => {
-                beforeAll(() => abnormalRound = false);
+                beforeAll(() => partsInMatch = 8);
                 test("Finished First", () => {
                     const expected = 14;
                     const rank = 0;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -33,7 +32,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Second", () => {
                     const expected = 12;
                     const rank = 1;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -41,7 +40,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Third", () => {
                     const expected = 10;
                     const rank = 2
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -49,46 +48,46 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Fourth", () => {
                     const expected = 8;
                     const rank = 3;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
                 test("Finished Fifth", () => {
                     const expected = 6;
                     const rank = 4;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
                 test("Finished Sixth", () => {
                     const expected = 4;
                     const rank = 5;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
                 test("Finished Seventh", () => {
                     const expected = 2;
                     const rank = 6;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
                 test("Finished Eighth", () => {
                     const expected = 0;
                     const rank = 7;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
             });
 
             describe("Abnormal Match", () => {
-                beforeAll(() => abnormalRound = true);
+                beforeAll(() => partsInMatch = 7);
                 test("Finished First (abnormal round)", () => {
                     const expected = 13;
                     const rank = 0;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -96,7 +95,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Second (abnormal round)", () => {
                     const expected = 11;
                     const rank = 1;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -104,7 +103,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Third (abnormal round)", () => {
                     const expected = 9;
                     const rank = 2;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -112,7 +111,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Fourth (abnormal round)", () => {
                     const expected = 7;
                     const rank = 3;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -120,7 +119,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Fifth (abnormal round)", () => {
                     const expected = 5;
                     const rank = 4;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -128,7 +127,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Sixth (abnormal round)", () => {
                     const expected = 3;
                     const rank = 5;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -136,7 +135,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Seventh (abnormal round)", () => {
                     const expected = 1;
                     const rank = 6;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -146,11 +145,11 @@ describe("Algorithms.ts Tests", () => {
         describe("7-player Match", () => {
             beforeAll(() => partsPerMatch = 7);
             describe("Normal Match", () => {
-                beforeAll(() => abnormalRound = false);
+                beforeAll(() => partsInMatch = 7);
                 test("Finished First", () => {
                     const expected = 12;
                     const rank = 0;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -158,7 +157,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Second", () => {
                     const expected = 10;
                     const rank = 1;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -166,7 +165,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Third", () => {
                     const expected = 8;
                     const rank = 2
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -174,39 +173,39 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Fourth", () => {
                     const expected = 6;
                     const rank = 3;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
                 test("Finished Fifth", () => {
                     const expected = 4;
                     const rank = 4;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
                 test("Finished Sixth", () => {
                     const expected = 2;
                     const rank = 5;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
                 test("Finished Seventh", () => {
                     const expected = 0;
                     const rank = 6;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
             });
 
             describe("Abnormal Match", () => {
-                beforeAll(() => abnormalRound = true);
+                beforeAll(() => partsInMatch = 6);
                 test("Finished First (abnormal round)", () => {
                     const expected = 11;
                     const rank = 0;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -214,7 +213,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Second (abnormal round)", () => {
                     const expected = 9;
                     const rank = 1;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -222,7 +221,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Third (abnormal round)", () => {
                     const expected = 7;
                     const rank = 2;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -230,7 +229,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Fourth (abnormal round)", () => {
                     const expected = 5;
                     const rank = 3;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -238,7 +237,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Fifth (abnormal round)", () => {
                     const expected = 3;
                     const rank = 4;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -246,7 +245,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Sixth (abnormal round)", () => {
                     const expected = 1;
                     const rank = 5;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -256,11 +255,11 @@ describe("Algorithms.ts Tests", () => {
         describe("6-player Match", () => {
             beforeAll(() => partsPerMatch = 6);
             describe("Normal Match", () => {
-                beforeAll(() => abnormalRound = false);
+                beforeAll(() => partsInMatch = 6);
                 test("Finished First", () => {
                     const expected = 10;
                     const rank = 0;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -268,7 +267,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Second", () => {
                     const expected = 8;
                     const rank = 1;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -276,7 +275,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Third", () => {
                     const expected = 6;
                     const rank = 2
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -284,7 +283,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Fourth", () => {
                     const expected = 4;
                     const rank = 3;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -292,7 +291,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Fifth", () => {
                     const expected = 2;
                     const rank = 4;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -300,18 +299,18 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Sixth", () => {
                     const expected = 0;
                     const rank = 5;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
             });
 
             describe("Abnormal Match", () => {
-                beforeAll(() => abnormalRound = true);
+                beforeAll(() => partsInMatch = 5);
                 test("Finished First (abnormal round)", () => {
                     const expected = 9;
                     const rank = 0;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -319,7 +318,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Second (abnormal round)", () => {
                     const expected = 7;
                     const rank = 1;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -327,7 +326,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Third (abnormal round)", () => {
                     const expected = 5;
                     const rank = 2;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -335,7 +334,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Fourth (abnormal round)", () => {
                     const expected = 3;
                     const rank = 3;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -343,7 +342,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Fifth (abnormal round)", () => {
                     const expected = 1;
                     const rank = 4;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -353,11 +352,11 @@ describe("Algorithms.ts Tests", () => {
         describe("5-player Match", () => {
             beforeAll(() => partsPerMatch = 5);
             describe("Normal Match", () => {
-                beforeAll(() => abnormalRound = false);
+                beforeAll(() => partsInMatch = 5);
                 test("Finished First", () => {
                     const expected = 8;
                     const rank = 0;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -365,7 +364,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Second", () => {
                     const expected = 6;
                     const rank = 1;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -373,7 +372,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Third", () => {
                     const expected = 4;
                     const rank = 2
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -381,7 +380,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Fourth", () => {
                     const expected = 2;
                     const rank = 3;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -389,18 +388,18 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Fifth", () => {
                     const expected = 0;
                     const rank = 4;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
             });
 
             describe("Abnormal Match", () => {
-                beforeAll(() => abnormalRound = true);
+                beforeAll(() => partsInMatch = 4);
                 test("Finished First (abnormal round)", () => {
                     const expected = 7;
                     const rank = 0;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -408,7 +407,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Second (abnormal round)", () => {
                     const expected = 5;
                     const rank = 1;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -416,7 +415,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Third (abnormal round)", () => {
                     const expected = 3;
                     const rank = 2;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -424,7 +423,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Fourth (abnormal round)", () => {
                     const expected = 1;
                     const rank = 3;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -434,11 +433,11 @@ describe("Algorithms.ts Tests", () => {
         describe("4-player Match", () => {
             beforeAll(() => partsPerMatch = 4);
             describe("Normal Match", () => {
-                beforeAll(() => abnormalRound = false);
+                beforeAll(() => partsInMatch = 4);
                 test("Finished First", () => {
                     const expected = 6;
                     const rank = 0;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -446,7 +445,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Second", () => {
                     const expected = 4;
                     const rank = 1;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -454,7 +453,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Third", () => {
                     const expected = 2;
                     const rank = 2
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -462,18 +461,18 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Fourth", () => {
                     const expected = 0;
                     const rank = 3;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
             });
 
             describe("Abnormal Match", () => {
-                beforeAll(() => abnormalRound = true);
+                beforeAll(() => partsInMatch = 3);
                 test("Finished First (abnormal round)", () => {
                     const expected = 5;
                     const rank = 0;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -481,7 +480,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Second (abnormal round)", () => {
                     const expected = 3;
                     const rank = 1;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -489,7 +488,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Third (abnormal round)", () => {
                     const expected = 1;
                     const rank = 2;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -502,12 +501,12 @@ describe("Algorithms.ts Tests", () => {
             })
             describe("Normal Match", () => {
                 beforeAll(() => {
-                    abnormalRound = false;
+                    partsInMatch = 3;
                 })
                 test("Finished First", () => {
                     const expected = 4;
                     const rank = 0
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -515,7 +514,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Second", () => {
                     const expected = 2;
                     const rank = 1;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -523,7 +522,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Third", () => {
                     const expected = 0;
                     const rank = 2;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -531,12 +530,12 @@ describe("Algorithms.ts Tests", () => {
 
             describe("Abnormal Match", () => {
                 beforeAll(() => {
-                    abnormalRound = true;
+                    partsInMatch = 2;
                 })
                 test("Finished First (abnormal round)", () => {
                     const expected = 3;
                     const rank = 0;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -544,7 +543,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Second (abnormal round)", () => {
                     const expected = 1;
                     const rank = 1;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -557,12 +556,12 @@ describe("Algorithms.ts Tests", () => {
             })
             describe("Normal Match", () => {
                 beforeAll(() => {
-                    abnormalRound = false;
+                    partsInMatch = 2;
                 })
                 test("Finished First", () => {
                     const expected = 2;
                     const rank = 0
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -570,7 +569,7 @@ describe("Algorithms.ts Tests", () => {
                 test("Finished Second", () => {
                     const expected = 0;
                     const rank = 1;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -578,12 +577,12 @@ describe("Algorithms.ts Tests", () => {
 
             describe("Abnormal Match", () => {
                 beforeAll(() => {
-                    abnormalRound = true;
+                    partsInMatch = 1;
                 })
                 test("Finished First (abnormal round)", () => {
                     const expected = 1;
                     const rank = 0;
-                    const actual = getPoints(rank, partsPerMatch, abnormalRound);
+                    const actual = getPoints(rank, partsPerMatch, partsInMatch);
     
                     expect(actual).toBe(expected);
                 });
@@ -779,8 +778,11 @@ describe("Algorithms.ts Tests", () => {
 });
 
 const tournament1: Tournament = {
+    id: 0,
     name: "Test Tournament #1",
     participants: participants1,
+    partsPerRound: 4,
+    racesPerRound: 4,
     currRound: 0,
     startTime: new Date("March 11, 2021 12:00:00"),
     setupsCount: 2,
@@ -790,7 +792,7 @@ const tournament1: Tournament = {
 test("Test createSeedingRounds with no leftovers", () => {
     const partsPerMatch = 4;
     const seedingRound = 0;
-    const setups: Setup[] = createSwissSeedingRounds(tournament1, partsPerMatch, seedingRound);
+    const setups: Setup[] = createSwissSeedingRounds(tournament1, seedingRound);
     // only 2 setups
     expect(setups).toHaveLength(2);
     // both setups have 1 round
@@ -988,8 +990,11 @@ const participants2: Participant[] = [
 ];
 
 const tournament2: Tournament = {
+    id: 1,
     name: "Test Tournament #2",
     participants: participants2,
+    partsPerRound: 4,
+    racesPerRound: 4,
     currRound: 0,
     startTime: new Date("March 11, 2021 12:00:00"),
     setupsCount: 4,
@@ -999,7 +1004,7 @@ const tournament2: Tournament = {
 test("Test createSeedingRounds with 3 leftovers and 4 setups", () => {
     const partsPerMatch = 4;
     const currRound = 0;
-    const setups: Setup[] = createSwissSeedingRounds(tournament2, partsPerMatch, currRound);
+    const setups: Setup[] = createSwissSeedingRounds(tournament2, currRound);
     // only 2 setups
     expect(setups).toHaveLength(4);
     // both setups have 1 round
@@ -1022,8 +1027,11 @@ test("Test createSeedingRounds with 3 leftovers and 4 setups", () => {
 })
 
 const tournament3: Tournament = {
+    id: 2,
     name: "Test Tournament #2",
     participants: participants2,
+    partsPerRound: 2,
+    racesPerRound: 4,
     currRound: 0,
     startTime: new Date("March 11, 2021 12:00:00"),
     setupsCount: 5,
@@ -1033,7 +1041,7 @@ const tournament3: Tournament = {
 test("Test createSeedingRounds with 3 leftovers and 5 setups", () => {
     const partsPerMatch = 4;
     const currRound = 0;
-    const setups: Setup[] = createSwissSeedingRounds(tournament3, partsPerMatch, currRound);
+    const setups: Setup[] = createSwissSeedingRounds(tournament3, partsPerMatch);
     // only 2 setups
     expect(setups).toHaveLength(5);
     // both setups have 1 round

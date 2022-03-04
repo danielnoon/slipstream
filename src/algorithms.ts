@@ -65,12 +65,12 @@ export function createSwissMatchups(parts: Participant[], partsPerMatch: number)
  * @param partsPerMatch - The amount of participants per race. For most Mariokart Tournaments, this will be 4, but it is passed as a parameter to allow flexibility
  * @param seeding_round - The round in the tournament you are seeding for. Should not be repeated for a given tournament
  * 
- * @link Swiss-System Tournament Wikipedia https://en.wikipedia.org/wiki/Swiss-system_tournament
+ * @link Swiss-System Tournament Wikipedia Page https://en.wikipedia.org/wiki/Swiss-system_tournament
  * 
  * @author Liam Seper
  * @returns - an array of Setup objects holding what rounds they will hold during this seeding round of the tournament
  */
-export function createSwissSeedingRounds(tournamentDetails: Tournament, partsPerMatch: number, seeding_round: number): Setup[] {
+export function createSwissSeedingRounds(tournamentDetails: Tournament, seeding_round: number): Setup[] {
   let participants = tournamentDetails.participants;
   if(seeding_round === 0){
     participants = shuffle(participants);
@@ -78,7 +78,7 @@ export function createSwissSeedingRounds(tournamentDetails: Tournament, partsPer
     participants = participants.sort((a, b) => b.score - a.score);
   }
   // disperse rounds correctly
-  let rounds: Participant[][] = createSwissMatchups(participants, partsPerMatch)
+  let rounds: Participant[][] = createSwissMatchups(participants, tournamentDetails.partsPerRound)
 
   let globalRoundId;
   if(tournamentDetails.currRound){
@@ -93,7 +93,7 @@ export function createSwissSeedingRounds(tournamentDetails: Tournament, partsPer
     actualRounds.push({ id: globalRoundId, 
       participants: rounds[round], 
       submitted: false, 
-      courses: generateCourseSelection(tournamentDetails.platform, getRandomThreshold(), partsPerMatch) });
+      courses: generateCourseSelection(tournamentDetails.platform, getRandomThreshold(), tournamentDetails.racesPerRound) });
     globalRoundId += 1;
   }
 
@@ -117,34 +117,32 @@ export function createSwissSeedingRounds(tournamentDetails: Tournament, partsPer
  * will have a score of 0. In an abnormal race (explained below), 1st place will havea score of (2 * (people_in_race - 1.5))
  * and last place will have a score of 1
  * @param rank - the rank that the player finished in the race (0 for 1st, partsPerMatch - 1 for last)
- * @param partsPerMatch - the number of players competing at once in a given match
- * @param abnormalRound - if a round has an abnormal amount of players in it ( === partsPerMatch - 1)
+ * @param partsPerMatch - the number of players in a "normal" match for the tournament
+ * @param partsInMatch - the numbers of players that are actually in this match
  * 
  * @returns - the points to be awarded
  * 
  * @author Liam Seper
  */
-export const getPoints = (rank: number, partsPerMatch: number, abnormalRound: boolean): number => {
-  if(abnormalRound){
-    // 5 - 3 - 1
-    return (((partsPerMatch - rank) - 1.5) * 2);
-  }
+export const getPoints = (rank: number, partsPerMatch: number, partsInMatch: number): number => {
+  let ppm = partsPerMatch;
+  ppm -= (0.5 * (partsPerMatch - partsInMatch));
     // 6 - 4 - 2 - 0
-  return (((partsPerMatch - rank) - 1) * 2);
+  return (ppm * 2) - (2 * (rank + 1));
 }
 
 /**
  * A function for rewarding points for a given overall finish for a complete round of races in the tournament 
  * @param rank - the rank that the participant finished in the round overall (0 for 1st, partsPerMatch - 1 for last)
- * @param partsPerMatch - the number of participants competing at once in a given match
- * @param abnormalRound - if a round has an abnormal amound of participants in it ( === partsPerMatch - 1)
+ * @param partsPerMatch - the number of participants in a "normal" match for this tournament
+ * @param partsInMatch - the actual number of participants in this match
  * 
  * @returns - the points to be awarded
  * 
  * @author Liam Seper
  */
-const getRoundPoints = (rank: number, partsPerMatch: number, abnormalRound: boolean): number => {
-  return getPoints(rank, partsPerMatch, abnormalRound) * 2;
+const getRoundPoints = (rank: number, partsPerMatch: number, partsInMatch: number): number => {
+  return getPoints(rank, partsPerMatch, partsInMatch) * 2;
 }
 
 /**
@@ -154,15 +152,15 @@ const getRoundPoints = (rank: number, partsPerMatch: number, abnormalRound: bool
  * 2nd = 8 points, 3rd = 6 points, 4th = 2 points | average = round(sum(2nd, 3rd, 4th) / 3) = 5 points
  * @param pTied - the number of participants tied for a single rank in a round 
  * @param rankTied - the rank they are all tied for
- * @param partsPerMatch - the number of participants that play in a normal round of the tournament
- * @param abnormalRound - if the round has an abnormal amount of participants in it ( === partsPerMatch - 1)
+ * @param partsPerMatch - the number of participants that play in a "normal" round of the tournament
+ * @param partsInMatch - the number of participants actually in this match
  * 
  * @returns the points to be awarded to each tied participant
  * 
  * @author Liam Seper
  */
-const handleTie = (pTied: number, rankTied: number, partsPerMatch: number, abnormalRound: boolean): number => {
-    const totalPoints = [...range(pTied)].map(e => getRoundPoints(e + rankTied, partsPerMatch, abnormalRound)).reduce((prev, curr) => prev + curr);
+const handleTie = (pTied: number, rankTied: number, partsPerMatch: number, partsInMatch: number): number => {
+    const totalPoints = [...range(pTied)].map(e => getRoundPoints(e + rankTied, partsPerMatch, partsInMatch)).reduce((prev, curr) => prev + curr);
     return Math.round(totalPoints / pTied);
 }
 
@@ -187,7 +185,7 @@ const uploadNewScore = (participant_id: number, newScore: number): void => {
  * 
  * @author Liam Seper
  */
-export function uploadRoundResult(round: Round, partsPerMatch: number): void {
+export function uploadRoundResult(round: Round, partsPerMatch: number, partsInMatch: number): void {
   if(!round.result){
     return;
   }
@@ -199,7 +197,7 @@ export function uploadRoundResult(round: Round, partsPerMatch: number): void {
     abnormalRound = raceResult.size !== partsPerMatch;
     for (let result of raceResult.values()) {
       const currRoundScore = roundScoresMap.get(result.participant);
-      const score = getPoints(result.rank, partsPerMatch, abnormalRound);
+      const score = getPoints(result.rank, partsPerMatch, partsInMatch);
       // done for determining the ending ranks of everyone
       if (currRoundScore) {
         roundScoresMap.set(result.participant, currRoundScore + score);
@@ -219,14 +217,14 @@ export function uploadRoundResult(round: Round, partsPerMatch: number): void {
       const entriesArr = [...values];
       if(entriesArr.length === 1){
         const [pId, score] = entriesArr[0];
-        uploadNewScore(pId, getRoundPoints(i, partsPerMatch, abnormalRound));
+        uploadNewScore(pId, getRoundPoints(i, partsPerMatch, partsInMatch));
         i++;
         // keep i consistent
         continue;
       } else {
           // a tie
           const numTies = entriesArr.length;
-          const tieScore = handleTie(numTies, i, partsPerMatch, abnormalRound);
+          const tieScore = handleTie(numTies, i, partsPerMatch, partsInMatch);
           // award shared tie score to each player that tied
           for (const [pId, score] of entriesArr) {
               uploadNewScore(pId, tieScore);
@@ -256,7 +254,7 @@ function getRandomCourse(coursePool: Course[], diffThreshold: number, chosenCour
 export const generateCourseSelection = (
   platform: Platform,
   threshold: number,
-  partsPerMatch: number
+  racesPerMatch: number
 ): Course[] => {
 
   if (threshold < 4) {
@@ -267,27 +265,11 @@ export const generateCourseSelection = (
   const courseSelection: Course[] = [];
   const coursesToChoose = COURSE_DATA.get(platform)!;
 
-  for(let courseChoice = 0; courseChoice < partsPerMatch; courseChoice++){
+  for(let courseChoice = 0; courseChoice < racesPerMatch; courseChoice++){
     // cycle thresholds in groups of 4 for now, but this should be extendable in the future
     const cThreshold = Math.round((threshold - courseSelection.reduce((c1, c2) => c1 + c2.degreeOfDifficulty, 0)) / (4 - courseChoice % 4));
     courseSelection.push(getRandomCourse(coursesToChoose, cThreshold, courseSelection));
   }
-
-  // switch (platform) {
-  //   // TODO: the default case is for Mario Kart Wii (RevoKart). Make this work with other platforms
-
-  //   default:
-  //     let dividedThreshold = threshold / 4.0
-
-  //     const firstCourse = getRandomWiiCourse(Math.round(dividedThreshold))
-  //     courseSelection.push(firstCourse)
-  //     const secondCourse = getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty) / 3.0), courseSelection)
-  //     courseSelection.push(secondCourse)
-  //     const thirdCourse = getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty - secondCourse.degreeOfDifficulty) / 2.0), courseSelection)
-  //     courseSelection.push(thirdCourse)
-  //     const fourthCourse = getRandomWiiCourse(Math.round((threshold - firstCourse.degreeOfDifficulty - secondCourse.degreeOfDifficulty - thirdCourse.degreeOfDifficulty)), courseSelection)
-  //     courseSelection.push(fourthCourse)
-  // }
 
   return courseSelection;
 };

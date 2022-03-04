@@ -5,6 +5,8 @@ export default interface Tournament {
   id: number;
   name: string;
   participants: Participant[];
+  partsPerRound: number;
+  racesPerRound: number;
   currRound: number;
   startTime: Date;
   setupsCount: number;
