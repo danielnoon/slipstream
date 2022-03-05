@@ -1,11 +1,10 @@
 import { createSwissSeedingRounds, createSwissMatchups, generateCourseSelection, getPoints } from '../src/algorithms';
 import Participant from '../src/types/Participant';
-import Round from '../src/types/Round';
 import Tournament from '../src/types/Tournament';
 import Setup from '../src/types/Setup';
 import Course from '../src/types/Course';
 import { Platform } from '../src/types/Platform';
-import CourseData, { getRandomThreshold } from '../src/data/courseData';
+import { getRandomThreshold } from '../src/data/courseData';
 import { range } from 'itertools';
 
 const participants1: Participant[] = [...range(8)].map(i => ({id: i, name: `Racer ${i}`, score: 0}));
@@ -792,7 +791,7 @@ const tournament1: Tournament = {
 test("Test createSeedingRounds with no leftovers", () => {
     const partsPerMatch = 4;
     const seedingRound = 0;
-    const setups: Setup[] = createSwissSeedingRounds(tournament1, seedingRound);
+    const setups: Setup[] = createSwissSeedingRounds(tournament1, tournament1.participants, seedingRound);
     // only 2 setups
     expect(setups).toHaveLength(2);
     // both setups have 1 round
@@ -1004,7 +1003,7 @@ const tournament2: Tournament = {
 test("Test createSeedingRounds with 3 leftovers and 4 setups", () => {
     const partsPerMatch = 4;
     const currRound = 0;
-    const setups: Setup[] = createSwissSeedingRounds(tournament2, currRound);
+    const setups: Setup[] = createSwissSeedingRounds(tournament2, tournament2.participants, currRound);
     // only 2 setups
     expect(setups).toHaveLength(4);
     // both setups have 1 round
@@ -1030,7 +1029,7 @@ const tournament3: Tournament = {
     id: 2,
     name: "Test Tournament #2",
     participants: participants2,
-    partsPerRound: 2,
+    partsPerRound: 4,
     racesPerRound: 4,
     currRound: 0,
     startTime: new Date("March 11, 2021 12:00:00"),
@@ -1041,7 +1040,7 @@ const tournament3: Tournament = {
 test("Test createSeedingRounds with 3 leftovers and 5 setups", () => {
     const partsPerMatch = 4;
     const currRound = 0;
-    const setups: Setup[] = createSwissSeedingRounds(tournament3, partsPerMatch);
+    const setups: Setup[] = createSwissSeedingRounds(tournament3, tournament3.participants, partsPerMatch);
     // only 2 setups
     expect(setups).toHaveLength(5);
     // both setups have 1 round

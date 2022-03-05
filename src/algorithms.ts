@@ -61,7 +61,8 @@ export function createSwissMatchups(parts: Participant[], partsPerMatch: number)
  * resource efficiency. Swiss seeded rounds are generated purely randomly for the first round, but then are generated fairly (according to Swiss style)
  * by being based off of the current standings for players.
  * This function only works if  Math.ceil(participants / 4) > setups, as a setup cannot go unused
- * @param tournamentDetails - a Tournament object that contains details about the tournament to generate rounds for. Must contain a list of participants, number of setups
+ * @param tournamentDetails - a Tournament object that contains details about the tournament to generate rounds for. Must contain number of setups, partsPerMatch, and racesPerRound
+ * @param participants - The participants currently in the tournament. MUST have scores that are non-zero, so cannot come from the tournament object
  * @param partsPerMatch - The amount of participants per race. For most Mariokart Tournaments, this will be 4, but it is passed as a parameter to allow flexibility
  * @param seeding_round - The round in the tournament you are seeding for. Should not be repeated for a given tournament
  * 
