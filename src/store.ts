@@ -113,7 +113,7 @@ export const useStore = create<Store>((set) => ({
       produce<Store>((draft) => {
         // handle legacy tournaments
         legacyHandler(draft);
-        draft.setups = createSwissSeedingRounds(draft.tournament!, seeding_round);
+        draft.setups = createSwissSeedingRounds(draft.tournament!, [...draft.participants!.values()], seeding_round);
         // handle legacy tournaments
         if(draft.tournament){
           if(draft.tournament.currRound === 0 || draft.tournament.currRound){
@@ -159,9 +159,7 @@ export const useStore = create<Store>((set) => ({
     set(
       produce<Store>((draft) => {
         const result = draft.rounds.delete(id);
-        console.log(result);
         const setupWithRound = draft.setups.find(s => s.rounds.some(r => r.id === id))!;
-        console.log(setupWithRound);
         setupWithRound.rounds = setupWithRound.rounds.filter(r => r.id !== id);
       })
     )

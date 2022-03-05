@@ -19,14 +19,12 @@ import {
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
-import { groupby, range, flatten, roundrobin } from "itertools";
-import React, { useState, Fragment } from "react";
+import { groupby, range } from "itertools";
+import { Fragment } from "react";
 import { useStore, select, getRound, getState, getTournament } from "../store";
 import { uploadRoundResult } from "../algorithms";
 import { getOrdinal } from "../utility/rankFormatting";
-import { current } from "immer";
-import { save, share } from "ionicons/icons";
-import RaceResult from "../types/RaceResult";
+import { save } from "ionicons/icons";
 import { closeCircleOutline } from "ionicons/icons";
 
 const grid = (players: number) => css`
@@ -92,7 +90,6 @@ export function ScoreEntryModal(props: Props) {
         for(const [key, value] of groups) {
           const sharedRank = [...value]
           if(sharedRank.length > 1){
-            console.log(sharedRank)
             return true;
           }
         }

@@ -70,13 +70,12 @@ export function createSwissMatchups(parts: Participant[], partsPerMatch: number)
  * @author Liam Seper
  * @returns - an array of Setup objects holding what rounds they will hold during this seeding round of the tournament
  */
-export function createSwissSeedingRounds(tournamentDetails: Tournament, seeding_round: number): Setup[] {
-  let participants = tournamentDetails.participants;
+export function createSwissSeedingRounds(tournamentDetails: Tournament, participants: Participant[], seeding_round: number): Setup[] {
   if(seeding_round === 0){
     participants = shuffle(participants);
-  } else {
-    participants = participants.sort((a, b) => b.score - a.score);
   }
+  participants = participants.sort((a, b) => b.score - a.score);
+
   // disperse rounds correctly
   let rounds: Participant[][] = createSwissMatchups(participants, tournamentDetails.partsPerRound)
 
