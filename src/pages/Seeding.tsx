@@ -86,7 +86,7 @@ export function Seeding() {
               Continue to Elims
             </IonButton>
           </div>
-          {canContinue() &&
+          {!canContinue() && 
             <ReactTooltip
               id="continueTip"
               type={prefersDarkTheme() ? "light" : "dark"}
