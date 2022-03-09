@@ -5,6 +5,7 @@ import { Fragment } from "react";
 import { useStore } from "../store";
 import { getOrdinal, getRankCSS, rankColors} from "../utility/rankFormatting";
 import { range } from "itertools";
+import { participantSorter } from "../algorithms";
 
 const grid = css`
   display: grid;
@@ -70,7 +71,7 @@ export function Leaderboard(props: Props) {
               <IonListHeader>Score</IonListHeader>
             </IonItem>
             {participants
-              .sort((a, b) => b.score - a.score)
+              .sort(participantSorter)
               .map((part, i) => (
                 <Fragment key={part.id}>
                   <IonItem lines="none">

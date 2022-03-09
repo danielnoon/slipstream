@@ -11,6 +11,17 @@ import { useStore } from "./store";
 import RoundResult from "./types/RoundResult";
 import SeedGenerationAlgorithm from "./types/SeedGenerationAlgorithm.enum";
 
+export const participantSorter = (a: Participant, b:Participant): number => {
+  if(a.score === b.score) {
+    if (a.id === b.id) {
+      return 1;
+    } else {
+      return b.id - a.id;
+    }
+  }
+  return b.score - a.score;
+}
+
 function shuffle<T>(arr: T[]): T[] {
   let currentIndex = arr.length;
   let randomIndex: number;
@@ -73,7 +84,7 @@ export function createSwissMatchups(parts: Participant[], partsPerMatch: number)
  * @returns - an array of Setup objects holding what rounds they will hold during this seeding round of the tournament
  */
 export function createRounds(tournamentDetails: Tournament, participants: Participant[], seeding_round: number): Setup[] {
-  participants = participants.sort((a, b) => b.score - a.score);
+  participants = participants.sort(participantSorter);
   if(seeding_round === 0 || tournamentDetails.seedGenerationAlgorithm === SeedGenerationAlgorithm.RANDOM){
     participants = shuffle(participants);
   }
@@ -210,6 +221,7 @@ export function uploadRoundResult(round: Round, partsPerMatch: number, partsInMa
   }
 
   // set scores for the total round result
+  // no participantSorter here because duplicate scores are fine
   const roundScores = [...roundScoresMap].sort((a, b) => b[1] - a[1]);
   const roundScoresGB = groupby(roundScores, e => e[1]);
   let i = 0;

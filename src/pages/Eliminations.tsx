@@ -13,6 +13,7 @@ import {
 } from "@ionic/react";
 import { close, trophy } from "ionicons/icons";
 import { useEffect, useState } from "react";
+import { participantSorter } from "../algorithms";
 import { Header } from "../components/Header";
 import { getState, useStore } from "../store";
 
@@ -129,7 +130,7 @@ export function Eliminations() {
     const seededParticipants: SeededParticipant[] =
       participants
         .slice()
-        .sort((a, b) => b.score - a.score)
+        .sort(participantSorter)
         .map((part, i) => ({
           id: part.id,
           seed: i,
