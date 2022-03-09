@@ -1,5 +1,6 @@
 import Participant from "./Participant";
 import { Platform } from "./Platform";
+import SeedGenerationAlgorithm from "./SeedGenerationAlgorithm.enum";
 
 export default interface Tournament {
   id: number;
@@ -11,4 +12,5 @@ export default interface Tournament {
   startTime: Date;
   setupsCount: number;
   platform: Platform;
+  seedGenerationAlgorithm: SeedGenerationAlgorithm;
 }

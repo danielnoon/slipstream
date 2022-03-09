@@ -24,6 +24,7 @@ import { Platform } from "../types/Platform";
 import MetaInfo from "./wizards/MetaInfo";
 import Participants from "./wizards/Participants";
 import Advanced from "./wizards/Advanced";
+import SeedGenerationAlgorithm from "../types/SeedGenerationAlgorithm.enum";
 
 const wrapper = css`
   display: flex;
@@ -64,6 +65,7 @@ export function Create() {
     dateTime: "",
     screens: 1,
     platform: Platform.NONE,
+    seedGenerationAlgorithm: SeedGenerationAlgorithm.CIRCLE,
   });
   const [step, setStep] = useState(0);
   const [present, dismiss] = useIonToast();
@@ -72,8 +74,8 @@ export function Create() {
    && formRef.current.participants
    && formRef.current.dateTime
    && formRef.current.screens
-   && formRef.current.platform
-   !== Platform.NONE;
+   && formRef.current.platform !== Platform.NONE
+   && formRef.current.seedGenerationAlgorithm;
 
   const prevStep = (): void => {
     if(step > 0){
@@ -107,7 +109,9 @@ export function Create() {
         partsPerRace={formRef.current.partsPerRace} 
         setPartsPerRace={(newPPR) => formRef.current.partsPerRace = newPPR} 
         racesPerRound={formRef.current.racesPerRound} 
-        setRacesPerRound={(newRPR) => formRef.current.racesPerRound = newRPR} />
+        setRacesPerRound={(newRPR) => formRef.current.racesPerRound = newRPR}
+        seedGenerationAlgorithm={formRef.current.seedGenerationAlgorithm}
+        setSeedGenerationAlgorithm={(newSGA => formRef.current.seedGenerationAlgorithm = newSGA)} />
       default:
         return <></>;
     }
@@ -136,7 +140,8 @@ export function Create() {
           startTime: formattedDateTime,
           currRound: 0,
           setupsCount: formRef.current.screens,
-          platform: formRef.current.platform
+          platform: formRef.current.platform,
+          seedGenerationAlgorithm: formRef.current.seedGenerationAlgorithm,
         });
         // seeding the first round of the tournament
         seed(0);

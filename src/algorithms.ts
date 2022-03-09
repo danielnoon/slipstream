@@ -9,6 +9,7 @@ import { Platform } from "./types/Platform";
 import COURSE_DATA, { getRandomThreshold } from "./data/courseData";
 import { useStore } from "./store";
 import RoundResult from "./types/RoundResult";
+import SeedGenerationAlgorithm from "./types/SeedGenerationAlgorithm.enum";
 
 function shuffle<T>(arr: T[]): T[] {
   let currentIndex = arr.length;
@@ -71,11 +72,11 @@ export function createSwissMatchups(parts: Participant[], partsPerMatch: number)
  * @author Liam Seper
  * @returns - an array of Setup objects holding what rounds they will hold during this seeding round of the tournament
  */
-export function createSwissSeedingRounds(tournamentDetails: Tournament, participants: Participant[], seeding_round: number): Setup[] {
-  if(seeding_round === 0){
+export function createRounds(tournamentDetails: Tournament, participants: Participant[], seeding_round: number): Setup[] {
+  participants = participants.sort((a, b) => b.score - a.score);
+  if(seeding_round === 0 || tournamentDetails.seedGenerationAlgorithm === SeedGenerationAlgorithm.RANDOM){
     participants = shuffle(participants);
   }
-  participants = participants.sort((a, b) => b.score - a.score);
 
   // disperse rounds correctly
   let rounds: Participant[][] = createSwissMatchups(participants, tournamentDetails.partsPerRound)
