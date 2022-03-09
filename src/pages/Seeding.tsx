@@ -1,5 +1,15 @@
 import { css } from "@emotion/css";
-import { IonPage, IonContent, IonRedirect, useIonRouter, IonButton, IonItem, IonFooter, IonToolbar, IonButtons } from "@ionic/react";
+import {
+  IonPage,
+  IonContent,
+  IonRedirect,
+  useIonRouter,
+  IonButton,
+  IonItem,
+  IonFooter,
+  IonToolbar,
+  IonButtons,
+} from "@ionic/react";
 import ReactTooltip from "react-tooltip";
 import { Header } from "../components/Header";
 import { RoundCard } from "../components/RoundCard";
@@ -19,18 +29,19 @@ const buttonWrapper = css`
   position: fixed;
   bottom: 0%;
   width: 100%;
+  pointer-events: none;
 `;
 
 export function Seeding() {
   const tournament = useStore((state) => state.tournament);
   const setups = useStore((state) => state.setups);
-  const rounds = useStore(state => state.rounds);
+  const rounds = useStore((state) => state.rounds);
   const router = useIonRouter();
 
   const canContinue = (): boolean => {
     // true if every round has been submitted, false if not
-    return [...rounds.values()].every(r => r.submitted)
-  }
+    return [...rounds.values()].every((r) => r.submitted);
+  };
 
   if (!tournament) {
     router.push("/");
@@ -38,7 +49,11 @@ export function Seeding() {
   }
   return (
     <IonPage>
-      <Header title={tournament?.name} showLeaderboard currentRound={tournament.currRound}/>
+      <Header
+        title={tournament?.name}
+        showLeaderboard
+        currentRound={tournament.currRound}
+      />
       <IonContent className="ion-padding">
         {setups.map((setup, i) => (
           <div key={i}>
@@ -52,10 +67,12 @@ export function Seeding() {
         ))}
       </IonContent>
       <div className={buttonWrapper}>
-        <div style={{display: 'flex'}}>
-          <div style={{ width: "min-content", margin: "30px" }}
+        <div style={{ display: "flex", pointerEvents: "auto" }}>
+          <div
+            style={{ width: "min-content", margin: "30px" }}
             data-tip
-            data-for="reseedTip">
+            data-for="reseedTip"
+          >
             <IonButton
               style={{ position: "relative" }}
               size="large"
@@ -73,9 +90,11 @@ export function Seeding() {
               Generate another seeding round for this tournament
             </ReactTooltip>
           }
-          <div style={{ width: "min-content", margin: "30px" }}
+          <div
+            style={{ width: "min-content", margin: "30px" }}
             data-tip
-            data-for="continueTip">
+            data-for="continueTip"
+          >
             <IonButton
               style={{ position: "relative" }}
               size="large"
@@ -93,7 +112,7 @@ export function Seeding() {
             >
               Finish all rounds to continue!
             </ReactTooltip>
-          }
+          )}
         </div>
       </div>
     </IonPage>

@@ -157,7 +157,7 @@ export function Create() {
 
   return (
     <IonPage>
-      <Header />
+      <Header showTestMenu={true}/>
       <IonContent>
         <div className={wrapper}>
           <IonCard className={card}>
