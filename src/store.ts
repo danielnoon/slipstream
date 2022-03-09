@@ -1,10 +1,11 @@
 import produce, { enableAllPlugins } from "immer";
 import { WritableDraft } from "immer/dist/internal";
 import create from "zustand";
-import { createSwissSeedingRounds } from "./algorithms";
+import { createRounds } from "./algorithms";
 import { replacer, reviver } from "./persistence";
 import Participant from "./types/Participant";
 import Round from "./types/Round";
+import SeedGenerationAlgorithm from "./types/SeedGenerationAlgorithm.enum";
 import Setup from "./types/Setup";
 import Tournament from "./types/Tournament";
 
@@ -113,7 +114,7 @@ export const useStore = create<Store>((set) => ({
       produce<Store>((draft) => {
         // handle legacy tournaments
         legacyHandler(draft);
-        draft.setups = createSwissSeedingRounds(draft.tournament!, [...draft.participants!.values()], seeding_round);
+        draft.setups = createRounds(draft.tournament!, [...draft.participants!.values()], seeding_round);
         // handle legacy tournaments
         if(draft.tournament){
           if(draft.tournament.currRound === 0 || draft.tournament.currRound){
