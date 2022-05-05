@@ -126,9 +126,9 @@ export function Create() {
           duration: 3000,
           color: "danger"});
       } else {
-        const formattedParticipants: Participant[] = formRef.current.participants
-          .split("\n")
-          .map((part, i) => ({ id: i, name: part, score: 0 }));
+        const participantsStringArr = formRef.current.participants.split("\n");
+        const medianRank = Math.floor(participantsStringArr.length / 2);
+        const formattedParticipants: Participant[] = participantsStringArr.map((part, i) => ({ id: i, name: part, score: 0}));
         const formattedDateTime: Date = new Date(formRef.current.dateTime);
 
         createTournament({

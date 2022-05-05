@@ -1,6 +1,6 @@
 import { css } from "@emotion/css";
-import { IonButton, IonButtons, IonContent, IonIcon, IonItem, IonList, IonListHeader, IonModal } from "@ionic/react";
-import { close, trophyOutline, trophy } from "ionicons/icons";
+import { IonButton, IonButtons, IonContent, IonIcon, IonItem, IonList, IonListHeader, IonModal, IonText } from "@ionic/react";
+import { close, trophy,  caretUp, caretDown, removeOutline } from "ionicons/icons";
 import { Fragment } from "react";
 import { useStore } from "../store";
 import { getOrdinal, getRankCSS, rankColors} from "../utility/rankFormatting";
@@ -9,7 +9,7 @@ import { participantSorter } from "../algorithms";
 
 const grid = css`
   display: grid;
-  grid-template-columns: 1.25fr 3fr 2fr;
+  grid-template-columns: 1.5fr 1.5fr 3fr 2fr;
 `;
 
 const LeaderboardLabel = css`
@@ -36,24 +36,43 @@ interface Props {
   onClose: () => void;
 }
 
+
 export function Leaderboard(props: Props) {
   const { isOpen, onClose } = props;
-  const leaderboard = useStore(state => [...state.leaderboard]);
+  const currLeaderboard = useStore(state => [...state.participants.values()]);
+  const beginningLeaderboard = useStore(state => state.currentStandings);
+  currLeaderboard.sort(participantSorter);
+  // should be correctly lined up with currLeaderboard participants
+  const differences = currLeaderboard.map((p, i) => (beginningLeaderboard.findIndex(bP => bP.id === p.id) - i));
+  
+  const getRankChangeIcon = (difference: number) => {
+    if(difference > 0) {
+      return caretUp
+    }
+    if(difference < 0) {
+      return caretDown;
+    }
+    return removeOutline;
+  }
+  
+  const getRankChangeColor = (difference: number) => {
+    if(difference > 0) {
+      return 'success'
+    }
+    if(difference < 0) {
+      return 'danger';
+    }
+    return 'medium';
+  }
 
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
       <IonContent style={{ '--background': 'var(--ion-item-background)' }}>
         <IonList lines="inset">
           <IonItem>
-            {/* <IonIcon slot="start" icon={trophy} color="third"/>
-            <IonIcon slot="start" icon={trophy} color="second"/>
-            <IonIcon slot="start" icon={trophy} color="first"/> */}
             <IonListHeader className={LeaderboardLabel}>
               <strong style={{ width: "100%", textAlign: "center" }}>Leaderboard</strong>
             </IonListHeader>
-            {/* <IonIcon slot="end" icon={trophy} color="first"/>
-            <IonIcon slot="end" icon={trophy} color="second"/>
-            <IonIcon slot="end" icon={trophy} color="third"/> */}
             <IonButtons >
               <IonButton onClick={onClose}>
                 <IonIcon icon={close} />
@@ -65,12 +84,16 @@ export function Leaderboard(props: Props) {
               <IonListHeader>Rank</IonListHeader>
             </IonItem>
             <IonItem>
+              <IonListHeader>Change</IonListHeader>
+            </IonItem>
+            <IonItem>
               <IonListHeader>Name</IonListHeader>
             </IonItem>
             <IonItem>
               <IonListHeader>Score</IonListHeader>
             </IonItem>
-            {leaderboard
+            {currLeaderboard
+              .sort(participantSorter)
               .map((part, i) => (
                 <Fragment key={part.id}>
                   <IonItem lines="none">
@@ -78,6 +101,15 @@ export function Leaderboard(props: Props) {
                     {
                       i < 3 && <IonIcon slot="end" icon={trophy} color={rankColors[i]}/>
                     }
+                  </IonItem>
+                  <IonItem>
+                      <IonIcon
+                      color={getRankChangeColor(differences[i])}
+                      style={{fontSize: 16, paddingRight: 4}} 
+                      icon={getRankChangeIcon(differences[i])} />
+                      {
+                        differences[i] !== 0 && <IonText color={getRankChangeColor(differences[i])}>{Math.abs(differences[i])}</IonText>
+                      }
                     </IonItem>
                   <div className={flex}>
                     <IonItem>{part.name}</IonItem>
