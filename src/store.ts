@@ -46,6 +46,7 @@ export interface Store {
   participants: Map<number, Participant>;
   idCounter: number;
   lastId: number;
+  leaderboard: {participant: Participant, pastRank: number, display: boolean}[];
   tournamentList: { id: number; name: string }[];
   currentId: number;
 
@@ -71,6 +72,7 @@ export const useStore = create<Store>((set) => ({
   setups: [],
   rounds: new Map(),
   participants: new Map(),
+  leaderboard: [],
   idCounter: 0,
   lastId: 0,
   currentId: 0,
@@ -84,6 +86,7 @@ export const useStore = create<Store>((set) => ({
         draft.idCounter += 1;
         draft.lastId = draft.idCounter;
         draft.currentId = draft.idCounter;
+        draft.leaderboard = tournament.participants.map((p) => ({participant: p, pastRank: -1, display: false}));
         draft.tournamentList.push({
           id: draft.idCounter,
           name: tournament.name,
@@ -114,7 +117,19 @@ export const useStore = create<Store>((set) => ({
       produce<Store>((draft) => {
         // handle legacy tournaments
         legacyHandler(draft);
+        // seeding
         draft.setups = createRounds(draft.tournament!, [...draft.participants!.values()], seeding_round);
+        // leaderboard generation
+        draft.leaderboard.sort((a, b) => a.participant.score - b.participant.score)
+        if(draft.leaderboard.some(e => e.pastRank === -1)){
+          // don't display if this is the first round (no one has "climbed" yet)
+          const newLeaderboard = draft.leaderboard.map((e, i) => ({...e, prevRank: i}));
+          draft.leaderboard = newLeaderboard;
+        } else {
+          // display if this isn't the first round (people have climbed/fallen ranks)
+          const newLeaderboard = draft.leaderboard.map((e, i) => ({...e, prevRank: i, display: true}));
+          draft.leaderboard = newLeaderboard;
+        }
         // handle legacy tournaments
         if(draft.tournament){
           if(draft.tournament.currRound === 0 || draft.tournament.currRound){
@@ -187,6 +202,8 @@ export const useStore = create<Store>((set) => ({
         draft.participants.delete(id);
         // remove participant from tournament.participants array within tournament
         draft.tournament?.participants.splice(draft.tournament.participants.findIndex(p => p.id === id), 1);
+        // remove participant from leaderboard
+        draft.leaderboard.splice(draft.leaderboard.findIndex(e => e.participant.id === id), 1);
         // remove from rounds, remove RoundResult from each round that has participant
         let roundId = 0;
         for(const [rId, round] of draft.rounds) {

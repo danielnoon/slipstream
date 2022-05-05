@@ -38,7 +38,7 @@ interface Props {
 
 export function Leaderboard(props: Props) {
   const { isOpen, onClose } = props;
-  const participants = useStore(state => [...state.participants.values()]);
+  const leaderboard = useStore(state => [...state.leaderboard]);
 
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
@@ -70,8 +70,7 @@ export function Leaderboard(props: Props) {
             <IonItem>
               <IonListHeader>Score</IonListHeader>
             </IonItem>
-            {participants
-              .sort(participantSorter)
+            {leaderboard
               .map((part, i) => (
                 <Fragment key={part.id}>
                   <IonItem lines="none">
