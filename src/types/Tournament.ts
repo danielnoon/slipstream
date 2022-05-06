@@ -13,4 +13,5 @@ export default interface Tournament {
   setupsCount: number;
   platform: Platform;
   seedGenerationAlgorithm: SeedGenerationAlgorithm;
+  currentStandings: {participant: Participant, change: number}[];
 }

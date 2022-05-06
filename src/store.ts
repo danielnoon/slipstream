@@ -1,7 +1,7 @@
 import produce, { enableAllPlugins } from "immer";
 import { WritableDraft } from "immer/dist/internal";
 import create from "zustand";
-import { createRounds } from "./algorithms";
+import { createRounds, participantSorter } from "./algorithms";
 import { replacer, reviver } from "./persistence";
 import Participant from "./types/Participant";
 import Round from "./types/Round";
@@ -25,6 +25,12 @@ const legacyTournamentMetaDataHandler = (draft: WritableDraft<Store>): void => {
     if(!draft.tournament.partsPerRound){
       // back when 4 was the default
       draft.tournament.partsPerRound = 4;
+    }
+    if(![...draft.tournament.currentStandings]) {
+      const currParticipants = [...draft.participants.values()];
+      currParticipants.sort(participantSorter);
+      const currStandings = currParticipants.map(p => ({participant: p, change: 0}));
+      draft.tournament.currentStandings = currStandings;
     }
   }
 }
@@ -71,6 +77,8 @@ export const useStore = create<Store>((set) => ({
   setups: [],
   rounds: new Map(),
   participants: new Map(),
+  currentStandings: [],
+  leaderboard: [],
   idCounter: 0,
   lastId: 0,
   currentId: 0,
@@ -83,6 +91,7 @@ export const useStore = create<Store>((set) => ({
         draft.participants = new Map();
         draft.idCounter += 1;
         draft.lastId = draft.idCounter;
+        draft.tournament.currentStandings = tournament.participants.map(p => ({participant: p, change: 0}));
         draft.currentId = draft.idCounter;
         draft.tournamentList.push({
           id: draft.idCounter,
@@ -114,7 +123,23 @@ export const useStore = create<Store>((set) => ({
       produce<Store>((draft) => {
         // handle legacy tournaments
         legacyHandler(draft);
+        // seeding
         draft.setups = createRounds(draft.tournament!, [...draft.participants!.values()], seeding_round);
+        // leaderboard generation
+        // record previous rank of contestants
+        const sortedParticipants = [...draft.participants!.values()].sort(participantSorter);
+        if(draft.tournament!.currRound > 0) {
+          // calculate the change in rank
+          const newStandings = [];
+          for(let newRank = 0; newRank < sortedParticipants.length; newRank++){
+            const oldRank = draft.tournament!.currentStandings.findIndex(e => e.participant.id === sortedParticipants[newRank].id);
+            const change = oldRank - newRank;
+            newStandings.push({participant: sortedParticipants[newRank], change: change});
+          }
+          draft.tournament!.currentStandings = newStandings;
+        } else {
+          draft.tournament!.currentStandings = sortedParticipants.map(p => ({participant: p, change: 0}));
+        }
         // handle legacy tournaments
         if(draft.tournament){
           if(draft.tournament.currRound === 0 || draft.tournament.currRound){
