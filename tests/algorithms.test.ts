@@ -787,7 +787,8 @@ const tournament1: Tournament = {
     startTime: new Date("March 11, 2021 12:00:00"),
     setupsCount: 2,
     platform: Platform.Wii,
-    seedGenerationAlgorithm: SeedGenerationAlgorithm.CIRCLE
+    seedGenerationAlgorithm: SeedGenerationAlgorithm.CIRCLE,
+    currentStandings: []
 }
 
 test("Test createSeedingRounds with no leftovers", () => {
@@ -1000,7 +1001,8 @@ const tournament2: Tournament = {
     startTime: new Date("March 11, 2021 12:00:00"),
     setupsCount: 4,
     platform: Platform.Wii,
-    seedGenerationAlgorithm: SeedGenerationAlgorithm.CIRCLE
+    seedGenerationAlgorithm: SeedGenerationAlgorithm.CIRCLE,
+    currentStandings: []
 }
 
 test("Test createSeedingRounds with 3 leftovers and 4 setups", () => {
@@ -1038,7 +1040,8 @@ const tournament3: Tournament = {
     startTime: new Date("March 11, 2021 12:00:00"),
     setupsCount: 5,
     platform: Platform.Wii,
-    seedGenerationAlgorithm: SeedGenerationAlgorithm.CIRCLE
+    seedGenerationAlgorithm: SeedGenerationAlgorithm.CIRCLE,
+    currentStandings: []
 }
 
 test("Test createSeedingRounds with 3 leftovers and 5 setups", () => {
