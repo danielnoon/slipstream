@@ -26,10 +26,12 @@ const legacyTournamentMetaDataHandler = (draft: WritableDraft<Store>): void => {
       // back when 4 was the default
       draft.tournament.partsPerRound = 4;
     }
-  }
-  if(!draft.currentStandings) {
-    const currParticipants = [...draft.participants.values()];
-    draft.currentStandings = currParticipants.sort((a, b) => a.score - b.score);
+    if(![...draft.tournament.currentStandings]) {
+      const currParticipants = [...draft.participants.values()];
+      currParticipants.sort(participantSorter);
+      const currStandings = currParticipants.map(p => ({participant: p, change: 0}));
+      draft.tournament.currentStandings = currStandings;
+    }
   }
 }
 
@@ -48,7 +50,6 @@ export interface Store {
   setups: Setup[];
   rounds: Map<number, Round>;
   participants: Map<number, Participant>;
-  currentStandings: Participant[],
   idCounter: number;
   lastId: number;
   tournamentList: { id: number; name: string }[];
@@ -90,7 +91,7 @@ export const useStore = create<Store>((set) => ({
         draft.participants = new Map();
         draft.idCounter += 1;
         draft.lastId = draft.idCounter;
-        draft.currentStandings = tournament.participants;
+        draft.tournament.currentStandings = tournament.participants.map(p => ({participant: p, change: 0}));
         draft.currentId = draft.idCounter;
         draft.tournamentList.push({
           id: draft.idCounter,
@@ -127,7 +128,18 @@ export const useStore = create<Store>((set) => ({
         // leaderboard generation
         // record previous rank of contestants
         const sortedParticipants = [...draft.participants!.values()].sort(participantSorter);
-        draft.currentStandings = sortedParticipants;
+        if(draft.tournament!.currRound > 0) {
+          // calculate the change in rank
+          const newStandings = [];
+          for(let newRank = 0; newRank < sortedParticipants.length; newRank++){
+            const oldRank = draft.tournament!.currentStandings.findIndex(e => e.participant.id === sortedParticipants[newRank].id);
+            const change = oldRank - newRank;
+            newStandings.push({participant: sortedParticipants[newRank], change: change});
+          }
+          draft.tournament!.currentStandings = newStandings;
+        } else {
+          draft.tournament!.currentStandings = sortedParticipants.map(p => ({participant: p, change: 0}));
+        }
         // handle legacy tournaments
         if(draft.tournament){
           if(draft.tournament.currRound === 0 || draft.tournament.currRound){

@@ -38,11 +38,8 @@ interface Props {
 
 export function Leaderboard(props: Props) {
   const { isOpen, onClose } = props;
-  const currLeaderboard = useStore(state => [...state.participants.values()]);
-  const beginningLeaderboard = useStore(state => state.currentStandings);
-  currLeaderboard.sort(participantSorter);
-  // should be correctly lined up with currLeaderboard participants
-  const differences = currLeaderboard.map((p, i) => (beginningLeaderboard.findIndex(bP => bP.id === p.id) - i));
+  const currLeaderboard = useStore(state => state.tournament!.currentStandings);
+  // currLeaderboard.sort(participantSorter);
   
   const getRankChangeIcon = (difference: number) => {
     if(difference > 0) {
@@ -92,9 +89,8 @@ export function Leaderboard(props: Props) {
               <IonListHeader>Score</IonListHeader>
             </IonItem>
             {currLeaderboard
-              .sort(participantSorter)
-              .map((part, i) => (
-                <Fragment key={part.id}>
+              .map((e, i) => (
+                <Fragment key={e.participant.id}>
                   <IonItem lines="none">
                     <strong style={{color: "white", marginRight: 8}}>{(i + 1) + getOrdinal(i + 1)}</strong>
                     {
@@ -103,18 +99,18 @@ export function Leaderboard(props: Props) {
                   </IonItem>
                   <IonItem>
                       <IonIcon
-                      color={getRankChangeColor(differences[i])}
+                      color={getRankChangeColor(e.change)}
                       style={{fontSize: 16, paddingRight: 4}} 
-                      icon={getRankChangeIcon(differences[i])} />
+                      icon={getRankChangeIcon(e.change)} />
                       {
-                        differences[i] !== 0 && <IonText color={getRankChangeColor(differences[i])}>{Math.abs(differences[i])}</IonText>
+                        e.change !== 0 && <IonText color={getRankChangeColor(e.change)}>{Math.abs(e.change)}</IonText>
                       }
                     </IonItem>
                   <div className={flex}>
-                    <IonItem>{part.name}</IonItem>
+                    <IonItem>{e.participant.name}</IonItem>
                   </div>
                   <div className={flex}>
-                    <IonItem> {part.score} </IonItem>
+                    <IonItem> {e.participant.score} </IonItem>
                   </div>
                 </Fragment>
               ))

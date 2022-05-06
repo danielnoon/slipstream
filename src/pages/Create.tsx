@@ -142,6 +142,7 @@ export function Create() {
           setupsCount: formRef.current.screens,
           platform: formRef.current.platform,
           seedGenerationAlgorithm: formRef.current.seedGenerationAlgorithm,
+          currentStandings: formattedParticipants.map(p => ({participant: p, change: 0}))
         });
         // seeding the first round of the tournament
         seed(0);
