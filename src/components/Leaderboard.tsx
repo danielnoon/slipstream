@@ -3,8 +3,7 @@ import { IonButton, IonButtons, IonContent, IonIcon, IonItem, IonList, IonListHe
 import { close, trophy,  caretUp, caretDown, removeOutline } from "ionicons/icons";
 import { Fragment } from "react";
 import { useStore } from "../store";
-import { getOrdinal, getRankCSS, rankColors} from "../utility/rankFormatting";
-import { range } from "itertools";
+import { getOrdinal, rankColors} from "../utility/rankFormatting";
 import { participantSorter } from "../algorithms";
 
 const grid = css`
