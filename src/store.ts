@@ -90,6 +90,7 @@ export const useStore = create<Store>((set) => ({
         draft.participants = new Map();
         draft.idCounter += 1;
         draft.lastId = draft.idCounter;
+        draft.currentStandings = tournament.participants;
         draft.currentId = draft.idCounter;
         draft.tournamentList.push({
           id: draft.idCounter,
