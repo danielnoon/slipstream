@@ -92,6 +92,9 @@ export function createRounds(tournamentDetails: Tournament, participants: Partic
   // disperse rounds correctly
   let rounds: Participant[][] = createSwissMatchups(participants, tournamentDetails.partsPerRound)
 
+  // distribute courses to all setups in the current round
+  let courseSelection: Course[] = generateCourseSelection(tournamentDetails.platform, getRandomThreshold(), tournamentDetails.racesPerRound)
+
   let globalRoundId;
   if(tournamentDetails.currRound){
     globalRoundId = tournamentDetails.currRound * rounds.length;
@@ -105,7 +108,7 @@ export function createRounds(tournamentDetails: Tournament, participants: Partic
     actualRounds.push({ id: globalRoundId, 
       participants: rounds[round], 
       submitted: false, 
-      courses: generateCourseSelection(tournamentDetails.platform, getRandomThreshold(), tournamentDetails.racesPerRound) });
+      courses: courseSelection });
     globalRoundId += 1;
   }
 
