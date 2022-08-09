@@ -85,6 +85,7 @@ export function Eliminations() {
   const participants = useStore((state) => [...state.participants.values()]);
   const [seededParticipants, setSeededParticipants] = useState([] as SeededParticipant[]);
 
+  // stateful vars of participants in elims view
   const [active, setActive] = useState([] as SeededParticipant[]);
   const [above, setAbove] = useState([] as SeededParticipant[]);
   const [below, setBelow] = useState([] as SeededParticipant[]);
