@@ -35,3 +35,9 @@ export function getRandomThreshold(): number {
   let max = Math.floor(4);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+export function getRandomElimsThreshold(): number {
+  let min = Math.ceil(13);
+  let max = Math.floor(17);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}

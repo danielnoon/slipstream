@@ -15,7 +15,7 @@ enableAllPlugins();
  * A function that handles missing tournament meta data, such as a missing participants per race, or missing id
  * @param draft - The draft object to be modified
  * 
- * @author Liam Seper
+ * @author Liam Seper, Andrew Herold
  */
 const legacyTournamentMetaDataHandler = (draft: WritableDraft<Store>): void => {
   if(draft.tournament){
@@ -31,6 +31,13 @@ const legacyTournamentMetaDataHandler = (draft: WritableDraft<Store>): void => {
       currParticipants.sort(participantSorter);
       const currStandings = currParticipants.map(p => ({participant: p, change: 0}));
       draft.tournament.currentStandings = currStandings;
+    }
+    if(!draft.tournament.currElimRound) {
+      draft.tournament.currElimRound = 0;
+    }
+    if(!draft.tournament.concurrentElims){
+      // back when concurrent elims didn't exist
+      draft.tournament.concurrentElims = false
     }
   }
 }
@@ -60,6 +67,7 @@ export interface Store {
   deleteTournament: (id: number) => void;
   seed: (seeding_round: number) => void;
   submitRound: (id: number) => void;
+  submitElimsRound: (id: number) => void;
   updateRound: (round: Round) => void;
   deleteRound: (id: number) => void;
   setParticipantScore: (id: number, score: number) => void;
@@ -176,6 +184,20 @@ export const useStore = create<Store>((set) => ({
         const round = draft.rounds.get(id);
         if (round) {
           round.submitted = true;
+        }
+      })
+    )
+  },
+
+  submitElimsRound: (id) => {
+    set(
+      produce<Store>((draft) => {
+        const round = draft.rounds.get(id);
+        if (round) {
+          round.submitted = true;
+          if (draft.tournament) {
+            draft.tournament!.currElimRound += 1
+          }
         }
       })
     )

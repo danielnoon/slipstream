@@ -139,10 +139,12 @@ export function Create() {
           racesPerRound: formRef.current.racesPerRound,
           startTime: formattedDateTime,
           currRound: 0,
+          currElimRound: 0,
           setupsCount: formRef.current.screens,
           platform: formRef.current.platform,
           seedGenerationAlgorithm: formRef.current.seedGenerationAlgorithm,
-          currentStandings: formattedParticipants.map(p => ({participant: p, change: 0}))
+          currentStandings: formattedParticipants.map(p => ({participant: p, change: 0})),
+          concurrentElims: false
         });
         // seeding the first round of the tournament
         seed(0);

@@ -31,6 +31,7 @@ import { Seeding } from "./pages/Seeding";
 import { Eliminations } from "./pages/Eliminations";
 import CourseGenerator from "./pages/tests/CourseGenerator";
 import TestPage from "./pages/Test";
+import { NewEliminations } from "./pages/NewEliminations";
 
 setupIonicReact();
 
@@ -50,7 +51,7 @@ function App() {
               <Seeding />
             </Route>
             <Route path="/elims">
-              <Eliminations />
+              <NewEliminations />
             </Route>
             <Route path="/tests">
               <TestPage />

@@ -9,9 +9,11 @@ export default interface Tournament {
   partsPerRound: number;
   racesPerRound: number;
   currRound: number;
+  currElimRound: number;
   startTime: Date;
   setupsCount: number;
   platform: Platform;
   seedGenerationAlgorithm: SeedGenerationAlgorithm;
   currentStandings: {participant: Participant, change: number}[];
+  concurrentElims: boolean;
 }
