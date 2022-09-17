@@ -49,7 +49,25 @@ const switchCourseData: Course[] = [
     { name: "Neo Bowser City (3DS)", degreeOfDifficulty: 5, platform: Platform.Switch },
     { name: "Ribbon Road (GBA)", degreeOfDifficulty: 4, platform: Platform.Switch },
     { name: "Super Bell Subway", degreeOfDifficulty: 4, platform: Platform.Switch },
-    { name: "Big Blue", degreeOfDifficulty: 2, platform: Platform.Switch }
+    { name: "Big Blue", degreeOfDifficulty: 2, platform: Platform.Switch },
+    // DLC 1
+    { name: "Paris Promenade (Tour)", degreeOfDifficulty: 3, platform: Platform.Switch },
+    { name: "Toad Circuit (3DS)", degreeOfDifficulty: 1, platform: Platform.Switch },
+    { name: "Choco Mountain (N64)", degreeOfDifficulty: 4, platform: Platform.Switch },
+    { name: "Coconut Mall (Wii)", degreeOfDifficulty: 4, platform: Platform.Switch },
+    { name: "Tokyo Blur (Tour)", degreeOfDifficulty: 1, platform: Platform.Switch },
+    { name: "Shroom Ridge (DS)", degreeOfDifficulty: 4, platform: Platform.Switch },
+    { name: "Sky Garden (GBA)", degreeOfDifficulty: 3, platform: Platform.Switch },
+    { name: "Ninja Hideaway", degreeOfDifficulty: 5, platform: Platform.Switch },
+    // DLC 2
+    { name: "New York Minute (Tour)", degreeOfDifficulty: 2, platform: Platform.Switch },
+    { name: "Mario Circuit 3 (SNES)", degreeOfDifficulty: 3, platform: Platform.Switch },
+    { name: "Kalimari Desert (N64)", degreeOfDifficulty: 4, platform: Platform.Switch },
+    { name: "Waluigi Pinball (DS)", degreeOfDifficulty: 3, platform: Platform.Switch },
+    { name: "Sydney Sprint (Tour)", degreeOfDifficulty: 2, platform: Platform.Switch },
+    { name: "Snow Land (GBA)", degreeOfDifficulty: 3, platform: Platform.Switch },
+    { name: "Mushroom Gorge (Wii)", degreeOfDifficulty: 2, platform: Platform.Switch },
+    { name: "Sky-High Sundae", degreeOfDifficulty: 3, platform: Platform.Switch },
   ];
 
   export default switchCourseData;
