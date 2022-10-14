@@ -81,6 +81,8 @@ export function ScoreEntryModal(props: Props) {
   --height: 32em;
   `;
 
+  console.log('courses', courses);
+  console.log('racesPerRound', racesPerRound);
 
   const hasAnyDuplicates = (): boolean => {
     const matchHasDuplicates = (match: number): boolean => {

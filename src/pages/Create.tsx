@@ -151,6 +151,7 @@ export function Create() {
           currentStandings: formattedParticipants.map(p => ({participant: p, change: 0}))
         });
         // seeding the first round of the tournament
+        console.log('created tournament');
         seed(0);
 
         router.push("/seeding");

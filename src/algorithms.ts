@@ -94,7 +94,7 @@ export function createRounds(tournamentDetails: Tournament, participants: Partic
   let rounds: Participant[][] = createSwissMatchups(participants, tournamentDetails.partsPerRound)
 
   // distribute courses to all setups in the current round
-  let courseSelection: Course[] = generateCourseSelection(tournamentDetails.platform, getRandomThreshold(), tournamentDetails.dlc)
+  let courseSelection: Course[] = generateCourseSelection(tournamentDetails.platform, tournamentDetails.racesPerRound, tournamentDetails.dlc)
 
   let globalRoundId;
   if(tournamentDetails.currRound){
