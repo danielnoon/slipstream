@@ -64,7 +64,7 @@ const CourseGenerator = () => {
   const [courses, setCourses] = useState<Course[]>([])
 
   const handleGenerateSelection = () => {
-    setCourses(generateCourseSelection(platform, threshold, 4))
+    setCourses(generateCourseSelection(platform, 4, true))
     showGeneratedCoursesModal()
   }
 
