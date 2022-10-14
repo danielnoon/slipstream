@@ -11,4 +11,5 @@ export default interface Tournament {
   startTime: Date;
   setupsCount: number;
   platform: Platform;
+  dlc?: boolean;
 }

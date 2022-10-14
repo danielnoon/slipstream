@@ -6,6 +6,7 @@ import Course from '../src/types/Course';
 import { Platform } from '../src/types/Platform';
 import { getRandomThreshold } from '../src/data/courseData';
 import { range } from 'itertools';
+import { switchCourseData, switchDLCCutoff } from '../src/data/course_data/switchCourseData';
 
 const participants1: Participant[] = [...range(8)].map(i => ({id: i, name: `Racer ${i}`, score: 0}));
 
@@ -803,30 +804,28 @@ test("Test createSeedingRounds with no leftovers", () => {
     expect(setups[1].rounds[0].participants).toHaveLength(4);
 })
 
-test("Test generateCourseSelection with random threshold 4-20", () => {
-    let min = Math.ceil(20);
-    let max = Math.floor(4);
-    let threshold =  Math.floor(Math.random() * (max - min + 1)) + min;
+// test("Test generateCourseSelection with random threshold 4-20", () => {
+//     const threshold
 
-    let actualThreshold = 0
+//     let actualThreshold = 0
 
-    const courses: Course[] = generateCourseSelection(Platform.Wii, threshold, 4)
-    //have length 4
-    expect(courses).toHaveLength(4);
+//     const courses: Course[] = generateCourseSelection(Platform.Wii, threshold, 4)
+//     //have length 4
+//     expect(courses).toHaveLength(4);
 
-    courses.forEach(element => {
-        actualThreshold += element.degreeOfDifficulty
-    });
-    //difficulty is correct
-    expect(actualThreshold).toEqual(threshold)
+//     courses.forEach(element => {
+//         actualThreshold += element.degreeOfDifficulty
+//     });
+//     //difficulty is correct
+//     expect(actualThreshold).toEqual(threshold)
 
-})
+// })
 
 test("Test getRandomThreshold", () => {
 
     let threshold = getRandomThreshold();
-    expect(threshold).toBeLessThan(21)
-    expect(threshold).toBeGreaterThan(3)
+    expect(threshold).toBeLessThan(6)
+    expect(threshold).toBeGreaterThan(0)
 
 })
 
@@ -1062,4 +1061,49 @@ test("Test createSeedingRounds with 3 leftovers and 5 setups", () => {
     expect(setups[3].rounds[0].participants).toHaveLength(4);
     // first round in setup 5 should have 4 players
     expect(setups[4].rounds[0].participants).toHaveLength(4);
+})
+
+const DLCTestTournament: Tournament = {
+    id: 3,
+    name: "DLC Test Tournament",
+    participants: participants2,
+    partsPerRound: 4,
+    racesPerRound: 3,
+    currRound: 0,
+    startTime: new Date("March 11, 2023 12:00:00"),
+    setupsCount: 5,
+    platform: Platform.Switch,
+    dlc: true
+}
+
+test("Course Generation Includes DLC Tracks when DLC is enabled", () => {
+    // The probability of this test falsly passing by pure random chance is 3.3933737e-63
+    const racesPerRound = 500;
+    const courses = generateCourseSelection(Platform.Switch, racesPerRound, true);
+    const selectedCourseNames = new Set(courses.map(c => c.name));
+    const DLCCourseNames = new Set(switchCourseData.slice(switchDLCCutoff).map(c => c.name));
+    let DLCCourseIncluded = false;
+    for(const dlcCourse of DLCCourseNames) {
+        if (selectedCourseNames.has(dlcCourse)){
+            DLCCourseIncluded = true;
+            break;
+        }
+    }
+    expect(DLCCourseIncluded).toBe(true);
+})
+
+test("Course Generation Excludes DLC Tracks when DLC is disabled", () => {
+    // The probability of this test falsly passing by pure random chance is 6.2230153e-61
+    const racesPerRound = 100;
+    const courses = generateCourseSelection(Platform.Switch, racesPerRound, false);
+    const selectedCourseNames = new Set(courses.map(c => c.name));
+    const DLCCourseNames = new Set(switchCourseData.slice(switchDLCCutoff).map(c => c.name));
+    let DLCCourseIncluded = false;
+    for(const dlcCourse of DLCCourseNames) {
+        if (selectedCourseNames.has(dlcCourse)){
+            DLCCourseIncluded = true;
+            break;
+        }
+    }
+    expect(DLCCourseIncluded).toBe(false);
 })

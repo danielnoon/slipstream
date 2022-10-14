@@ -7,6 +7,7 @@ import { chunked, range, groupby } from "itertools";
 import Course from "./types/Course";
 import { Platform } from "./types/Platform";
 import COURSE_DATA, { getRandomThreshold } from "./data/courseData";
+import { switchDLCCutoff } from "./data/course_data/switchCourseData";
 import { useStore } from "./store";
 import RoundResult from "./types/RoundResult";
 
@@ -91,9 +92,9 @@ export function createSwissSeedingRounds(tournamentDetails: Tournament, particip
 
   for (let round = 0; round < rounds.length; round++) {
     actualRounds.push({ id: globalRoundId, 
-      participants: rounds[round], 
+      participants: rounds[round],
       submitted: false, 
-      courses: generateCourseSelection(tournamentDetails.platform, getRandomThreshold(), tournamentDetails.racesPerRound) });
+      courses: generateCourseSelection(tournamentDetails.platform, getRandomThreshold(), tournamentDetails.dlc) });
     globalRoundId += 1;
   }
 
@@ -238,7 +239,8 @@ export function uploadRoundResult(round: Round, partsPerMatch: number, partsInMa
 function getRandomCourseFromPool(coursePool: Course[], diffThreshold: number, chosenCourses: Course[]): Course {
   const availableCourses = coursePool.filter((course: Course) => course.degreeOfDifficulty == diffThreshold && !chosenCourses.some((c) => c.name === course.name));
   if (availableCourses.length > 0){
-    return availableCourses[Math.floor(Math.random() * availableCourses.length)];
+    // TODO: remove lol
+    return availableCourses[Math.floor( Math.random() * availableCourses.length)];
   }
   return coursePool[Math.floor(Math.random() * coursePool.length)];
 }
@@ -246,29 +248,27 @@ function getRandomCourseFromPool(coursePool: Course[], diffThreshold: number, ch
 /**
  * A function that generates courses randomly for a given platform using a difficulty threshold to select courses semi-randomly
  * @param platform - the platform you are playing on
- * @param threshold - the amount of difficulty you desire for your courses selection (varies 4(easiest for 4 race round) - 20(hardest for 4 race round))
+ * @param racesPerMatch - the amount of races in a round
+ * @param dlc - whether DLC tracks are included in course selection
  * @returns an array of selected courses
  * 
  * @author Andrew Herold, Liam Seper
  */
 export const generateCourseSelection = (
   platform: Platform,
-  threshold: number,
-  racesPerMatch: number
+  racesPerMatch: number,
+  dlc?: boolean,
 ): Course[] => {
-
-  if (threshold < 4) {
-    threshold = 4
-  } else if (threshold > 20) {
-    threshold = 20
-  }
   const courseSelection: Course[] = [];
-  const coursesToChoose = COURSE_DATA.get(platform)!;
+  let coursesToChoose: Course[] = COURSE_DATA.get(platform)!;
+  if(platform === Platform.Switch && !dlc) {
+    coursesToChoose = coursesToChoose.slice(0, switchDLCCutoff);
+  }
 
   for(let courseChoice = 0; courseChoice < racesPerMatch; courseChoice++){
     // cycle thresholds in groups of 4 for now, but this should be extendable in the future
-    const cThreshold = Math.round((threshold - courseSelection.reduce((c1, c2) => c1 + c2.degreeOfDifficulty, 0)) / (4 - courseChoice % 4));
-    courseSelection.push(getRandomCourseFromPool(coursesToChoose, cThreshold, courseSelection));
+    const threshold = Math.round(Math.random() * 5);
+    courseSelection.push(getRandomCourseFromPool(coursesToChoose, threshold, courseSelection));
   }
 
   return courseSelection;

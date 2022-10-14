@@ -64,6 +64,7 @@ export function Create() {
     dateTime: "",
     screens: 1,
     platform: Platform.NONE,
+    dlc: false,
   });
   const [step, setStep] = useState(0);
   const [present, dismiss] = useIonToast();
@@ -95,7 +96,10 @@ export function Create() {
         event={formRef.current.event}
         setEvent={(newEvent) => formRef.current.event = newEvent} 
         platform={formRef.current.platform} 
-        setPlatform={(newPlat) => formRef.current.platform = newPlat} />;
+        setPlatform={(newPlat) => formRef.current.platform = newPlat} 
+        DLC={formRef.current.dlc}
+        setDLC={(newDLC) => formRef.current.dlc = newDLC}
+        />;
       case 1:
         return <Participants 
         participants={formRef.current.participants} 
@@ -136,7 +140,9 @@ export function Create() {
           startTime: formattedDateTime,
           currRound: 0,
           setupsCount: formRef.current.screens,
-          platform: formRef.current.platform
+          platform: formRef.current.platform,
+          // for some fucking reason, this is the only way this works??
+          dlc: formRef.current.dlc
         });
         // seeding the first round of the tournament
         seed(0);

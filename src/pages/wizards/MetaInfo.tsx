@@ -8,12 +8,20 @@ import {
     IonPopover,
     IonList,
     IonSelect,
-    IonSelectOption
+    IonSelectOption,
+    IonToggle
   } from "@ionic/react";
   import { calendarOutline } from "ionicons/icons";
 import { Platform } from '../../types/Platform';
 import { wizardPage } from '../../utility/css';
 import { useState } from 'react';
+import { createPortal } from "react-dom";
+
+import { prefersDarkTheme } from "../../darkTheme";
+
+
+import ReactTooltip from "react-tooltip";
+
 
 interface Props {
     dateTime: string,
@@ -22,13 +30,16 @@ interface Props {
     setEvent: (newEvent: string) => void; 
     platform: Platform,
     setPlatform: (newPlat: Platform) => void;
+    DLC: boolean,
+    setDLC: (newDLC: boolean) => void
 }
 
-export default function MetaInfo({ dateTime, setDateTime, event, setEvent, platform, setPlatform } : Props) {
+export default function MetaInfo({ dateTime, setDateTime, event, setEvent, platform, setPlatform, DLC, setDLC } : Props) {
 
     const [date, setDate] = useState(dateTime);
     const [eventName, setEventName] = useState(event);
     const [plat, setPlat] = useState(platform);
+    const [dlc, setDlc] = useState(DLC);
 
     return (
         <IonList className={wizardPage}>
@@ -81,6 +92,20 @@ export default function MetaInfo({ dateTime, setDateTime, event, setEvent, platf
                     ))}
                 </IonSelect>
             </IonItem>
+            {
+                plat === Platform.Switch &&
+                <IonItem>
+                <IonLabel>DLC</IonLabel>
+                <IonToggle
+                checked={dlc}
+                onIonChange={(ev) => {
+                    // idk why, but its reversed otherwise so this works
+                    setDlc(ev.detail.checked);
+                    setDLC(ev.detail.checked);
+                }}
+                />
+            </IonItem>
+            }
         </IonList>
     )
 }

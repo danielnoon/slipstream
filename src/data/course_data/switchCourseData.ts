@@ -1,7 +1,7 @@
 import Course from "../../types/Course";
 import { Platform } from "../../types/Platform";
 
-const switchCourseData: Course[] = [
+export const switchCourseData: Course[] = [
     { name: "Mario Kart Stadium", degreeOfDifficulty: 1, platform: Platform.Switch },
     { name: "Water Park", degreeOfDifficulty: 2, platform: Platform.Switch },
     { name: "Sweet Sweet Canyon", degreeOfDifficulty: 3, platform: Platform.Switch },
@@ -70,4 +70,5 @@ const switchCourseData: Course[] = [
     { name: "Sky-High Sundae", degreeOfDifficulty: 3, platform: Platform.Switch },
   ];
 
-  export default switchCourseData;
+  // index which DLC courses start
+  export const switchDLCCutoff = 48;

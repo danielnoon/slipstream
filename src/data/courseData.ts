@@ -1,6 +1,6 @@
 import Course from "../types/Course";
 import { Platform } from "../types/Platform";
-import switchCourseData from "./course_data/switchCourseData";
+import { switchCourseData } from "./course_data/switchCourseData";
 import wiiCourseData from "./course_data/wiiCourseData";
 
 const COURSE_DATA: Map<Platform, Course[]> =  new Map();
@@ -30,8 +30,8 @@ export function getRandomCourse(platform: Platform, threshold: number, chosenCou
   return selectedCourse
 }
 
-export function getRandomThreshold(): number {
-  let min = Math.ceil(20);
-  let max = Math.floor(4);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+export function getRandomThreshold(pseudoRandom?: () => number): number {
+  const min = 1;
+  const max = 5;
+  return Math.round(Math.random() * (max - min)) + min;
 }
