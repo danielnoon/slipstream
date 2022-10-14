@@ -24,6 +24,7 @@ import { Platform } from "../types/Platform";
 import MetaInfo from "./wizards/MetaInfo";
 import Participants from "./wizards/Participants";
 import Advanced from "./wizards/Advanced";
+import SeedGenerationAlgorithm from "../types/SeedGenerationAlgorithm.enum";
 
 const wrapper = css`
   display: flex;
@@ -65,6 +66,7 @@ export function Create() {
     screens: 1,
     platform: Platform.NONE,
     dlc: false,
+    seedGenerationAlgorithm: SeedGenerationAlgorithm.CIRCLE,
   });
   const [step, setStep] = useState(0);
   const [present, dismiss] = useIonToast();
@@ -73,8 +75,8 @@ export function Create() {
    && formRef.current.participants
    && formRef.current.dateTime
    && formRef.current.screens
-   && formRef.current.platform
-   !== Platform.NONE;
+   && formRef.current.platform !== Platform.NONE
+   && formRef.current.seedGenerationAlgorithm;
 
   const prevStep = (): void => {
     if(step > 0){
@@ -111,7 +113,9 @@ export function Create() {
         partsPerRace={formRef.current.partsPerRace} 
         setPartsPerRace={(newPPR) => formRef.current.partsPerRace = newPPR} 
         racesPerRound={formRef.current.racesPerRound} 
-        setRacesPerRound={(newRPR) => formRef.current.racesPerRound = newRPR} />
+        setRacesPerRound={(newRPR) => formRef.current.racesPerRound = newRPR}
+        seedGenerationAlgorithm={formRef.current.seedGenerationAlgorithm}
+        setSeedGenerationAlgorithm={(newSGA => formRef.current.seedGenerationAlgorithm = newSGA)} />
       default:
         return <></>;
     }
@@ -126,9 +130,9 @@ export function Create() {
           duration: 3000,
           color: "danger"});
       } else {
-        const formattedParticipants: Participant[] = formRef.current.participants
-          .split("\n")
-          .map((part, i) => ({ id: i, name: part, score: 0 }));
+        const participantsStringArr = formRef.current.participants.split("\n");
+        const medianRank = Math.floor(participantsStringArr.length / 2);
+        const formattedParticipants: Participant[] = participantsStringArr.map((part, i) => ({ id: i, name: part, score: 0}));
         const formattedDateTime: Date = new Date(formRef.current.dateTime);
 
         createTournament({
@@ -142,7 +146,9 @@ export function Create() {
           setupsCount: formRef.current.screens,
           platform: formRef.current.platform,
           // for some fucking reason, this is the only way this works??
-          dlc: formRef.current.dlc
+          dlc: formRef.current.dlc,
+          seedGenerationAlgorithm: formRef.current.seedGenerationAlgorithm,
+          currentStandings: formattedParticipants.map(p => ({participant: p, change: 0}))
         });
         // seeding the first round of the tournament
         seed(0);
@@ -158,7 +164,7 @@ export function Create() {
 
   return (
     <IonPage>
-      <Header />
+      <Header showTestMenu={true}/>
       <IonContent>
         <div className={wrapper}>
           <IonCard className={card}>

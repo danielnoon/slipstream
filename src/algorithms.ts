@@ -10,6 +10,18 @@ import COURSE_DATA, { getRandomThreshold } from "./data/courseData";
 import { switchDLCCutoff } from "./data/course_data/switchCourseData";
 import { useStore } from "./store";
 import RoundResult from "./types/RoundResult";
+import SeedGenerationAlgorithm from "./types/SeedGenerationAlgorithm.enum";
+
+export const participantSorter = (a: Participant, b:Participant): number => {
+  if(a.score === b.score) {
+    if (a.id === b.id) {
+      return 1;
+    } else {
+      return b.id - a.id;
+    }
+  }
+  return b.score - a.score;
+}
 
 function shuffle<T>(arr: T[]): T[] {
   let currentIndex = arr.length;
@@ -72,14 +84,17 @@ export function createSwissMatchups(parts: Participant[], partsPerMatch: number)
  * @author Liam Seper
  * @returns - an array of Setup objects holding what rounds they will hold during this seeding round of the tournament
  */
-export function createSwissSeedingRounds(tournamentDetails: Tournament, participants: Participant[], seeding_round: number): Setup[] {
-  if(seeding_round === 0){
+export function createRounds(tournamentDetails: Tournament, participants: Participant[], seeding_round: number): Setup[] {
+  participants = participants.sort(participantSorter);
+  if(seeding_round === 0 || tournamentDetails.seedGenerationAlgorithm === SeedGenerationAlgorithm.RANDOM){
     participants = shuffle(participants);
   }
-  participants = participants.sort((a, b) => b.score - a.score);
 
   // disperse rounds correctly
   let rounds: Participant[][] = createSwissMatchups(participants, tournamentDetails.partsPerRound)
+
+  // distribute courses to all setups in the current round
+  let courseSelection: Course[] = generateCourseSelection(tournamentDetails.platform, getRandomThreshold(), tournamentDetails.dlc)
 
   let globalRoundId;
   if(tournamentDetails.currRound){
@@ -94,7 +109,7 @@ export function createSwissSeedingRounds(tournamentDetails: Tournament, particip
     actualRounds.push({ id: globalRoundId, 
       participants: rounds[round],
       submitted: false, 
-      courses: generateCourseSelection(tournamentDetails.platform, getRandomThreshold(), tournamentDetails.dlc) });
+      courses: courseSelection });
     globalRoundId += 1;
   }
 
@@ -210,6 +225,7 @@ export function uploadRoundResult(round: Round, partsPerMatch: number, partsInMa
   }
 
   // set scores for the total round result
+  // no participantSorter here because duplicate scores are fine
   const roundScores = [...roundScoresMap].sort((a, b) => b[1] - a[1]);
   const roundScoresGB = groupby(roundScores, e => e[1]);
   let i = 0;

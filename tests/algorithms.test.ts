@@ -1,4 +1,4 @@
-import { createSwissSeedingRounds, createSwissMatchups, generateCourseSelection, getPoints } from '../src/algorithms';
+import { createRounds, createSwissMatchups, generateCourseSelection, getPoints } from '../src/algorithms';
 import Participant from '../src/types/Participant';
 import Tournament from '../src/types/Tournament';
 import Setup from '../src/types/Setup';
@@ -7,6 +7,7 @@ import { Platform } from '../src/types/Platform';
 import { getRandomThreshold } from '../src/data/courseData';
 import { range } from 'itertools';
 import { switchCourseData, switchDLCCutoff } from '../src/data/course_data/switchCourseData';
+import SeedGenerationAlgorithm from '../src/types/SeedGenerationAlgorithm.enum';
 
 const participants1: Participant[] = [...range(8)].map(i => ({id: i, name: `Racer ${i}`, score: 0}));
 
@@ -786,13 +787,15 @@ const tournament1: Tournament = {
     currRound: 0,
     startTime: new Date("March 11, 2021 12:00:00"),
     setupsCount: 2,
-    platform: Platform.Wii
+    platform: Platform.Wii,
+    seedGenerationAlgorithm: SeedGenerationAlgorithm.CIRCLE,
+    currentStandings: []
 }
 
 test("Test createSeedingRounds with no leftovers", () => {
     const partsPerMatch = 4;
     const seedingRound = 0;
-    const setups: Setup[] = createSwissSeedingRounds(tournament1, tournament1.participants, seedingRound);
+    const setups: Setup[] = createRounds(tournament1, tournament1.participants, seedingRound);
     // only 2 setups
     expect(setups).toHaveLength(2);
     // both setups have 1 round
@@ -996,13 +999,15 @@ const tournament2: Tournament = {
     currRound: 0,
     startTime: new Date("March 11, 2021 12:00:00"),
     setupsCount: 4,
-    platform: Platform.Wii
+    platform: Platform.Wii,
+    seedGenerationAlgorithm: SeedGenerationAlgorithm.CIRCLE,
+    currentStandings: []
 }
 
 test("Test createSeedingRounds with 3 leftovers and 4 setups", () => {
     const partsPerMatch = 4;
     const currRound = 0;
-    const setups: Setup[] = createSwissSeedingRounds(tournament2, tournament2.participants, currRound);
+    const setups: Setup[] = createRounds(tournament2, tournament2.participants, currRound);
     // only 2 setups
     expect(setups).toHaveLength(4);
     // both setups have 1 round
@@ -1033,13 +1038,15 @@ const tournament3: Tournament = {
     currRound: 0,
     startTime: new Date("March 11, 2021 12:00:00"),
     setupsCount: 5,
-    platform: Platform.Wii
+    platform: Platform.Wii,
+    seedGenerationAlgorithm: SeedGenerationAlgorithm.CIRCLE,
+    currentStandings: []
 }
 
 test("Test createSeedingRounds with 3 leftovers and 5 setups", () => {
     const partsPerMatch = 4;
     const currRound = 0;
-    const setups: Setup[] = createSwissSeedingRounds(tournament3, tournament3.participants, partsPerMatch);
+    const setups: Setup[] = createRounds(tournament3, tournament3.participants, partsPerMatch);
     // only 2 setups
     expect(setups).toHaveLength(5);
     // both setups have 1 round
@@ -1062,19 +1069,6 @@ test("Test createSeedingRounds with 3 leftovers and 5 setups", () => {
     // first round in setup 5 should have 4 players
     expect(setups[4].rounds[0].participants).toHaveLength(4);
 })
-
-const DLCTestTournament: Tournament = {
-    id: 3,
-    name: "DLC Test Tournament",
-    participants: participants2,
-    partsPerRound: 4,
-    racesPerRound: 3,
-    currRound: 0,
-    startTime: new Date("March 11, 2023 12:00:00"),
-    setupsCount: 5,
-    platform: Platform.Switch,
-    dlc: true
-}
 
 test("Course Generation Includes DLC Tracks when DLC is enabled", () => {
     // The probability of this test falsly passing by pure random chance is 3.3933737e-63

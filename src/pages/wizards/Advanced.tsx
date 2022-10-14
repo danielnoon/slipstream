@@ -3,11 +3,12 @@ import {
     IonItem,
     IonLabel,
     IonRange,
-    IonList
+    IonList,
+    IonSelect,
+    IonSelectOption,
   } from "@ionic/react";
-  import { calendarOutline } from "ionicons/icons";
 import { useState } from "react";
-import { Platform } from '../../types/Platform';
+import SeedGenerationAlgorithm from "../../types/SeedGenerationAlgorithm.enum";
 import { selectableRange } from '../../utility/css';
 import { wizardPage } from '../../utility/css';
 
@@ -17,12 +18,23 @@ interface Props {
     setPartsPerRace: (newPPR: number) => void,
     racesPerRound: number,
     setRacesPerRound: (newRPR: number) => void,
+    seedGenerationAlgorithm: SeedGenerationAlgorithm,
+    setSeedGenerationAlgorithm: (newSGA: SeedGenerationAlgorithm) => void
 }
 
-export default function Advanced({ partsPerRace, setPartsPerRace, racesPerRound, setRacesPerRound } : Props) {
+export default function Advanced(
+    { 
+        partsPerRace, 
+        setPartsPerRace, 
+        racesPerRound, 
+        setRacesPerRound, 
+        seedGenerationAlgorithm, 
+        setSeedGenerationAlgorithm 
+    } : Props) {
 
     const [PPR, setPPR] = useState(partsPerRace);
     const [RPR, setRPR] = useState(racesPerRound);
+    const [SGA, setSGA] = useState(seedGenerationAlgorithm);
 
     return (
         <IonList className={wizardPage}>
@@ -62,6 +74,22 @@ export default function Advanced({ partsPerRace, setPartsPerRace, racesPerRound,
                 <IonLabel slot="start">1</IonLabel>
                 <IonLabel slot="end">8</IonLabel>
             </IonRange>
+            <IonItem>
+                <IonLabel>Round Generation Method</IonLabel>
+                <IonSelect
+                value={SGA}
+                placeholder="Select a Method..."
+                onIonChange={(ev) => {
+                    setSGA(ev.detail.value);
+                    setSeedGenerationAlgorithm(ev.detail.value);
+                }}
+                >
+                {Object.values(SeedGenerationAlgorithm)
+                    .map((sga, i) => (
+                    <IonSelectOption key={i} value={sga}>{sga}</IonSelectOption>
+                    ))}
+                </IonSelect>
+            </IonItem>
         </IonList>
     )
 }
