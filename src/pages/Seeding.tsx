@@ -100,7 +100,10 @@ export function Seeding() {
               size="large"
               color={canContinue() ? "primary" : "dark"}
               disabled={!canContinue()}
-              onClick={() => router.push("/elims")}
+              onClick={() => {
+                getState().updateLeaderboard();
+                router.push("/elims");
+              }}
             >
               Continue to Elims
             </IonButton>

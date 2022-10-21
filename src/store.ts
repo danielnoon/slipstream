@@ -64,6 +64,7 @@ export interface Store {
   deleteRound: (id: number) => void;
   setParticipantScore: (id: number, score: number) => void;
   deleteParticipant: (id: number) => void;
+  updateLeaderboard: () => void;
   setRaceResult: (
     round: number,
     race: number,
@@ -114,6 +115,26 @@ export const useStore = create<Store>((set) => ({
         // delete from tournamentList
         const tournamentIndex = draft.tournamentList.findIndex(t => t.id === id);
         draft.tournamentList.splice(tournamentIndex, 1);
+      })
+    )
+  },
+
+  updateLeaderboard: () => {
+    set(
+      produce<Store>((draft) => {
+        const sortedParticipants = [...draft.participants!.values()].sort(participantSorter);
+        if(draft.tournament!.currRound > 0) {
+          // calculate the change in rank
+          const newStandings = [];
+          for(let newRank = 0; newRank < sortedParticipants.length; newRank++){
+            const oldRank = draft.tournament!.currentStandings.findIndex(e => e.participant.id === sortedParticipants[newRank].id);
+            const change = oldRank - newRank;
+            newStandings.push({participant: sortedParticipants[newRank], change: change});
+          }
+          draft.tournament!.currentStandings = newStandings;
+        } else {
+          draft.tournament!.currentStandings = sortedParticipants.map(p => ({participant: p, change: 0}));
+        }
       })
     )
   },
