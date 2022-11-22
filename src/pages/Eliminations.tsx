@@ -14,15 +14,14 @@ import {
 	IonList,
 	IonItem,
 } from "@ionic/react";
-import { close, trophy, syncOutline } from "ionicons/icons";
+import { close, trophy } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { participantSorter } from "../algorithms";
 import { Header } from "../components/Header";
 import { getState, useStore } from "../store";
-import ElimsCourseCard from "../components/ElimsCoursesCard";
 import Participant from "../types/Participant";
-import ElimsScoresCard from "../components/ElimsScoresCard";
 import { Platform } from "../types/Platform";
+import ElimsRoundManagement from "../components/ElimsRoundManagement";
 
 const fadeIn = keyframes`
   from {
@@ -115,8 +114,6 @@ export function Eliminations() {
 	const [awardThird, setAwardThird] = useState(-1);
 	const [awardSecond, setAwardSecond] = useState(-1);
 	const [awardFirst, setAwardFirst] = useState(-1);
-
-	const [elimsPerRound, setElimsPerRound] = useState(1);
 
 	const [placeToAward, setPlaceToAward] = useState("Award 3rd");
 
@@ -234,15 +231,15 @@ export function Eliminations() {
 
 		return ["var(--ion-color-light)", "var(--ion-color-light-contrast)"];
 	}
-
 	return (
 		<IonPage>
 			<Header title={tournament?.name} showLeaderboard />
 			{/* races card */}
-			<ElimsScoresCard participants={active} racesPerRound={4} />
-			<ElimsCourseCard
+			<ElimsRoundManagement
+				participants={active as Participant[]}
 				platform={tournament?.platform ?? Platform.Switch}
 				DLCEnabled={tournament?.dlc ?? false}
+				tournamentRacesPerRound={tournament?.racesPerRound ?? 4}
 			/>
 			<IonContent className="ion-padding">
 				<div className={cardWrapper}>

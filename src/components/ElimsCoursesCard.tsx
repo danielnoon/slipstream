@@ -30,9 +30,16 @@ const elimRoundRaces = css`
 type Props = {
 	DLCEnabled: boolean;
 	platform: Platform;
+	addRace: () => void;
+	removeRace: () => void;
 };
 
-const ElimsCourseCard = ({ platform, DLCEnabled }: Props) => {
+const ElimsCourseCard = ({
+	platform,
+	DLCEnabled,
+	addRace,
+	removeRace,
+}: Props) => {
 	const [racesPerRound, setRacesPerRound] = useState(4);
 	const [courses, setCourses] = useState(
 		generateCourseSelection(platform, racesPerRound, DLCEnabled)
@@ -80,7 +87,7 @@ const ElimsCourseCard = ({ platform, DLCEnabled }: Props) => {
 		[courses, setCourses, platform, DLCEnabled]
 	);
 	return (
-		<IonCard key={"courses"} className={elimRoundRaces}>
+		<IonCard key={"races"} className={elimRoundRaces}>
 			<IonCardHeader>
 				<IonCardTitle style={{ display: "flex" }}>
 					<strong style={{ flexGrow: 1 }}>Courses</strong>
@@ -95,7 +102,7 @@ const ElimsCourseCard = ({ platform, DLCEnabled }: Props) => {
 							)
 						}
 						icon={syncOutline}
-						color="primary"
+						color="danger"
 						style={{
 							marginRight: 8,
 							fontSize: 28,
@@ -113,7 +120,10 @@ const ElimsCourseCard = ({ platform, DLCEnabled }: Props) => {
 						>
 							<>
 								<IonIcon
-									onClick={() => removeCourse(course)}
+									onClick={() => {
+										removeCourse(course);
+										removeRace();
+									}}
 									icon={removeCircleOutline}
 									color="danger"
 									slot="start"
@@ -137,7 +147,10 @@ const ElimsCourseCard = ({ platform, DLCEnabled }: Props) => {
 						</IonItem>
 					))}
 					<IonButton
-						onClick={() => addCourse()}
+						onClick={() => {
+							addCourse();
+							addRace();
+						}}
 						fill="outline"
 						color="success"
 						expand="block"
