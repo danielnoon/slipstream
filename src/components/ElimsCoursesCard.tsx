@@ -5,17 +5,12 @@ import {
 	IonCardHeader,
 	IonCardTitle,
 	IonCardContent,
-	IonContent,
 	IonIcon,
 	IonLabel,
-	IonPage,
-	useIonRouter,
-	useIonViewDidEnter,
-	useIonViewWillEnter,
 	IonList,
 	IonItem,
 } from "@ionic/react";
-import { close, trophyOutline, syncOutline } from "ionicons/icons";
+import { add, syncOutline, removeCircleOutline } from "ionicons/icons";
 import { getState, useStore } from "../store";
 import { css } from "@emotion/css";
 import { generateCourseSelection, getPoints } from "../algorithms";
@@ -32,23 +27,33 @@ const elimRoundRaces = css`
 	left: 200px;
 `;
 
-const elimRoundScores = css`
-	z-index: 2;
-	position: fixed;
-	top: 350px;
-	left: 1400px;
-`;
-
 type Props = {
-	racesPerRound: number;
 	DLCEnabled: boolean;
 	platform: Platform;
 };
 
-const ElimsCourseCard = ({ racesPerRound, platform, DLCEnabled }: Props) => {
+const ElimsCourseCard = ({ platform, DLCEnabled }: Props) => {
+	const [racesPerRound, setRacesPerRound] = useState(4);
 	const [courses, setCourses] = useState(
 		generateCourseSelection(platform, racesPerRound, DLCEnabled)
 	);
+
+	const removeCourse = useCallback(
+		(course: Course) => {
+			const newCourses = courses.filter((c) => c.name !== course.name);
+			setCourses(newCourses);
+			setRacesPerRound(racesPerRound - 1);
+		},
+		[courses, setCourses, racesPerRound, setRacesPerRound]
+	);
+
+	const addCourse = useCallback(() => {
+		setCourses([
+			...courses,
+			...generateCourseSelection(platform, 1, DLCEnabled),
+		]);
+		setRacesPerRound(racesPerRound + 1);
+	}, [courses, setCourses, racesPerRound, setRacesPerRound]);
 
 	const regenerateCourse = useCallback(
 		(course: Course) => {
@@ -72,10 +77,10 @@ const ElimsCourseCard = ({ racesPerRound, platform, DLCEnabled }: Props) => {
 			}
 			setCourses(newCourses);
 		},
-		[courses, platform, DLCEnabled]
+		[courses, setCourses, platform, DLCEnabled]
 	);
 	return (
-		<IonCard key={"races"} className={elimRoundRaces}>
+		<IonCard key={"courses"} className={elimRoundRaces}>
 			<IonCardHeader>
 				<IonCardTitle style={{ display: "flex" }}>
 					<strong style={{ flexGrow: 1 }}>Courses</strong>
@@ -90,7 +95,7 @@ const ElimsCourseCard = ({ racesPerRound, platform, DLCEnabled }: Props) => {
 							)
 						}
 						icon={syncOutline}
-						color="danger"
+						color="primary"
 						style={{
 							marginRight: 8,
 							fontSize: 28,
@@ -100,16 +105,23 @@ const ElimsCourseCard = ({ racesPerRound, platform, DLCEnabled }: Props) => {
 				</IonCardTitle>
 			</IonCardHeader>
 			<IonCardContent>
-				<IonList
-					lines="full"
-					style={{ paddingLeft: 10, paddingRight: 4 }}
-				>
+				<IonList lines="full">
 					{courses.map((course, i) => (
 						<IonItem
 							lines={i === courses.length - 1 ? "none" : "full"}
 							key={`Course ${i}`}
 						>
 							<>
+								<IonIcon
+									onClick={() => removeCourse(course)}
+									icon={removeCircleOutline}
+									color="danger"
+									slot="start"
+									size="small"
+									style={{
+										cursor: "pointer",
+									}}
+								/>
 								<IonLabel>{course.name}</IonLabel>
 								<IonIcon
 									onClick={() => regenerateCourse(course)}
@@ -124,6 +136,20 @@ const ElimsCourseCard = ({ racesPerRound, platform, DLCEnabled }: Props) => {
 							</>
 						</IonItem>
 					))}
+					<IonButton
+						onClick={() => addCourse()}
+						fill="outline"
+						color="success"
+						expand="block"
+					>
+						<IonLabel>Add Course</IonLabel>
+						<IonIcon
+							icon={add}
+							color="success"
+							slot="end"
+							size="small"
+						/>
+					</IonButton>
 				</IonList>
 			</IonCardContent>
 		</IonCard>

@@ -116,9 +116,6 @@ export function Eliminations() {
 	const [awardSecond, setAwardSecond] = useState(-1);
 	const [awardFirst, setAwardFirst] = useState(-1);
 
-	const [racesPerRoundElims, setRacesPerRoundElims] = useState(
-		tournament?.racesPerRound ? tournament.racesPerRound : 4
-	);
 	const [elimsPerRound, setElimsPerRound] = useState(1);
 
 	const [placeToAward, setPlaceToAward] = useState("Award 3rd");
@@ -242,9 +239,8 @@ export function Eliminations() {
 		<IonPage>
 			<Header title={tournament?.name} showLeaderboard />
 			{/* races card */}
-			<ElimsScoresCard participants={active} elimsPerRound={1} />
+			<ElimsScoresCard participants={active} racesPerRound={4} />
 			<ElimsCourseCard
-				racesPerRound={racesPerRoundElims}
 				platform={tournament?.platform ?? Platform.Switch}
 				DLCEnabled={tournament?.dlc ?? false}
 			/>
