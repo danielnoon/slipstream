@@ -2,17 +2,13 @@ import { css, keyframes } from "@emotion/css";
 import {
 	IonButton,
 	IonCard,
-	IonCardHeader,
 	IonCardContent,
 	IonContent,
 	IonIcon,
 	IonLabel,
 	IonPage,
-	useIonRouter,
 	useIonViewDidEnter,
 	useIonViewWillEnter,
-	IonList,
-	IonItem,
 } from "@ionic/react";
 import { close, trophy } from "ionicons/icons";
 import { useEffect, useState } from "react";
@@ -77,20 +73,6 @@ const placeName = css`
 
 const awardName = css`
 	padding-left: 5px;
-`;
-
-const elimRoundRaces = css`
-	z-index: 3;
-	position: fixed;
-	top: 350px;
-	left: 200px;
-`;
-
-const elimRoundScores = css`
-	z-index: 2;
-	position: fixed;
-	top: 350px;
-	left: 1400px;
 `;
 
 type SeededParticipant = Participant & {

@@ -1,8 +1,6 @@
 import {
-	Fragment,
 	useMemo,
 	useState,
-	useRef,
 	useEffect,
 	useCallback,
 } from "react";
@@ -12,13 +10,8 @@ import {
 	IonCardHeader,
 	IonCardTitle,
 	IonCardContent,
-	IonContent,
 	IonIcon,
 	IonLabel,
-	IonPage,
-	useIonRouter,
-	useIonViewDidEnter,
-	useIonViewWillEnter,
 	IonList,
 	IonItem,
 	IonGrid,
@@ -29,47 +22,64 @@ import {
 	IonRow,
 } from "@ionic/react";
 import {
-	close,
 	trophyOutline,
 	syncOutline,
 	add,
+	shuffleOutline,
 	removeCircleOutline,
 	refreshCircle,
 } from "ionicons/icons";
-import { getState, useStore } from "../store";
 import { css } from "@emotion/css";
-import { generateCourseSelection, getPoints } from "../algorithms";
+import { generateCourseSelection } from "../algorithms";
 import { range } from "itertools";
-import type RoundParticipant from "../types/RoundParticipant";
 import { getOrdinal, rankColors } from "../utility/rankFormatting";
 import Participant from "../types/Participant";
-import { grid, error } from "../utility/css";
+import { error } from "../utility/css";
 
 import useRaceTracking from "../hooks/useRaceTracking";
 import { Platform } from "../types/Platform";
 import Course from "../types/Course";
+import { switchCourseData, switchDLCCutoff } from "../data/course_data/switchCourseData";
+import wiiCourseData from "../data/course_data/wiiCourseData";
 
-const elimRoundScoresEntry = css`
+const ELIMS_CARDS = 600;
+const GROWTH_FACTOR = 0.5;
+
+const LEFT_MIN_WIDTH = 300;
+
+const RIGHT_MIN_WIDTH = 400;
+
+const elimRacesContainer = css`
 	z-index: 2;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
 	position: fixed;
-	top: 450px;
-	left: 1300px;
-`;
+	top: 0px;
+	left: 0px;
 
-const elimRoundRaces = css`
-	z-index: 3;
+	height: 100%;
+	min-width: 300px;
+`
+
+const elimsStandingsContainer = css`
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 	position: fixed;
-	top: 350px;
-	left: 200px;
-`;
+	top: 0px;
+	right: 0px;
+
+	height: 100%;
+	min-width: 400px;
+`
 
 const elminRoundStandings = css`
 	min-width: 300px;
 	padding: 8;
-	z-index: 4;
-	position: fixed;
-	top: 100px;
-	left: 1300px;
 `;
 
 type Props = {
@@ -92,9 +102,33 @@ const ElimsRoundManagement = ({
 		generateCourseSelection(platform, racesPerRound, DLCEnabled)
 	);
 
+	const possibleCourses: Course[] = useMemo(() => {
+		switch(platform) {
+			case Platform.Wii:
+				return wiiCourseData;
+			case Platform.Switch:
+				if (!DLCEnabled) {
+					return switchCourseData.slice(0, switchDLCCutoff);
+				}
+				return switchCourseData;
+			default:
+				return switchCourseData;
+		}
+	}, [platform, DLCEnabled])
+
+	const leftWidth = useMemo(() => {
+		const preferredWidth = (window.innerWidth - ELIMS_CARDS);
+		return preferredWidth > LEFT_MIN_WIDTH ? preferredWidth * GROWTH_FACTOR : LEFT_MIN_WIDTH;
+	}, [window.innerWidth]);
+
+	const rightWidth = useMemo(() => {
+		const preferredWidth = (window.innerWidth - ELIMS_CARDS);
+		return preferredWidth > RIGHT_MIN_WIDTH ? preferredWidth * GROWTH_FACTOR : RIGHT_MIN_WIDTH;
+	}, [window.innerWidth])
+
 	const removeCourse = useCallback(
 		(course: Course) => {
-			const newCourses = courses.filter((c) => c.name !== course.name);
+			const newCourses = courses.filter(c => c.name !== course.name);
 			setCourses(newCourses);
 			setRacesPerRound(racesPerRound - 1);
 		},
@@ -145,13 +179,6 @@ const ElimsRoundManagement = ({
 		roundResultsReady,
 	} = useRaceTracking(participants, racesPerRound);
 
-	useEffect(() => {
-		console.log(roundRanks);
-	}, [roundRanks]);
-
-	useEffect(() => {
-		console.log(roundResultsReady);
-	}, [roundResultsReady]);
 
 	const errorsUI = useMemo(() => {
 		return duplicateErrors.map((dE) => {
@@ -212,9 +239,44 @@ const ElimsRoundManagement = ({
 		);
 	};
 
+	const onCourseChange = useCallback(() => {
+		return (oldCourse: Course, newCourse: Course) => {
+			const newCourses = [...courses.filter(c => c.name === oldCourse.name), newCourse];
+			setCourses(newCourses);
+		}
+	}, [courses, setCourses])
+
+	const courseSelectors = useMemo(() => {
+		console.log('courses in courseSelectors', courses);
+		return courses.map((course, i) => {
+			return (
+				<IonSelect
+				value={courses[i]}
+				placeholder="Select Course"
+				interface="popover"
+				onIonChange={(ev) => {
+					const newCourse = ev.detail.value;
+					const oldCourse = courses[i];
+					// DO NOT CHANGE THIS, THIS FOR SOME REASON MAKES IT WORK????
+					onCourseChange(oldCourse, newCourse)
+				}}
+			>
+				{possibleCourses.map((pCourse) => {
+					return (
+						<IonSelectOption value={pCourse} key={pCourse.name}>
+							{pCourse.name}
+						</IonSelectOption>
+					);
+				})}
+			</IonSelect>
+			)
+		})
+	}, [courses.length, possibleCourses, setCourses, courses])
+
 	return (
 		<>
-			<IonCard key={"races"} className={elimRoundRaces}>
+		<div style={{width: leftWidth}} className={elimRacesContainer}>
+			<IonCard key={"races"}>
 				<IonCardHeader>
 					<IonCardTitle style={{ display: "flex" }}>
 						<strong style={{ flexGrow: 1 }}>Courses</strong>
@@ -228,7 +290,7 @@ const ElimsRoundManagement = ({
 									)
 								)
 							}
-							icon={syncOutline}
+							icon={shuffleOutline}
 							color="danger"
 							style={{
 								marginRight: 8,
@@ -261,7 +323,9 @@ const ElimsRoundManagement = ({
 											cursor: "pointer",
 										}}
 									/>
-									<IonLabel>{course.name}</IonLabel>
+									<IonItem>
+										{courseSelectors[i]}
+									</IonItem>
 									<IonIcon
 										onClick={() => regenerateCourse(course)}
 										icon={syncOutline}
@@ -295,6 +359,8 @@ const ElimsRoundManagement = ({
 					</IonList>
 				</IonCardContent>
 			</IonCard>
+		</div>
+		<div style={{width: rightWidth}} className={elimsStandingsContainer}>
 			{/* Standings */}
 			<IonCard key="standings" className={elminRoundStandings}>
 				<IonCardContent>
@@ -328,7 +394,7 @@ const ElimsRoundManagement = ({
 				</IonCardContent>
 			</IonCard>
 			{/* Score Entry */}
-			<IonCard key={"scoreentry"} className={elimRoundScoresEntry}>
+			<IonCard key={"scoreentry"}>
 				<IonCardHeader>
 					<IonCardTitle style={{ display: "flex" }}>
 						<strong style={{ flexGrow: 1 }}>
@@ -391,6 +457,7 @@ const ElimsRoundManagement = ({
 					)}
 				</IonCardContent>
 			</IonCard>
+		</div>
 		</>
 	);
 };
