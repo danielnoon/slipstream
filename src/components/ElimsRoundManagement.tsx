@@ -301,6 +301,8 @@ const ElimsRoundManagement = ({
 								key={`Course ${i}`}
 							>
 								<>
+								{
+									courses.length > 1 && 
 									<IonIcon
 										onClick={() => {
 											removeCourse(course);
@@ -314,6 +316,7 @@ const ElimsRoundManagement = ({
 											cursor: "pointer",
 										}}
 									/>
+								}
 									<IonItem>
 										{courseSelectors[i]}
 									</IonItem>
