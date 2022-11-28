@@ -127,8 +127,8 @@ const ElimsRoundManagement = ({
 	}, [window.innerWidth])
 
 	const removeCourse = useCallback(
-		(course: Course) => {
-			const newCourses = courses.filter(c => c.name !== course.name);
+		(courseIndex: number) => {
+			const newCourses = courses.filter((c, i) => i !== courseIndex);
 			setCourses(newCourses);
 			setRacesPerRound(racesPerRound - 1);
 		},
@@ -305,7 +305,7 @@ const ElimsRoundManagement = ({
 									courses.length > 1 && 
 									<IonIcon
 										onClick={() => {
-											removeCourse(course);
+											removeCourse(i);
 											removeRace(i);
 										}}
 										icon={removeCircleOutline}
