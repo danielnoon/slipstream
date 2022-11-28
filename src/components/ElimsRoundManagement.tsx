@@ -239,13 +239,6 @@ const ElimsRoundManagement = ({
 		);
 	};
 
-	const onCourseChange = useCallback(() => {
-		return (oldCourse: Course, newCourse: Course) => {
-			const newCourses = [...courses.filter(c => c.name === oldCourse.name), newCourse];
-			setCourses(newCourses);
-		}
-	}, [courses, setCourses])
-
 	const courseSelectors = useMemo(() => {
 		console.log('courses in courseSelectors', courses);
 		return courses.map((course, i) => {
@@ -256,9 +249,7 @@ const ElimsRoundManagement = ({
 				interface="popover"
 				onIonChange={(ev) => {
 					const newCourse = ev.detail.value;
-					const oldCourse = courses[i];
-					// DO NOT CHANGE THIS, THIS FOR SOME REASON MAKES IT WORK????
-					onCourseChange(oldCourse, newCourse)
+					courses[i] = newCourse;
 				}}
 			>
 				{possibleCourses.map((pCourse) => {
