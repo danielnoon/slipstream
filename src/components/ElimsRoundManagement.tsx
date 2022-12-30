@@ -240,7 +240,6 @@ const ElimsRoundManagement = ({
 	};
 
 	const courseSelectors = useMemo(() => {
-		console.log('courses in courseSelectors', courses);
 		return courses.map((course, i) => {
 			return (
 				<IonSelect

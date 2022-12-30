@@ -1,5 +1,6 @@
 import { Platform } from "../../types/Platform";
 import Course from "../../types/Course";
+import { computeCoursesMean, computeCoursesStd } from "../courseData";
 
 const wiiCourseData: Course[] = [{
     name: "Luigi Circuit",
@@ -158,3 +159,6 @@ const wiiCourseData: Course[] = [{
   }];
 
   export default wiiCourseData;
+
+  export const WII_COURSES_ALL_MEAN = computeCoursesMean(wiiCourseData);
+  export const WII_COURSES_ALL_STD = computeCoursesStd(wiiCourseData, WII_COURSES_ALL_MEAN);
