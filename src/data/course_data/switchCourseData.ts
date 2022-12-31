@@ -68,6 +68,16 @@ export const switchCourseData: Course[] = [
     { name: "Snow Land (GBA)", degreeOfDifficulty: 3, platform: Platform.Switch },
     { name: "Mushroom Gorge (Wii)", degreeOfDifficulty: 2, platform: Platform.Switch },
     { name: "Sky-High Sundae", degreeOfDifficulty: 3, platform: Platform.Switch },
+    // DLC 3
+    { name: "London Loop (Tour)", degreeOfDifficulty: 4, platform: Platform.Switch },
+    { name: "Boo Lake (GBA)", degreeOfDifficulty: 4, platform: Platform.Switch },
+    { name: "Rock rock Mountain (3DS)", degreeOfDifficulty: 2, platform: Platform.Switch },
+    { name: "Maple Treeway (Wii)", degreeOfDifficulty: 3, platform: Platform.Switch },
+    { name: "Berlin Byways (Tour)", degreeOfDifficulty: 3, platform: Platform.Switch },
+    { name: "Peach Gardens (DS)", degreeOfDifficulty: 2, platform: Platform.Switch },
+    { name: "Merry Mountain", degreeOfDifficulty: 5, platform: Platform.Switch },
+    { name: "Rainbow Road (3DS)", degreeOfDifficulty: 4, platform: Platform.Switch },
+    
   ];
 
   // index which DLC courses start
