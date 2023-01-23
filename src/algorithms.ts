@@ -6,7 +6,7 @@ import Setup from "./types/Setup";
 import { chunked, range, groupby } from "itertools";
 import Course from "./types/Course";
 import { Platform } from "./types/Platform";
-import COURSE_DATA, { getRandomThreshold } from "./data/courseData";
+import COURSE_DATA, { getRandomCourse } from "./data/courseData";
 import { switchDLCCutoff } from "./data/course_data/switchCourseData";
 import { useStore } from "./store";
 import RoundResult from "./types/RoundResult";
@@ -252,15 +252,6 @@ export function uploadRoundResult(round: Round, partsPerMatch: number, partsInMa
   }
 }
 
-function getRandomCourseFromPool(coursePool: Course[], diffThreshold: number, chosenCourses: Course[]): Course {
-  const availableCourses = coursePool.filter((course: Course) => course.degreeOfDifficulty == diffThreshold && !chosenCourses.some((c) => c.name === course.name));
-  if (availableCourses.length > 0){
-    // TODO: remove lol
-    return availableCourses[Math.floor( Math.random() * availableCourses.length)];
-  }
-  return coursePool[Math.floor(Math.random() * coursePool.length)];
-}
-
 /**
  * A function that generates courses randomly for a given platform using a difficulty threshold to select courses semi-randomly
  * @param platform - the platform you are playing on
@@ -282,9 +273,7 @@ export const generateCourseSelection = (
   }
 
   for(let courseChoice = 0; courseChoice < racesPerMatch; courseChoice++){
-    // cycle thresholds in groups of 4 for now, but this should be extendable in the future
-    const threshold = Math.round(Math.random() * 5);
-    courseSelection.push(getRandomCourseFromPool(coursesToChoose, threshold, courseSelection));
+    courseSelection.push(getRandomCourse(platform, courseSelection, dlc));
   }
 
   return courseSelection;

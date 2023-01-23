@@ -1,6 +1,8 @@
 import Course from "../../types/Course";
 import { Platform } from "../../types/Platform";
 
+import { computeCoursesMean, computeCoursesStd } from "../courseData";
+
 export const switchCourseData: Course[] = [
     { name: "Mario Kart Stadium", degreeOfDifficulty: 1, platform: Platform.Switch },
     { name: "Water Park", degreeOfDifficulty: 2, platform: Platform.Switch },
@@ -82,3 +84,10 @@ export const switchCourseData: Course[] = [
 
   // index which DLC courses start
   export const switchDLCCutoff = 48;
+
+  export const SWITCH_COURSES_NO_DLC_MEAN = computeCoursesMean(switchCourseData.slice(0, switchDLCCutoff));
+  export const SWITCH_COURSES_NO_DLC_STD = computeCoursesStd(switchCourseData.slice(0, switchDLCCutoff), SWITCH_COURSES_NO_DLC_MEAN);
+
+  export const SWITCH_COURSES_ALL_MEAN = computeCoursesMean(switchCourseData);
+  export const SWITCH_COURSES_ALL_STD = computeCoursesStd(switchCourseData, SWITCH_COURSES_ALL_MEAN);
+
