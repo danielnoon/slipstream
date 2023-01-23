@@ -4,7 +4,6 @@ import Tournament from '../src/types/Tournament';
 import Setup from '../src/types/Setup';
 import Course from '../src/types/Course';
 import { Platform } from '../src/types/Platform';
-import { getRandomThreshold } from '../src/data/courseData';
 import { range } from 'itertools';
 import { switchCourseData, switchDLCCutoff } from '../src/data/course_data/switchCourseData';
 import SeedGenerationAlgorithm from '../src/types/SeedGenerationAlgorithm.enum';
@@ -807,30 +806,7 @@ test("Test createSeedingRounds with no leftovers", () => {
     expect(setups[1].rounds[0].participants).toHaveLength(4);
 })
 
-// test("Test generateCourseSelection with random threshold 4-20", () => {
-//     const threshold
-
-//     let actualThreshold = 0
-
-//     const courses: Course[] = generateCourseSelection(Platform.Wii, threshold, 4)
-//     //have length 4
-//     expect(courses).toHaveLength(4);
-
-//     courses.forEach(element => {
-//         actualThreshold += element.degreeOfDifficulty
-//     });
-//     //difficulty is correct
-//     expect(actualThreshold).toEqual(threshold)
-
-// })
-
-test("Test getRandomThreshold", () => {
-
-    let threshold = getRandomThreshold();
-    expect(threshold).toBeLessThan(6)
-    expect(threshold).toBeGreaterThan(0)
-
-})
+// TODO: Add normal distribution tests
 
 const participants2: Participant[] = [
     { 
