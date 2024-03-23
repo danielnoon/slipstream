@@ -68,6 +68,28 @@ export function createSwissMatchups(parts: Participant[], partsPerMatch: number)
 }
 
 /**
+ * Helper function for createSwissSeedingRounds, which creates the swiss matchups for a swiss seeding round, but accelerates 
+ * pairings such that top players are greedily paired with other top players sooner
+ * @param parts - the sorted participants for the matchup creation (top ranked players should be lower index)
+ * @param partsPerMatch - the number of participants per match
+ * @return an array of participant arrays, each one representing an even matchup for the round
+ * 
+ * @author Liam Seper
+ */
+export function createAcceleratedSwissMatchups(parts: Participant[], partsPerMatch: number): Participant[][] {
+  if(partsPerMatch >= parts.length) {
+    return [parts];
+  }
+  const matchups = []
+  for(let i = 0; i < parts.length; i+=partsPerMatch){
+    const endIndex = Math.min(i + partsPerMatch, parts.length);
+    const currMatchup = parts.slice(i, endIndex);
+    matchups.push(currMatchup);
+  }
+  return matchups;
+}
+
+/**
  * A function that generates an array of Setup objects that contain generated rounds done in the Swiss-style method of matchup generation
  * It takes in a Tournament object, which should contain the tournament, which has all of the participants that the function will use 
  * to generate rounds from, as well as the number of setups, so it can allocate the ideal amount of rounds to each setup for maximum
@@ -89,9 +111,15 @@ export function createRounds(tournamentDetails: Tournament, participants: Partic
   if(seeding_round === 0 || tournamentDetails.seedGenerationAlgorithm === SeedGenerationAlgorithm.RANDOM){
     participants = shuffle(participants);
   }
-
+  
   // disperse rounds correctly
-  let rounds: Participant[][] = createSwissMatchups(participants, tournamentDetails.partsPerRound)
+  let rounds: Participant[][];
+  
+  if (tournamentDetails.seedGenerationAlgorithm === SeedGenerationAlgorithm.ACCELERATED) {
+    rounds = createAcceleratedSwissMatchups(participants, tournamentDetails.partsPerRound);
+  } else {
+    rounds = createSwissMatchups(participants, tournamentDetails.partsPerRound)
+  }
 
   // distribute courses to all setups in the current round
   let courseSelection: Course[] = generateCourseSelection(tournamentDetails.platform, tournamentDetails.racesPerRound, tournamentDetails.dlc)

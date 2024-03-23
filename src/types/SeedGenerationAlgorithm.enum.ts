@@ -1,5 +1,6 @@
 enum SeedGenerationAlgorithm {
     CIRCLE = "Circle Seeding (Default)",
-    RANDOM = "Random Seeding"
+    RANDOM = "Random Seeding",
+    ACCELERATED = "Accelerated Seeding",
   }
 export default SeedGenerationAlgorithm;

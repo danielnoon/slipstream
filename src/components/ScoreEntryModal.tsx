@@ -183,7 +183,7 @@ export function ScoreEntryModal(props: Props) {
 			<IonSelect
 				value={raceResult?.rank}
 				placeholder="Result"
-				interface="popover"
+				interface="alert"
 				onIonChange={(ev) =>
 					setRaceResult(id, match, playerID, ev.detail.value)
 				}
@@ -266,7 +266,7 @@ export function ScoreEntryModal(props: Props) {
 						<IonList
 							style={{
 								background: "transparent",
-								"padding-bottom": 16,
+								paddingBottom: 16,
 							}}
 						>
 							{[...range(courses.length)]

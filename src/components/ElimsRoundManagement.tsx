@@ -222,7 +222,6 @@ const ElimsRoundManagement = ({
 			<IonSelect
 				value={results[race][pID]}
 				placeholder="Result"
-				interface="popover"
 				onIonChange={(ev) => {
 					const newRank = ev.detail.value;
 					setRank(race, pID, newRank);
@@ -245,7 +244,6 @@ const ElimsRoundManagement = ({
 				<IonSelect
 				value={courses[i]}
 				placeholder="Select Course"
-				interface="popover"
 				onIonChange={(ev) => {
 					const newCourse = ev.detail.value;
 					courses[i] = newCourse;
